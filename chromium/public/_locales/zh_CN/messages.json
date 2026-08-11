@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "本地阅读收藏" },
+  "extensionShortName": { "message": "阅读收藏" },
+  "extensionDescription": { "message": "分类保存资料，记录阅读状态，并跨站点 Endpoint 识别同一内容。" }
+}

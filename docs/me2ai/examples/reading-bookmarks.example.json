@@ -1,0 +1,86 @@
+{
+  "format": "reading-bookmarks",
+  "formatVersion": 1,
+  "exportedAt": "2026-08-11T08:30:00.000Z",
+  "app": {
+    "version": "0.1.0",
+    "name": "Local Reading Library"
+  },
+  "settings": {
+    "globalIgnoredQueryParams": ["utm_*", "fbclid", "gclid", "mc_cid", "mc_eid"],
+    "stripTrailingSlash": true,
+    "defaultReadingState": "unread",
+    "defaultView": "unread"
+  },
+  "collections": [
+    {
+      "id": "0c127097-7f85-4bd6-8db7-536f9c40bf18",
+      "name": "研究",
+      "parentId": null,
+      "sortOrder": 0,
+      "createdAt": "2026-08-11T08:00:00.000Z",
+      "updatedAt": "2026-08-11T08:00:00.000Z"
+    },
+    {
+      "id": "de6d5dbb-62c7-4cd9-b586-53f04f1c916c",
+      "name": "机器学习",
+      "parentId": "0c127097-7f85-4bd6-8db7-536f9c40bf18",
+      "sortOrder": 0,
+      "createdAt": "2026-08-11T08:00:00.000Z",
+      "updatedAt": "2026-08-11T08:00:00.000Z"
+    }
+  ],
+  "sites": [
+    {
+      "id": "6edec09b-a891-4c72-9bca-1eb34b03d31d",
+      "name": "Example Papers",
+      "description": "论文示例站点",
+      "endpoints": [
+        {
+          "id": "1b3f2d65-08ac-44b9-9ff4-3fa7a82e2770",
+          "prefix": "https://papers.example.org/archive",
+          "priority": 0,
+          "enabled": true,
+          "createdAt": "2026-08-11T08:00:00.000Z",
+          "updatedAt": "2026-08-11T08:00:00.000Z"
+        },
+        {
+          "id": "bcf79336-404d-4057-b249-8b01b5d01594",
+          "prefix": "https://papers-old.example.com",
+          "priority": 1,
+          "enabled": true,
+          "createdAt": "2026-08-11T08:00:00.000Z",
+          "updatedAt": "2026-08-11T08:00:00.000Z"
+        }
+      ],
+      "queryPolicy": {
+        "mode": "keep-all-except-ignored",
+        "ignoredParams": []
+      },
+      "createdAt": "2026-08-11T08:00:00.000Z",
+      "updatedAt": "2026-08-11T08:00:00.000Z"
+    }
+  ],
+  "items": [
+    {
+      "id": "3067b9cb-b97a-4b83-957b-8110b6d8b216",
+      "title": "An Example Paper",
+      "note": "关注方法部分，之后整理到研究笔记。",
+      "tags": ["论文", "待整理"],
+      "collectionId": "de6d5dbb-62c7-4cd9-b586-53f04f1c916c",
+      "siteId": "6edec09b-a891-4c72-9bca-1eb34b03d31d",
+      "resourceKey": "/paper/123?lang=en",
+      "canonicalKey": "v1:site:6edec09b-a891-4c72-9bca-1eb34b03d31d:%2Fpaper%2F123%3Flang%3Den",
+      "originalUrl": "https://papers-old.example.com/paper/123?lang=en&utm_source=search",
+      "lastResolvedUrl": "https://papers.example.org/archive/paper/123?lang=en",
+      "readingState": "read",
+      "isArchived": true,
+      "createdAt": "2026-08-11T08:05:00.000Z",
+      "updatedAt": "2026-08-11T08:20:00.000Z",
+      "firstReadAt": "2026-08-11T08:20:00.000Z",
+      "readAt": "2026-08-11T08:20:00.000Z",
+      "lastOpenedAt": "2026-08-11T08:21:00.000Z",
+      "openCount": 2
+    }
+  ]
+}

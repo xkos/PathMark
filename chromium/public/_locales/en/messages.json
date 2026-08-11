@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "Local Reading Library" },
+  "extensionShortName": { "message": "Reading Library" },
+  "extensionDescription": { "message": "Save research into collections, track reading status, and recognize the same content across site endpoints." }
+}
