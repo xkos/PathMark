@@ -14,6 +14,10 @@ Open `http://localhost:4173/zh-CN/` or `http://localhost:4173/en/`.
 
 ## Cloudflare Pages settings
 
+- Project: `pathmark`
+- Production branch: `main`
+- Preview branch: `dev`
+- Build watch path: `web/*`
 - Framework preset: None
 - Build command: empty
 - Build output directory: `web`
