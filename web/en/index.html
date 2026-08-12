@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PathMark — URLs change. What you read should not.</title>
+    <meta name="description" content="PathMark is a local-first Chrome and Edge reading library with notes, reading states, collections, and content recognition across domains and endpoints.">
+    <link rel="canonical" href="https://pathmark.elenchlab.app/en/">
+    <link rel="alternate" hreflang="zh-CN" href="https://pathmark.elenchlab.app/zh-CN/">
+    <link rel="alternate" hreflang="en" href="https://pathmark.elenchlab.app/en/">
+    <link rel="alternate" hreflang="x-default" href="https://pathmark.elenchlab.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PathMark — URLs change. What you read should not.">
+    <meta property="og:description" content="A local-first reading library for long-term research.">
+    <meta name="theme-color" content="#0e4acc">
+    <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/assets/site.css">
+    <script src="/assets/site.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/en/"><img src="/assets/icon.svg" alt=""><span>PathMark</span></a>
+        <button class="menu-button" type="button" aria-label="Open navigation" aria-expanded="false" data-menu-button>☰</button>
+        <nav class="nav" aria-label="Main navigation" data-nav>
+          <a href="#features">Features</a><a href="#workflow">How it works</a>
+          <a href="https://github.com/xkos/PathMark">GitHub</a>
+          <a class="language" href="/zh-CN/" lang="zh-CN">简体中文</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <span class="eyebrow">Local-first · Chrome &amp; Edge</span>
+            <h1>URLs change. What you read should not.</h1>
+            <p class="hero-copy">PathMark is more than another bookmark folder. It keeps pages, notes, reading states, and content identity together—so even when a website moves domains, you still know what you have read.</p>
+            <div class="actions">
+              <a class="button button-primary" href="https://github.com/xkos/PathMark/releases/latest">Download developer build</a>
+              <a class="button button-secondary" href="https://github.com/xkos/PathMark">View source</a>
+            </div>
+            <p class="hero-note">Open source · Stored locally · The current build requires developer-mode installation</p>
+          </div>
+          <div class="product-card" aria-label="PathMark current-page recognition illustration">
+            <div class="browser-bar"><i></i><i></i><i></i></div>
+            <div class="popup-demo">
+              <div class="popup-head"><strong>PathMark</strong><span class="state-dot" title="Unread"></span></div>
+              <div class="popup-body">
+                <span class="popup-label">Current page</span>
+                <h2 class="popup-title">How browsers identify an extension</h2>
+                <div class="popup-url">https://new.example.org/papers/browser-identity</div>
+                <div class="status-row"><span class="status-pill active">Unread</span><span class="status-pill">Reading</span><span class="status-pill">Read</span></div>
+                <div class="identity-box">
+                  <div class="identity-line"><span>Site</span><strong>Example Papers</strong></div>
+                  <div class="identity-line"><span>Resource key</span><strong>/papers/browser-identity</strong></div>
+                  <div class="identity-line"><span>Match</span><strong>Site endpoint</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="trust-strip"><div class="container trust-grid">
+        <div class="trust-item"><span></span>Local IndexedDB storage</div>
+        <div class="trust-item"><span></span>One build for Chrome and Edge</div>
+        <div class="trust-item"><span></span>Open source and self-buildable</div>
+      </div></div>
+
+      <section class="section" id="features">
+        <div class="container">
+          <div class="section-heading"><h2>Built for people who actually come back to read</h2><p>From quick capture to rediscovery, PathMark preserves more than a link. It keeps the context your future self needs.</p></div>
+          <div class="feature-grid">
+            <article class="feature"><span class="feature-index">01</span><h3>Recognize content across domains</h3><p>A site can contain multiple domains or URL prefixes. When it moves, matching paths can retain a stable content identity.</p></article>
+            <article class="feature"><span class="feature-index">02</span><h3>Reading states that stay clear</h3><p>Unread, reading, read, and archived stay distinct. The toolbar icon changes color to reflect the current page.</p></article>
+            <article class="feature"><span class="feature-index">03</span><h3>Save the reason, not just the URL</h3><p>Capture a title, personal note, tags, and collection so you remember why it mattered and what to look for.</p></article>
+            <article class="feature"><span class="feature-index">04</span><h3>Match existing sites automatically</h3><p>The popup recognizes the current domain, selects a known site, or helps create a new site and its first endpoint.</p></article>
+            <article class="feature"><span class="feature-index">05</span><h3>A complete local library</h3><p>Search and filter by state, site, collection, tag, or date. Organize in bulk, migrate identity, and choose where to open an item.</p></article>
+            <article class="feature"><span class="feature-index">06</span><h3>Your data stays yours</h3><p>Business data lives locally in the browser. Export complete JSON backups and merge or restore them transactionally.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-alt" id="workflow">
+        <div class="container">
+          <div class="section-heading"><h2>Build a reading memory in three steps</h2><p>Capture stays lightweight. Deeper organization waits until you actually need it.</p></div>
+          <div class="steps">
+            <article class="step"><h3>Open PathMark on any page</h3><p>Use the toolbar icon or shortcut to see immediately whether the page is saved and what its reading state is.</p></article>
+            <article class="step"><h3>Add context and save</h3><p>Record a note, tags, and collection. The site and endpoint are suggested automatically from the current URL.</p></article>
+            <article class="step"><h3>Read, migrate, rediscover</h3><p>Even after a domain changes, the stable site identity helps recognize and open the same resource again.</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta"><div class="container"><div class="cta-card">
+        <h2>Start with the next page you mean to read later.</h2>
+        <p>Download a GitHub release and load it into Chrome or Microsoft Edge in developer mode. Store listings are not available yet.</p>
+        <div class="actions"><a class="button button-primary" href="https://github.com/xkos/PathMark/releases/latest">Get PathMark</a><a class="button button-secondary" href="https://github.com/xkos/PathMark/blob/main/chromium/README.md">Installation guide</a></div>
+      </div></div></section>
+    </main>
+
+    <footer class="footer"><div class="container footer-inner"><span>© <span data-year></span> PathMark</span><div class="footer-links"><a href="https://github.com/xkos/PathMark">GitHub</a><a href="https://github.com/xkos/PathMark/issues">Report an issue</a><a href="/zh-CN/" lang="zh-CN">简体中文</a></div></div></footer>
+  </body>
+</html>

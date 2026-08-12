@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PathMark — 网址会变，读过的不会丢</title>
+    <meta name="description" content="PathMark 是一款本地优先的 Chrome 与 Edge 阅读收藏扩展，支持笔记、阅读状态、分类，以及跨域名与 Endpoint 识别同一内容。">
+    <link rel="canonical" href="https://pathmark.elenchlab.app/zh-CN/">
+    <link rel="alternate" hreflang="zh-CN" href="https://pathmark.elenchlab.app/zh-CN/">
+    <link rel="alternate" hreflang="en" href="https://pathmark.elenchlab.app/en/">
+    <link rel="alternate" hreflang="x-default" href="https://pathmark.elenchlab.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PathMark — 网址会变，读过的不会丢">
+    <meta property="og:description" content="面向长期阅读与资料研究的本地优先收藏工具。">
+    <meta name="theme-color" content="#0e4acc">
+    <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/assets/site.css">
+    <script src="/assets/site.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/zh-CN/"><img src="/assets/icon.svg" alt=""><span>PathMark</span></a>
+        <button class="menu-button" type="button" aria-label="打开导航" aria-expanded="false" data-menu-button>☰</button>
+        <nav class="nav" aria-label="主导航" data-nav>
+          <a href="#features">核心能力</a><a href="#workflow">工作方式</a>
+          <a href="https://github.com/xkos/PathMark">GitHub</a>
+          <a class="language" href="/en/" lang="en">English</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <span class="eyebrow">本地优先 · Chrome &amp; Edge</span>
+            <h1>网址会变，读过的不会丢。</h1>
+            <p class="hero-copy">PathMark 不只是另一个收藏夹。它把网页、笔记、阅读状态和内容身份保存在一起，即使网站换了域名，你仍然知道哪些内容已经读过。</p>
+            <div class="actions">
+              <a class="button button-primary" href="https://github.com/xkos/PathMark/releases/latest">下载开发者版本</a>
+              <a class="button button-secondary" href="https://github.com/xkos/PathMark">查看源代码</a>
+            </div>
+            <p class="hero-note">开源 · 数据保存在浏览器本地 · 当前版本需按开发者模式安装</p>
+          </div>
+          <div class="product-card" aria-label="PathMark 当前页面识别示意">
+            <div class="browser-bar"><i></i><i></i><i></i></div>
+            <div class="popup-demo">
+              <div class="popup-head"><strong>PathMark</strong><span class="state-dot" title="未读"></span></div>
+              <div class="popup-body">
+                <span class="popup-label">当前页面</span>
+                <h2 class="popup-title">How browsers identify an extension</h2>
+                <div class="popup-url">https://new.example.org/papers/browser-identity</div>
+                <div class="status-row"><span class="status-pill active">未读</span><span class="status-pill">阅读中</span><span class="status-pill">已读</span></div>
+                <div class="identity-box">
+                  <div class="identity-line"><span>站点</span><strong>Example Papers</strong></div>
+                  <div class="identity-line"><span>资源键</span><strong>/papers/browser-identity</strong></div>
+                  <div class="identity-line"><span>匹配</span><strong>同站点 Endpoint</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="trust-strip"><div class="container trust-grid">
+        <div class="trust-item"><span></span>本地 IndexedDB 存储</div>
+        <div class="trust-item"><span></span>Chrome 与 Edge 共用</div>
+        <div class="trust-item"><span></span>开放源码，可自行构建</div>
+      </div></div>
+
+      <section class="section" id="features">
+        <div class="container">
+          <div class="section-heading"><h2>为真正会回头阅读的人设计</h2><p>从快速收集到重新找到，PathMark 保留的不只是链接，还有你理解这份资料所需的上下文。</p></div>
+          <div class="feature-grid">
+            <article class="feature"><span class="feature-index">01</span><h3>跨域名识别同一内容</h3><p>一个站点可以配置多个域名或 URL 前缀。网站迁移后，相同路径的资料仍能保持稳定身份。</p></article>
+            <article class="feature"><span class="feature-index">02</span><h3>阅读状态不会混乱</h3><p>未读、阅读中、已读与归档彼此清晰；工具栏图标会随当前页面状态改变颜色。</p></article>
+            <article class="feature"><span class="feature-index">03</span><h3>收藏时留下原因</h3><p>保存标题、个人说明、标签与分类，让未来的你知道为什么收藏、接下来重点看什么。</p></article>
+            <article class="feature"><span class="feature-index">04</span><h3>自动匹配已有站点</h3><p>打开 Popup 时自动识别当前域名并选择已有站点，也可以立即创建站点和首个 Endpoint。</p></article>
+            <article class="feature"><span class="feature-index">05</span><h3>完整的本地资料库</h3><p>按状态、站点、分类、标签和日期筛选；支持搜索、批量整理、身份迁移以及打开地址切换。</p></article>
+            <article class="feature"><span class="feature-index">06</span><h3>数据由你掌控</h3><p>业务数据保存在浏览器本地，可导出完整 JSON 备份并进行事务化合并或恢复。</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-alt" id="workflow">
+        <div class="container">
+          <div class="section-heading"><h2>三步建立自己的阅读记忆</h2><p>捕获操作保持轻量，真正需要整理时再进入资料库。</p></div>
+          <div class="steps">
+            <article class="step"><h3>在当前页面打开 PathMark</h3><p>使用工具栏图标或快捷键，立即查看页面是否已经保存及其阅读状态。</p></article>
+            <article class="step"><h3>补充上下文后收藏</h3><p>记录说明、标签和分类；站点与 Endpoint 会根据当前地址自动建议。</p></article>
+            <article class="step"><h3>阅读、迁移、再次找到</h3><p>即使域名发生变化，也可以通过稳定的站点身份重新识别和打开同一份资料。</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta"><div class="container"><div class="cta-card">
+        <h2>从下一篇“以后再看”开始。</h2>
+        <p>下载 GitHub Release，并按开发者模式加载到 Chrome 或 Microsoft Edge。面向普通用户的商店版本尚未发布。</p>
+        <div class="actions"><a class="button button-primary" href="https://github.com/xkos/PathMark/releases/latest">获取 PathMark</a><a class="button button-secondary" href="https://github.com/xkos/PathMark/blob/main/chromium/README.md">查看安装说明</a></div>
+      </div></div></section>
+    </main>
+
+    <footer class="footer"><div class="container footer-inner"><span>© <span data-year></span> PathMark</span><div class="footer-links"><a href="https://github.com/xkos/PathMark">GitHub</a><a href="https://github.com/xkos/PathMark/issues">反馈问题</a><a href="/en/" lang="en">English</a></div></div></footer>
+  </body>
+</html>
