@@ -4,7 +4,7 @@
 - 平台与目录：Chrome、Microsoft Edge 共用 `chromium/` 源码和 `chromium/dist/`；项目不使用 Pen 工具。
 - 国际化：已支持简体中文与英文并自动跟随浏览器界面语言；未知语言回退简体中文。Manifest 使用 Chromium 原生 `_locales/zh_CN`、`_locales/en`，Popup、资料库、站点/分类管理、条目编辑/迁移、设置与导入导出、图标悬浮标题及常见领域错误统一使用运行时语言资源；本地预览可用 `?lang=zh-CN` 或 `?lang=en` 验证。
 - GitHub 发布：`.github/workflows/release-extension.yml` 在 main/PR 自动测试、构建并上传保留 14 天的 ZIP；`v*` 标签校验 package、Manifest 和 tag 版本一致后，受保护的 `release` job 使用固定 RSA 密钥生成 CRX3、`SHA256SUMS.txt` 与 GitHub Release。普通 CI 不读取签名密钥。
-- 引流站：Cloudflare Pages 项目 `pathmark` 已连接 `xkos/PathMark`；`main` 为生产分支，`dev` 是唯一预览分支，仅 `web/*` 变更触发构建。正式域名为 `https://pathmark.elenchlab.app`；`web/` 提供 `/zh-CN/`、`/en/` 独立 SEO 页面、根路径语言选择、响应式布局、安全响应头、robots 与 sitemap；扩展制品继续由 GitHub Release 承载。桌面与 390px 移动端已完成真实浏览器回归，无横向溢出。
+- 引流站：Cloudflare Pages 项目 `pathmark` 已连接 `xkos/PathMark`；`main` 为生产分支，`dev` 是唯一预览分支，仅 `web/*` 变更触发构建。首次 `main` 生产部署已成功，默认地址为 `https://pathmark-1r5.pages.dev`；正式域名为 `https://pathmark.elenchlab.app`，当前等待 DNS CNAME 配置后完成验证与证书签发。`web/` 提供 `/zh-CN/`、`/en/` 独立 SEO 页面、根路径语言选择、响应式布局、安全响应头、robots 与 sitemap；扩展制品继续由 GitHub Release 承载。桌面与 390px 移动端已完成真实浏览器回归，无横向溢出。
 - 技术栈：Manifest V3、React 19、TypeScript 7、Vite 8、Dexie 4、Vitest 4。
 - 领域基线：Site 是承载多个 Endpoint 的稳定来源实体；Item 身份由 `siteId + resourceKey` 或规范化完整 URL 生成；Endpoint 日常变更不会静默重算已有 Item 身份。
 - 保存与识别：Popup 支持编辑标题、说明、标签、分类与初始阅读状态；重复 URL/等价 Endpoint 不重复建项；未读、阅读中、已读、永久曾读历史和独立归档均已实现。
@@ -21,4 +21,4 @@
 - 浏览器冒烟：中英文 Popup、资料库主列表、站点与 Endpoint、设置与数据均已在本地真实浏览器运行；`html.lang` 与页面标题正确切换，英文管理页无界面文案漏出中文，常见桌面宽度无横向溢出。浏览器中出现的中文仅来自本地已有的用户数据（分类或条目标题），不会被翻译。
 - 后台视觉：已完成专业后台样式优化，统一导航、标题、表单、筛选区、列表、编辑器、数据卡片、弹窗和危险操作的层级与交互状态；左侧导航在长页面保持固定，桌面端四个核心页面已完成视觉回归。
 - Popup 视觉：按 420×620 高频操作窗口重新设计信息层级；当前页面与站点选择前置，分类和标签紧凑排列，识别技术详情按需展开，保存操作固定在底部。自动匹配、新建站点、冲突禁用和已收藏状态均已完成真实浏览器回归，无横向溢出或 Console 错误。
-- 剩余发布动作：等待 Cloudflare Pages 首次生产部署及 `pathmark.elenchlab.app` 域名/证书激活；在 GitHub `release` Environment 配置 `CRX_PRIVATE_KEY_B64` 并安全离线备份 PEM；在 Chrome 与 Edge 手工执行一次完整安装验收。面向普通 Windows/macOS 用户的一键安装仍需后续上架 Chrome Web Store 与 Edge Add-ons。
+- 剩余发布动作：为 `pathmark.elenchlab.app` 添加指向 `pathmark-1r5.pages.dev` 的代理 CNAME，等待域名验证与证书激活；在 GitHub `release` Environment 配置 `CRX_PRIVATE_KEY_B64` 并安全离线备份 PEM；在 Chrome 与 Edge 手工执行一次完整安装验收。面向普通 Windows/macOS 用户的一键安装仍需后续上架 Chrome Web Store 与 Edge Add-ons。
