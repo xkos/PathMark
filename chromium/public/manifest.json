@@ -4,7 +4,7 @@
   "name": "__MSG_extensionName__",
   "short_name": "__MSG_extensionShortName__",
   "description": "__MSG_extensionDescription__",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "action": {
     "default_title": "__MSG_extensionName__",
     "default_popup": "popup.html",
@@ -25,7 +25,7 @@
     "service_worker": "assets/background.js"
   },
   "options_page": "library.html",
-  "permissions": ["activeTab", "tabs"],
+  "permissions": ["tabs"],
   "icons": {
     "16": "icons/icon-16.png",
     "32": "icons/icon-32.png",

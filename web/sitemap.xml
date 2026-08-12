@@ -10,4 +10,14 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pathmark.elenchlab.app/en/" />
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://pathmark.elenchlab.app/zh-CN/" />
   </url>
+  <url>
+    <loc>https://pathmark.elenchlab.app/en/privacy/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pathmark.elenchlab.app/en/privacy/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://pathmark.elenchlab.app/zh-CN/privacy/" />
+  </url>
+  <url>
+    <loc>https://pathmark.elenchlab.app/zh-CN/privacy/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pathmark.elenchlab.app/en/privacy/" />
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://pathmark.elenchlab.app/zh-CN/privacy/" />
+  </url>
 </urlset>

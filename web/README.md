@@ -12,6 +12,8 @@ python3 -m http.server 4173 --directory web
 
 Open `http://localhost:4173/zh-CN/` or `http://localhost:4173/en/`.
 
+Privacy policy pages used by the browser stores are available at `/zh-CN/privacy/` and `/en/privacy/`.
+
 ## Cloudflare Pages settings
 
 - Project: `pathmark`

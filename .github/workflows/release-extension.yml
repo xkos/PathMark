@@ -62,9 +62,11 @@ jobs:
           test -f web/index.html
           test -f web/en/index.html
           test -f web/zh-CN/index.html
+          test -f web/en/privacy/index.html
+          test -f web/zh-CN/privacy/index.html
           test -f web/_headers
           ! grep -R -E "pathmark\.(example|pages\.dev)" web
-          grep -R "https://pathmark.elenchlab.app" web/en/index.html web/zh-CN/index.html web/robots.txt web/sitemap.xml
+          grep -R "https://pathmark.elenchlab.app" web/en/index.html web/zh-CN/index.html web/en/privacy/index.html web/zh-CN/privacy/index.html web/robots.txt web/sitemap.xml
 
       - name: Package ZIP
         id: package
