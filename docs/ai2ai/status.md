@@ -1,10 +1,11 @@
 # 项目当前状态
 
-- 当前阶段：MVP/P0 源码、Chromium 共用构建、发布自动化、多语言引流页，以及收藏夹 HTML/浏览器直接迁移均已完成，进入第二阶段 Edge 权限弹窗与真实收藏夹验收。
+- 当前阶段：Chrome Web Store 首版已审核发布；收藏夹 HTML/浏览器直接迁移已完成，源码版本已提升至 `0.2.0`，提审 ZIP 与签名 CRX 已在本地生成并通过构建验证，等待后台上传提审。
 - 平台与目录：Chrome、Microsoft Edge 共用 `chromium/` 源码和 `chromium/dist/`；项目不使用 Pen 工具。
 - 国际化：已支持简体中文与英文并自动跟随浏览器界面语言；未知语言回退简体中文。Manifest 使用 Chromium 原生 `_locales/zh_CN`、`_locales/en`，Popup、资料库、站点/分类管理、条目编辑/迁移、设置与导入导出、图标悬浮标题及常见领域错误统一使用运行时语言资源；本地预览可用 `?lang=zh-CN` 或 `?lang=en` 验证。
-- GitHub 发布：`.github/workflows/release-extension.yml` 在 main/PR 自动测试、构建并上传保留 14 天的 ZIP；`v*` 标签校验 package、Manifest 和 tag 版本一致后，受保护的 `release` job 使用固定 RSA 密钥生成 CRX3、`SHA256SUMS.txt` 与 GitHub Release。`v0.1.0` 与 Chrome Web Store 上架版本 `v0.1.1` 均已构建、签名并发布成功；普通 CI 不读取签名密钥。
-- 引流站：Cloudflare Pages 项目 `pathmark` 已连接 `xkos/PathMark`；`main` 为生产分支，`dev` 是唯一预览分支，仅 `web/*` 变更触发构建。首次 `main` 生产部署已成功，默认地址为 `https://pathmark-1r5.pages.dev`；正式域名 `https://pathmark.elenchlab.app` 的代理 CNAME、域名验证和证书验证均已激活，公网 HTTPS 返回 HTTP/2 200。`web/` 提供 `/zh-CN/`、`/en/` 独立 SEO 页面、根路径语言选择、响应式布局、安全响应头、robots 与 sitemap；扩展制品继续由 GitHub Release 承载。桌面与 390px 移动端已完成真实浏览器回归，无横向溢出。
+- GitHub 发布：`.github/workflows/release-extension.yml` 在 main/PR 自动测试、构建并上传保留 14 天的 ZIP；`v*` 标签校验 package、Manifest 和 tag 版本一致后，受保护的 `release` job 使用固定 RSA 密钥生成 CRX3、`SHA256SUMS.txt` 与 GitHub Release。Chrome Web Store 上架版本 `v0.1.1` 已发布；`0.2.0` 本地包已生成，尚未创建 `v0.2.0` 标签或 GitHub Release。普通 CI 不读取签名密钥，本地打包脚本也支持通过 `CRX_PRIVATE_KEY_PATH` 读取受 Git 忽略的 PEM。
+- 引流站：Cloudflare Pages 项目 `pathmark` 已连接 `xkos/PathMark`；`main` 为生产分支，`dev` 是唯一预览分支，仅 `web/*` 变更触发构建。正式域名 `https://pathmark.elenchlab.app` 正常提供 `/zh-CN/`、`/en/` 独立 SEO 页面、根路径语言选择、安全响应头、robots 与 sitemap；中英文导航、Hero 与底部 CTA 已直接指向正式 Chrome Web Store 商品，并按语言和位置携带 UTM。线上重新采集的 18 项页面/SEO/转化入口检查全部通过。
+- 本地分析：根目录 `.gitignore` 忽略整个 `analytics/`；本地工具可采集官网技术 SEO、Search Console、官网 GA4、Chrome Web Store GA4、中英文商品页，并导入商店安装、卸载、展示、每周用户 CSV，输出不依赖外部图表库的自包含 HTML 报告。首份报告已使用真实官网和商店页面生成；Google API 与商店 CSV 未授权/未导入时明确显示缺失，不生成模拟数据。
 - 商店上架准备：Manifest 已移除未使用的 `activeTab`，保留自动识别标签页状态所需的 `tabs`，并把直接读取收藏夹所需的 `bookmarks` 声明为运行时可选权限；`web/` 的中英文隐私政策已经披露收藏夹目录、标题、URL、时间的本地处理方式和只读边界。`store-assets/chrome/` 包含宣传图、真实截图、中英文商店文案、`tabs`/`bookmarks` 权限理由、数据披露和审核测试步骤。
 - 技术栈：Manifest V3、React 19、TypeScript 7、Vite 8、Dexie 4、Vitest 4。
 - 领域基线：Site 是承载多个 Endpoint 的稳定来源实体；Item 身份由 `siteId + resourceKey` 或规范化完整 URL 生成；Endpoint 日常变更不会静默重算已有 Item 身份。
@@ -24,4 +25,4 @@
 - 浏览器冒烟：中英文 Popup、资料库主列表、站点与 Endpoint、设置与数据均已在本地真实浏览器运行；`html.lang` 与页面标题正确切换，英文管理页无界面文案漏出中文，常见桌面宽度无横向溢出。浏览器中出现的中文仅来自本地已有的用户数据（分类或条目标题），不会被翻译。
 - 后台视觉：已完成专业后台样式优化，统一导航、标题、表单、筛选区、列表、编辑器、数据卡片、弹窗和危险操作的层级与交互状态；左侧导航在长页面保持固定，桌面端四个核心页面已完成视觉回归。
 - Popup 视觉：按 420×620 高频操作窗口重新设计信息层级；当前页面与站点选择前置，分类和标签紧凑排列，识别技术详情按需展开，保存操作固定在底部。自动匹配、新建站点、冲突禁用和已收藏状态均已完成真实浏览器回归，无横向溢出或 Console 错误。
-- 剩余发布动作：在 Edge 扩展环境重新加载构建，验证可选权限弹窗、拒绝后降级、授权后真实收藏夹树、原收藏夹不变及最终导入结果；完成后提升扩展版本并生成下一版商店包。Chrome Web Store 与 Microsoft Edge Add-ons 的版本发布仍需分别提交。
+- 剩余发布动作：在 Chrome Web Store 后台上传 `release/pathmark-chromium-0.2.0.zip`；若该商品已启用 Verified CRX Uploads，则改传同目录的签名 CRX。同步确认 `bookmarks` 可选权限理由与数据披露后提交审核。随后可创建并推送 `v0.2.0` 标签生成 GitHub Release；Microsoft Edge Add-ons 仍需单独提交。

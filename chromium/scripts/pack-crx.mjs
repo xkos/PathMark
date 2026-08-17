@@ -3,15 +3,16 @@ import { readFile, writeFile } from "node:fs/promises";
 
 const [, , zipPath, outputPath] = process.argv;
 const encodedKey = process.env.CRX_PRIVATE_KEY_B64;
+const keyPath = process.env.CRX_PRIVATE_KEY_PATH;
 
 if (!zipPath || !outputPath) {
   throw new Error("Usage: node scripts/pack-crx.mjs <extension.zip> <extension.crx>");
 }
-if (!encodedKey) {
-  throw new Error("CRX_PRIVATE_KEY_B64 is required");
+if (!encodedKey && !keyPath) {
+  throw new Error("CRX_PRIVATE_KEY_B64 or CRX_PRIVATE_KEY_PATH is required");
 }
 
-const privateKey = createPrivateKey(Buffer.from(encodedKey, "base64"));
+const privateKey = createPrivateKey(encodedKey ? Buffer.from(encodedKey, "base64") : await readFile(keyPath));
 if (privateKey.asymmetricKeyType !== "rsa") {
   throw new Error("CRX signing key must be an RSA private key");
 }
