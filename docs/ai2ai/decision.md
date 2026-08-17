@@ -35,6 +35,16 @@
 - 使用 Vitest 和 fake-indexeddb 通过模块 Interface 验证 URL 身份、唯一识别、持久化与阅读历史。
 - 使用原生 CSS 变量落实设计令牌，不在第一阶段引入额外样式框架。
 
+## 浏览器收藏夹迁移
+
+- 内部 JSON 是无损备份/恢复格式；浏览器收藏夹 HTML 是需要人工映射的外部迁移来源，两者不共用文件语义。
+- 支持 Chrome、Edge 等浏览器导出的 Netscape Bookmark HTML，也支持用户主动授权后直接读取当前浏览器收藏夹。`bookmarks` 只能声明在 `optional_permissions` 中，并且必须在用户点击“授权并读取”时申请；读取结果是一次性导入快照，浏览器收藏夹树不作为主数据库或实时同步源。
+- 直接读取只允许调用 `chrome.bookmarks.getTree()`；禁止调用创建、更新、移动和删除浏览器收藏夹的接口。权限被拒绝或撤销时，HTML 导入及其他核心功能必须继续可用。
+- 导入目录只决定 Item 的阅读状态、归档状态和可选 Collection；域名/Endpoint 映射只决定 Site 身份，两个维度互不绑定。
+- 候选链接按规范化 Origin 分组。精确命中已有 Endpoint 时可自动选择 Site；不同域名不得静默合并，用户可以把多个 Origin 映射到同一已有 Site，或通过相同新站点名称显式创建包含多个 Endpoint 的 Site。
+- 收藏夹导入默认保持已有 Item 不变；同批次产生相同规范键时按 `read > reading > unread` 保留已读程度较高的记录，并在应用前显示合并与跳过数量。
+- 收藏夹导入计划必须使用现有 URL Identity 规则重新计算规范键，并在单个 IndexedDB 事务中写入 Site、Collection 和 Item；校验失败不得留下部分数据。
+
 ## 快捷键与工具栏状态
 
 - 使用 Manifest V3 `_execute_action` 打开 Popup；建议快捷键为 macOS `Command+Shift+X`、Windows/Linux `Ctrl+Shift+X`，其中 `X` 取自 extension。

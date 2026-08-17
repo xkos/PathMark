@@ -5,6 +5,7 @@ import { Button } from "../ui/Button";
 import type { AppSettings } from "../domain/models";
 import { requestActionIconRefresh } from "../browser/action-refresh";
 import { localizeError, t } from "../i18n";
+import { BookmarkImportManager } from "./BookmarkImportManager";
 
 interface ExportSummary {
   collections: number;
@@ -132,6 +133,8 @@ export function DataTransferManager() {
         </div>
         <Button type="button" onClick={() => void saveSettings()} disabled={busy}>{t("saveSettings")}</Button>
       </section> : null}
+
+      <BookmarkImportManager onImported={refreshSummary} />
 
       <div className="transfer-grid">
         <section className="transfer-card" aria-labelledby="export-heading">

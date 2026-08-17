@@ -1,11 +1,11 @@
 # 项目当前状态
 
-- 当前阶段：MVP/P0 源码、Chromium 共用构建、发布自动化和多语言引流页均已完成，进入 Chrome/Edge 安装验收与线上部署。
+- 当前阶段：MVP/P0 源码、Chromium 共用构建、发布自动化、多语言引流页，以及收藏夹 HTML/浏览器直接迁移均已完成，进入第二阶段 Edge 权限弹窗与真实收藏夹验收。
 - 平台与目录：Chrome、Microsoft Edge 共用 `chromium/` 源码和 `chromium/dist/`；项目不使用 Pen 工具。
 - 国际化：已支持简体中文与英文并自动跟随浏览器界面语言；未知语言回退简体中文。Manifest 使用 Chromium 原生 `_locales/zh_CN`、`_locales/en`，Popup、资料库、站点/分类管理、条目编辑/迁移、设置与导入导出、图标悬浮标题及常见领域错误统一使用运行时语言资源；本地预览可用 `?lang=zh-CN` 或 `?lang=en` 验证。
 - GitHub 发布：`.github/workflows/release-extension.yml` 在 main/PR 自动测试、构建并上传保留 14 天的 ZIP；`v*` 标签校验 package、Manifest 和 tag 版本一致后，受保护的 `release` job 使用固定 RSA 密钥生成 CRX3、`SHA256SUMS.txt` 与 GitHub Release。`v0.1.0` 与 Chrome Web Store 上架版本 `v0.1.1` 均已构建、签名并发布成功；普通 CI 不读取签名密钥。
 - 引流站：Cloudflare Pages 项目 `pathmark` 已连接 `xkos/PathMark`；`main` 为生产分支，`dev` 是唯一预览分支，仅 `web/*` 变更触发构建。首次 `main` 生产部署已成功，默认地址为 `https://pathmark-1r5.pages.dev`；正式域名 `https://pathmark.elenchlab.app` 的代理 CNAME、域名验证和证书验证均已激活，公网 HTTPS 返回 HTTP/2 200。`web/` 提供 `/zh-CN/`、`/en/` 独立 SEO 页面、根路径语言选择、响应式布局、安全响应头、robots 与 sitemap；扩展制品继续由 GitHub Release 承载。桌面与 390px 移动端已完成真实浏览器回归，无横向溢出。
-- 商店上架准备：Manifest 已移除未使用的 `activeTab`，仅保留自动识别标签页状态所需的 `tabs`；`web/` 已增加 `/zh-CN/privacy/` 与 `/en/privacy/` 双语隐私政策。`store-assets/chrome/` 包含 440×280 无文字宣传图、两张真实 1280×800 插件截图、中英文商店文案、权限理由、数据披露和审核测试步骤。
+- 商店上架准备：Manifest 已移除未使用的 `activeTab`，保留自动识别标签页状态所需的 `tabs`，并把直接读取收藏夹所需的 `bookmarks` 声明为运行时可选权限；`web/` 的中英文隐私政策已经披露收藏夹目录、标题、URL、时间的本地处理方式和只读边界。`store-assets/chrome/` 包含宣传图、真实截图、中英文商店文案、`tabs`/`bookmarks` 权限理由、数据披露和审核测试步骤。
 - 技术栈：Manifest V3、React 19、TypeScript 7、Vite 8、Dexie 4、Vitest 4。
 - 领域基线：Site 是承载多个 Endpoint 的稳定来源实体；Item 身份由 `siteId + resourceKey` 或规范化完整 URL 生成；Endpoint 日常变更不会静默重算已有 Item 身份。
 - 保存与识别：Popup 支持编辑标题、说明、标签、分类与初始阅读状态；重复 URL/等价 Endpoint 不重复建项；未读、阅读中、已读、永久曾读历史和独立归档均已实现。
@@ -17,9 +17,11 @@
 - 分类与站点：五层嵌套分类、同级唯一、循环保护、同级排序、分类树总数/未读数、安全删除；Site/Endpoint CRUD、最长路径匹配、查询参数策略、配置影响预演、显式身份重映射、冲突阻止和单条目迁移均已实现。
 - 设置与本地数据：可配置全局忽略参数、尾斜杠、默认阅读状态和默认视图；清空全部业务数据需要两次确认并提示先导出备份。
 - 导入导出：完整 UTF-8 JSON 导出；合并/替换导入；格式、必填字段、引用、时间、分类层级、Endpoint、规范键与阅读状态一致性校验；冲突预览；同 ID 可选“较新版本”或“导入覆盖”；替换二次确认；所有写入在单个事务中完成，无效导入不会清除现有数据。
+- 浏览器收藏夹迁移：设置与数据页支持 Chrome、Edge 等浏览器导出的 Netscape Bookmark HTML；自动解析目录、链接和收藏时间，跳过非 HTTP(S) 地址；`todo`、`done`、`reading`、`archive` 及中英文同义目录自动预填阅读/归档状态。用户可逐目录选择是否导入、覆盖状态、编辑可选 Collection 路径；链接按 Origin 分组，可保持未归站、映射已有 Site 并补充 Endpoint，或用相同新站点名称把多个域名合并到一个 Site。写入前展示新增、已存在跳过、同批重复合并、分类与站点变化；已有条目默认不覆盖，同批规范键重复按已读程度较高者保留；最终在单个 IndexedDB 事务内写入。
+- 浏览器直接读取：用户点击“授权并读取”后才请求 `bookmarks` 可选权限；拒绝权限不会触发收藏夹树读取，也不影响 HTML 导入。授权后只调用 `chrome.bookmarks.getTree()`，把根目录、嵌套目录、标题、URL 和收藏时间转换为与 HTML 相同的中立快照；不调用创建、更新、移动或删除接口，不改变浏览器原收藏夹。浏览器系统根目录默认不转换为 Collection，但仍在来源路径中可见。
 - 交换格式：运行时校验器接受 `docs/me2ai/examples/reading-bookmarks.example.json`，未修改 `docs/me2ai`。
-- 自动验证：`npm test` 为 11 个测试文件、51 个测试全部通过，包含中英文插值、领域错误和图标标题测试；`npm run build` 通过并重新生成 `chromium/dist/`。构建校验确认后台 Service Worker 是自包含经典脚本，动态图标与 `_locales` 资源均已进入产物。
+- 自动验证：`npm test` 为 13 个测试文件、59 个测试全部通过，覆盖收藏夹 HTML 与浏览器树解析、权限拒绝时不读取、授权后调用顺序、目录状态与站点映射解耦、多个域名合并 Site、补充已有 Site Endpoint、规范键去重和事务写入，以及原有中英文插值、领域错误和图标标题测试；`npm run build` 通过并重新生成 `chromium/dist/`。静态扫描确认业务代码只调用 `chrome.bookmarks.getTree()`。
 - 浏览器冒烟：中英文 Popup、资料库主列表、站点与 Endpoint、设置与数据均已在本地真实浏览器运行；`html.lang` 与页面标题正确切换，英文管理页无界面文案漏出中文，常见桌面宽度无横向溢出。浏览器中出现的中文仅来自本地已有的用户数据（分类或条目标题），不会被翻译。
 - 后台视觉：已完成专业后台样式优化，统一导航、标题、表单、筛选区、列表、编辑器、数据卡片、弹窗和危险操作的层级与交互状态；左侧导航在长页面保持固定，桌面端四个核心页面已完成视觉回归。
 - Popup 视觉：按 420×620 高频操作窗口重新设计信息层级；当前页面与站点选择前置，分类和标签紧凑排列，识别技术详情按需展开，保存操作固定在底部。自动匹配、新建站点、冲突禁用和已收藏状态均已完成真实浏览器回归，无横向溢出或 Console 错误。
-- 剩余发布动作：将 `v0.1.1` ZIP 与 `store-assets/chrome/` 商店材料上传 Chrome Web Store 并提交审核；安全离线备份固定 CRX 签名 PEM；在 Chrome 与 Edge 手工执行一次完整安装验收。Microsoft Edge Add-ons 仍需后续单独上架。
+- 剩余发布动作：在 Edge 扩展环境重新加载构建，验证可选权限弹窗、拒绝后降级、授权后真实收藏夹树、原收藏夹不变及最终导入结果；完成后提升扩展版本并生成下一版商店包。Chrome Web Store 与 Microsoft Edge Add-ons 的版本发布仍需分别提交。

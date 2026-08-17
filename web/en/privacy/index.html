@@ -19,13 +19,13 @@
       <span class="eyebrow">Privacy · Local first</span>
       <h1>Privacy Policy</h1>
       <p class="legal-lead">PathMark is designed so your reading library remains under your control. Extension data is processed and stored locally in your browser and is not sent to PathMark's developer or third parties.</p>
-      <div class="legal-meta">Effective date: August 12, 2026 · Applies to the PathMark browser extension and website.</div>
+      <div class="legal-meta">Effective date: August 15, 2026 · Applies to the PathMark browser extension and website.</div>
 
       <h2>1. Data PathMark handles</h2>
-      <p>When you use the extension, PathMark may handle the URL and title of the current browser tab, the time you save or open an item, and information you enter, such as notes, tags, collections, reading state, sites, and endpoint rules. PathMark does not read page body content, passwords, form entries, cookies, or full browser history.</p>
+      <p>When you use the extension, PathMark may handle the URL and title of the current browser tab, the time you save or open an item, and information you enter, such as notes, tags, collections, reading state, sites, and endpoint rules. When you explicitly choose to import directly from the browser, PathMark also reads bookmark folders, titles, URLs, and saved times locally. PathMark does not read page body content, passwords, form entries, cookies, or full browser history.</p>
 
       <h2>2. Why this data is used</h2>
-      <p>The information is used only to provide PathMark's user-facing reading-library features: recognizing whether the current page has been saved, suggesting a site, preserving a stable resource identity when domains change, organizing items, and updating the toolbar icon to reflect reading state.</p>
+      <p>The information is used only to provide PathMark's user-facing reading-library features: recognizing whether the current page has been saved, suggesting a site, preserving a stable resource identity when domains change, organizing items, building an editable bookmark-import preview, and updating the toolbar icon to reflect reading state.</p>
 
       <h2>3. Local storage and retention</h2>
       <p>Extension data is stored in IndexedDB inside your browser profile. PathMark has no account system or cloud synchronization service. Data remains on your device until you delete an item, clear the library, remove the extension or browser profile, or replace the data through an import. You can export a JSON backup at any time.</p>
@@ -37,10 +37,11 @@
       <p>PathMark does not sell user data and does not use it for advertising, creditworthiness, lending, or purposes unrelated to the extension's single purpose. Any use of information received from Chrome APIs adheres to the Chrome Web Store User Data Policy, including its Limited Use requirements.</p>
 
       <h2>6. Your controls</h2>
-      <ul><li>Edit or delete individual saved items.</li><li>Export your complete library as JSON.</li><li>Clear all local business data from PathMark settings.</li><li>Remove the extension to stop all future processing.</li></ul>
+      <ul><li>Edit or delete individual saved items.</li><li>Export your complete library as JSON.</li><li>Deny or revoke the optional bookmark permission in browser extension settings while continuing to use HTML import.</li><li>Clear all local business data from PathMark settings.</li><li>Remove the extension to stop all future processing.</li></ul>
 
       <h2>7. Permissions</h2>
       <p>PathMark uses the <code>tabs</code> permission to read a tab's URL and title when needed to recognize saved pages and keep the toolbar icon in sync with the active page. This information is evaluated locally and is not used to read page content or sent elsewhere.</p>
+      <p>PathMark declares <code>bookmarks</code> as an optional permission and requests it only after you click “Authorize &amp; read.” Although the browser warning may say “read and change bookmarks,” PathMark only calls the API that reads the bookmark tree; it does not create, update, move, or remove browser bookmarks. Denying this permission does not affect HTML import or other core features.</p>
 
       <h2>8. Changes and contact</h2>
       <p>If PathMark's data practices materially change, this policy and the extension's disclosures will be updated before the new behavior is released. Questions and privacy requests can be submitted through the project's <a href="https://github.com/xkos/PathMark/issues">GitHub issue tracker</a>.</p>

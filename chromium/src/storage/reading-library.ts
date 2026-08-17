@@ -20,6 +20,11 @@ import {
   type LibraryExportDocument,
   type SameIdImportPolicy,
 } from "../domain/library-transfer";
+import {
+  buildBookmarkImportPreview,
+  type BookmarkImportPreview,
+  type BookmarkImportRequest,
+} from "../domain/bookmark-import";
 import { ReadingLibraryDatabase } from "./database";
 
 export interface PageRecognition {
@@ -255,6 +260,38 @@ export class ReadingLibrary {
         await this.database.sites.bulkPut(preview.plan.sites);
         await this.database.items.bulkPut(preview.plan.items);
         if (preview.plan.settings) await this.database.settings.put({ id: "app", value: preview.plan.settings });
+        return preview;
+      },
+    );
+  }
+
+  async previewBookmarkImport(request: BookmarkImportRequest): Promise<BookmarkImportPreview> {
+    return buildBookmarkImportPreview(request, {
+      ...await this.readAllData(),
+      now: this.now(),
+      createId: this.createId,
+    });
+  }
+
+  async applyBookmarkImport(request: BookmarkImportRequest): Promise<BookmarkImportPreview> {
+    return this.database.transaction(
+      "rw",
+      this.database.collections,
+      this.database.sites,
+      this.database.items,
+      this.database.settings,
+      async () => {
+        const preview = buildBookmarkImportPreview(request, {
+          ...await this.readAllData(),
+          now: this.now(),
+          createId: this.createId,
+        });
+        if (!preview.canApply || !preview.plan) {
+          throw new Error(preview.errors.join("\n") || "收藏夹导入校验未通过，或没有可新增的链接");
+        }
+        await this.database.collections.bulkPut(preview.plan.collections);
+        await this.database.sites.bulkPut(preview.plan.sites);
+        await this.database.items.bulkAdd(preview.plan.items);
         return preview;
       },
     );

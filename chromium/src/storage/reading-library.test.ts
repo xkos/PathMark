@@ -3,6 +3,7 @@ import { ReadingLibraryDatabase } from "./database";
 import { ReadingLibrary } from "./reading-library";
 import { DEFAULT_SETTINGS, type Item } from "../domain/models";
 import type { LibraryExportDocument } from "../domain/library-transfer";
+import { bookmarkFolderKey, parseBookmarkHtml } from "../domain/bookmark-import";
 
 const databases: ReadingLibraryDatabase[] = [];
 
@@ -389,6 +390,35 @@ describe("ReadingLibrary", () => {
 
     await expect(library.applyImport({ format: "reading-bookmarks", formatVersion: 99 }, "replace")).rejects.toThrow("格式版本");
     expect((await library.listItems()).map((item) => item.title)).toEqual(["Existing"]);
+  });
+
+  it("applies a mapped bookmark HTML import in one transaction", async () => {
+    const library = createLibrary();
+    const snapshot = parseBookmarkHtml(`<DL><p><DT><H3>done</H3><DL><p>
+      <DT><A HREF="https://old.example.com/paper/1">Old address</A>
+      <DT><A HREF="https://new.example.org/paper/2">New address</A>
+    </DL><p></DL><p>`);
+    const request = {
+      candidates: snapshot.candidates,
+      folderRules: [{
+        folderKey: bookmarkFolderKey(["done"]), selected: true, readingState: "read" as const,
+        isArchived: false, collectionPath: ["Papers"],
+      }],
+      siteMappings: [
+        { origin: "https://old.example.com/", target: { type: "new" as const, siteName: "Papers" } },
+        { origin: "https://new.example.org/", target: { type: "new" as const, siteName: "Papers" } },
+      ],
+    };
+
+    const preview = await library.previewBookmarkImport(request);
+    expect(preview).toEqual(expect.objectContaining({ canApply: true, addedItems: 2, createdSites: 1, createdCollections: 1 }));
+
+    await library.applyBookmarkImport(request);
+    const [items, sites, collections] = await Promise.all([library.listItems(), library.listSites(), library.listCollections()]);
+    expect(items).toHaveLength(2);
+    expect(items.every((item) => item.siteId === sites[0].id && item.readingState === "read")).toBe(true);
+    expect(items.every((item) => item.collectionId === collections[0].id)).toBe(true);
+    expect(sites[0].endpoints).toHaveLength(2);
   });
 
   it("edits, records opening and deletes an item without changing its identity", async () => {
