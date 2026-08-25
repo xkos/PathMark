@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PathMark — 網址會變，讀過的不會丟</title>
+    <meta name="description" content="PathMark 是一款本機優先的 Chrome 與 Edge 閱讀收藏擴充功能，支援筆記、閱讀狀態、分類，以及跨網域與 Endpoint 識別同一內容。">
+    <link rel="canonical" href="https://pathmark.elenchlab.app/zh-TW/">
+    <!-- locale-alternates:start -->
+    <link rel="alternate" hreflang="en" href="https://pathmark.elenchlab.app/en/">
+    <link rel="alternate" hreflang="zh-CN" href="https://pathmark.elenchlab.app/zh-CN/">
+    <link rel="alternate" hreflang="zh-TW" href="https://pathmark.elenchlab.app/zh-TW/">
+    <link rel="alternate" hreflang="ja" href="https://pathmark.elenchlab.app/ja/">
+    <link rel="alternate" hreflang="ko" href="https://pathmark.elenchlab.app/ko/">
+    <link rel="alternate" hreflang="es" href="https://pathmark.elenchlab.app/es/">
+    <link rel="alternate" hreflang="pt-BR" href="https://pathmark.elenchlab.app/pt-BR/">
+    <link rel="alternate" hreflang="fr" href="https://pathmark.elenchlab.app/fr/">
+    <link rel="alternate" hreflang="de" href="https://pathmark.elenchlab.app/de/">
+    <link rel="alternate" hreflang="it" href="https://pathmark.elenchlab.app/it/">
+    <link rel="alternate" hreflang="ru" href="https://pathmark.elenchlab.app/ru/">
+    <link rel="alternate" hreflang="tr" href="https://pathmark.elenchlab.app/tr/">
+    <link rel="alternate" hreflang="pl" href="https://pathmark.elenchlab.app/pl/">
+    <link rel="alternate" hreflang="nl" href="https://pathmark.elenchlab.app/nl/">
+    <link rel="alternate" hreflang="id" href="https://pathmark.elenchlab.app/id/">
+    <link rel="alternate" hreflang="vi" href="https://pathmark.elenchlab.app/vi/">
+    <link rel="alternate" hreflang="th" href="https://pathmark.elenchlab.app/th/">
+    <link rel="alternate" hreflang="hi" href="https://pathmark.elenchlab.app/hi/">
+    <link rel="alternate" hreflang="ar" href="https://pathmark.elenchlab.app/ar/">
+    <link rel="alternate" hreflang="x-default" href="https://pathmark.elenchlab.app/en/">
+    <!-- locale-alternates:end -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="PathMark — 網址會變，讀過的不會丟">
+    <meta property="og:description" content="面向長期閱讀與資料研究的本機優先收藏工具。">
+    <meta name="theme-color" content="#0e4acc">
+    <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/assets/site.css">
+    <script src="/assets/locales.generated.js" defer></script>
+    <script src="/assets/site.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="/zh-TW/"><img src="/assets/icon.svg" alt=""><span>PathMark</span></a>
+        <button class="menu-button" type="button" aria-label="開啟導覽" aria-expanded="false" data-menu-button>☰</button>
+        <nav class="nav" aria-label="主導覽" data-nav>
+          <a href="#features">核心能力</a><a href="#workflow">工作方式</a>
+          <a href="https://chromewebstore.google.com/detail/%E6%9C%AC%E5%9C%B0%E9%98%85%E8%AF%BB%E6%94%B6%E8%97%8F/bojpgaebbgpjiohfnhpgojmjjcabgame?utm_source=pathmark_website&amp;utm_medium=referral&amp;utm_campaign=chrome_store_install_zh_tw&amp;utm_content=nav_zh_tw">Chrome 線上應用程式商店</a>
+          <a href="https://github.com/xkos/PathMark">GitHub</a>
+          <span class="locale-picker" data-locale-picker data-label="語言"></span>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-grid">
+          <div>
+            <span class="eyebrow">本機優先 · Chrome &amp; Edge</span>
+            <h1>網址會變，讀過的不會丟。</h1>
+            <p class="hero-copy">PathMark 不只是另一個收藏夾。它把網頁、筆記、閱讀狀態和內容身分儲存在一起，即使網站換了網域，你仍然知道哪些內容已經讀過。</p>
+            <div class="actions">
+              <a class="button button-primary" href="https://chromewebstore.google.com/detail/%E6%9C%AC%E5%9C%B0%E9%98%85%E8%AF%BB%E6%94%B6%E8%97%8F/bojpgaebbgpjiohfnhpgojmjjcabgame?utm_source=pathmark_website&amp;utm_medium=referral&amp;utm_campaign=chrome_store_install_zh_tw&amp;utm_content=hero_zh_tw">從 Chrome 線上應用程式商店安裝</a>
+              <a class="button button-secondary" href="https://github.com/xkos/PathMark">檢視原始碼</a>
+            </div>
+            <p class="hero-note">開源 · 資料儲存在瀏覽器本機 · 已上架 Chrome 線上應用程式商店</p>
+          </div>
+          <div class="product-card" aria-label="PathMark 目前頁面識別示意">
+            <div class="browser-bar"><i></i><i></i><i></i></div>
+            <div class="popup-demo">
+              <div class="popup-head"><strong>PathMark</strong><span class="state-dot" title="未讀"></span></div>
+              <div class="popup-body">
+                <span class="popup-label">目前頁面</span>
+                <h2 class="popup-title">How browsers identify an extension</h2>
+                <div class="popup-url">https://new.example.org/papers/browser-identity</div>
+                <div class="status-row"><span class="status-pill active">未讀</span><span class="status-pill">閱讀中</span><span class="status-pill">已讀</span></div>
+                <div class="identity-box">
+                  <div class="identity-line"><span>網站</span><strong>Example Papers</strong></div>
+                  <div class="identity-line"><span>資源鍵</span><strong>/papers/browser-identity</strong></div>
+                  <div class="identity-line"><span>匹配</span><strong>相同網站 Endpoint</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="trust-strip"><div class="container trust-grid">
+        <div class="trust-item"><span></span>本機 IndexedDB 儲存</div>
+        <div class="trust-item"><span></span>Chrome 與 Edge 共用</div>
+        <div class="trust-item"><span></span>開放原始碼，可自行建置</div>
+      </div></div>
+
+      <section class="section" id="features">
+        <div class="container">
+          <div class="section-heading"><h2>為真正會回頭閱讀的人設計</h2><p>從快速收集到重新找到，PathMark 保留的不只是連結，還有你理解這份資料所需的脈絡。</p></div>
+          <div class="feature-grid">
+            <article class="feature"><span class="feature-index">01</span><h3>跨網域識別同一內容</h3><p>一個網站可以設定多個網域或 URL 字首。網站遷移後，相同路徑的資料仍能保持穩定身分。</p></article>
+            <article class="feature"><span class="feature-index">02</span><h3>閱讀狀態不會混亂</h3><p>未讀、閱讀中、已讀與歸檔彼此清楚；工具欄圖示會隨目前頁面狀態改變顏色。</p></article>
+            <article class="feature"><span class="feature-index">03</span><h3>收藏時留下原因</h3><p>儲存標題、個人說明、標籤與分類，讓未來的你知道為什麼收藏、接下來重點看什麼。</p></article>
+            <article class="feature"><span class="feature-index">04</span><h3>自動匹配已有網站</h3><p>開啟 Popup 時自動識別目前網域並選擇已有網站，也可以立即建立網站和首個 Endpoint。</p></article>
+            <article class="feature"><span class="feature-index">05</span><h3>完整的本機資料庫</h3><p>按狀態、網站、分類、標籤和日期篩選；支援搜尋、批次整理、身分遷移以及開啟位址切換。</p></article>
+            <article class="feature"><span class="feature-index">06</span><h3>資料由你掌控</h3><p>應用程式資料儲存在瀏覽器本機，可匯出完整 JSON 備份並進行以交易方式合併或還原。</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-alt" id="workflow">
+        <div class="container">
+          <div class="section-heading"><h2>三步建立自己的閱讀記憶</h2><p>擷取操作保持輕量，真正需要整理時再進入資料庫。</p></div>
+          <div class="steps">
+            <article class="step"><h3>在目前頁面開啟 PathMark</h3><p>使用工具欄圖示或快捷鍵，立即檢視頁面是否已經儲存及其閱讀狀態。</p></article>
+            <article class="step"><h3>補充脈絡後收藏</h3><p>記錄說明、標籤和分類；網站與 Endpoint 會根據目前位址自動建議。</p></article>
+            <article class="step"><h3>閱讀、遷移、再次找到</h3><p>即使網域發生變化，也可以透過穩定的網站身分重新識別和開啟同一份資料。</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta"><div class="container"><div class="cta-card">
+        <h2>從下一篇「以後再看」開始。</h2>
+        <p>從 Chrome 線上應用程式商店安裝 PathMark，開始整理待讀、在讀和已讀資料。開發者也可以從 GitHub 取得原始碼和獨立建置。</p>
+        <div class="actions"><a class="button button-primary" href="https://chromewebstore.google.com/detail/%E6%9C%AC%E5%9C%B0%E9%98%85%E8%AF%BB%E6%94%B6%E8%97%8F/bojpgaebbgpjiohfnhpgojmjjcabgame?utm_source=pathmark_website&amp;utm_medium=referral&amp;utm_campaign=chrome_store_install_zh_tw&amp;utm_content=cta_zh_tw">安裝 PathMark</a><a class="button button-secondary" href="https://github.com/xkos/PathMark/releases/latest">GitHub Release</a></div>
+      </div></div></section>
+    </main>
+
+    <footer class="footer"><div class="container footer-inner"><span>© <span data-year></span> PathMark</span><div class="footer-links"><a href="/zh-TW/privacy/">隱私政策</a><a href="https://github.com/xkos/PathMark">GitHub</a><a href="https://github.com/xkos/PathMark/issues">回報問題</a></div></div></footer>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "本機閱讀收藏" },
+  "extensionShortName": { "message": "閱讀收藏" },
+  "extensionDescription": { "message": "分類儲存資料、記錄閱讀狀態，並跨網站 Endpoint 識別相同內容。" }
+}

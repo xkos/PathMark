@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "Lokale Lesebibliothek" },
+  "extensionShortName": { "message": "Lesebibliothek" },
+  "extensionDescription": { "message": "Speichern Sie Quellen in Sammlungen, verfolgen Sie den Lesestatus und erkennen Sie dieselben Inhalte über verschiedene Websites und Endpoints hinweg." }
+}

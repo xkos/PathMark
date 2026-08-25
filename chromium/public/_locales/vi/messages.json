@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "Thư viện đọc cục bộ" },
+  "extensionShortName": { "message": "Thư viện đọc" },
+  "extensionDescription": { "message": "Lưu tài nguyên vào bộ sưu tập, theo dõi trạng thái đọc và nhận diện cùng nội dung trên nhiều trang web và endpoint." }
+}

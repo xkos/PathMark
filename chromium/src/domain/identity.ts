@@ -1,3 +1,4 @@
+import { AppError } from "./app-error";
 import type { AppSettings, Endpoint, QueryPolicy, Site } from "./models";
 
 export interface UrlIdentity {
@@ -11,9 +12,9 @@ export interface UrlIdentity {
   resourceKey: string | null;
 }
 
-export class InvalidHttpUrlError extends Error {}
-export class InvalidEndpointError extends Error {}
-export class AmbiguousEndpointError extends Error {}
+export class InvalidHttpUrlError extends AppError {}
+export class InvalidEndpointError extends AppError {}
+export class AmbiguousEndpointError extends AppError {}
 
 interface EndpointMatch {
   site: Site;
@@ -26,12 +27,12 @@ export function normalizeEndpoint(prefix: string): string {
   try {
     url = new URL(prefix);
   } catch {
-    throw new InvalidEndpointError("Endpoint 必须是合法 URL");
+    throw new InvalidEndpointError("endpointInvalidUrl");
   }
 
   assertHttpProtocol(url, InvalidEndpointError);
   if (url.username || url.password || url.search || url.hash) {
-    throw new InvalidEndpointError("Endpoint 不能包含凭据、查询参数或片段");
+    throw new InvalidEndpointError("endpointHasUnsupportedParts");
   }
 
   url.pathname = stripTrailingSlash(url.pathname);
@@ -81,7 +82,7 @@ function parseHttpUrl(input: string): URL {
   try {
     url = new URL(input);
   } catch {
-    throw new InvalidHttpUrlError("当前页面不是合法 URL");
+    throw new InvalidHttpUrlError("currentPageInvalidUrl");
   }
   assertHttpProtocol(url, InvalidHttpUrlError);
   return url;
@@ -89,10 +90,10 @@ function parseHttpUrl(input: string): URL {
 
 function assertHttpProtocol(
   url: URL,
-  ErrorType: new (message: string) => Error,
+  ErrorType: typeof InvalidEndpointError | typeof InvalidHttpUrlError,
 ): void {
   if (url.protocol !== "http:" && url.protocol !== "https:") {
-    throw new ErrorType("只支持 HTTP 和 HTTPS 页面");
+    throw new ErrorType("httpOnly");
   }
 }
 
@@ -120,7 +121,7 @@ function selectLongestMatch(matches: EndpointMatch[]): EndpointMatch | null {
   const canonicalPrefixes = new Set(longest.map((match) => normalizeEndpoint(match.endpoint.prefix)));
   const siteIds = new Set(longest.map((match) => match.site.id));
   if (canonicalPrefixes.size === 1 && siteIds.size > 1) {
-    throw new AmbiguousEndpointError("相同 Endpoint 被配置到了多个 Site");
+    throw new AmbiguousEndpointError("ambiguousEndpoint");
   }
   return longest[0];
 }

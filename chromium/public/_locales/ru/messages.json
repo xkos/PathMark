@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "Локальная библиотека чтения" },
+  "extensionShortName": { "message": "Библиотека чтения" },
+  "extensionDescription": { "message": "Сохраняйте материалы в коллекции, отслеживайте статус чтения и узнавайте один контент на разных сайтах и endpoints." }
+}

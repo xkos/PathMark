@@ -3,6 +3,7 @@ import {
   type BookmarkImportSnapshot,
   type BrowserBookmarkTreeNode,
 } from "../domain/bookmark-import";
+import { AppError } from "../domain/app-error";
 
 export interface BrowserBookmarksGateway {
   requestReadPermission: () => Promise<boolean>;
@@ -23,12 +24,12 @@ export async function requestBrowserBookmarkSnapshot(
 
 function createChromeBookmarksGateway(): BrowserBookmarksGateway {
   if (typeof chrome === "undefined" || !chrome.permissions) {
-    throw new Error("当前环境不支持浏览器收藏夹读取接口");
+    throw new AppError("bookmarkAccessUnsupported");
   }
   return {
     requestReadPermission: () => chrome.permissions.request({ permissions: ["bookmarks"] }),
     getTree: () => {
-      if (!chrome.bookmarks) throw new Error("浏览器未提供收藏夹读取接口");
+      if (!chrome.bookmarks) throw new AppError("bookmarkApiUnavailable");
       return chrome.bookmarks.getTree();
     },
   };

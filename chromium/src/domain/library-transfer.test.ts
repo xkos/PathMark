@@ -7,6 +7,7 @@ import {
   type LibraryExportDocument,
 } from "./library-transfer";
 import documentedExample from "../../../docs/me2ai/examples/reading-bookmarks.example.json";
+import { localizeError } from "../i18n";
 
 const ids = {
   collection: "11111111-1111-4111-8111-111111111111",
@@ -84,11 +85,11 @@ describe("library transfer", () => {
 
   it("rejects unsupported versions and a tampered canonical key", () => {
     const unsupported = { ...documentFixture(), formatVersion: 2 };
-    expect(previewLibraryImport(unsupported, "replace", emptyData()).errors).toContain("不支持的主格式版本：2");
+    expect(previewLibraryImport(unsupported, "replace", emptyData()).errors.map(localizeError)).toContain("Unsupported major format version: 2");
 
     const tampered = documentFixture();
     tampered.items[0].canonicalKey = "v1:url:tampered";
-    expect(previewLibraryImport(tampered, "replace", emptyData()).errors.join("\n")).toContain("与重算结果不一致");
+    expect(previewLibraryImport(tampered, "replace", emptyData()).errors.map(localizeError).join("\n")).toContain("inconsistent with the recalculated value");
   });
 
   it("uses updatedAt for same-id merge updates and skips", () => {

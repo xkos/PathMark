@@ -40,6 +40,6 @@ async function refreshActionForTab(tabId: number, knownUrl?: string): Promise<vo
     const item = recognition?.item ?? null;
     await setActionVisualStateForTab(tabId, item);
   } catch (error) {
-    console.warn(`无法更新标签页 ${tabId} 的收藏状态图标`, error);
+    console.warn(`Could not update the saved-state icon for tab ${tabId}`, error);
   }
 }

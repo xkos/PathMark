@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "Biblioteca di lettura locale" },
+  "extensionShortName": { "message": "Biblioteca di lettura" },
+  "extensionDescription": { "message": "Salva le risorse nelle raccolte, registra lo stato di lettura e riconosce gli stessi contenuti tra siti ed endpoint diversi." }
+}

@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "Lokale leesbibliotheek" },
+  "extensionShortName": { "message": "Leesbibliotheek" },
+  "extensionDescription": { "message": "Bewaar bronnen in collecties, volg de leesstatus en herken dezelfde inhoud op verschillende sites en endpoints." }
+}

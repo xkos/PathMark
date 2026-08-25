@@ -1,4 +1,5 @@
 import { identifyUrl, normalizeEndpoint } from "./identity";
+import { appErrorMessage } from "./app-error";
 import type { AppSettings, Collection, Item, ReadingState, Site, UUID } from "./models";
 import { prepareSite, siteToDraft } from "./site-management";
 
@@ -10,6 +11,8 @@ export interface BookmarkCandidate {
   addedAt: string | null;
   origin: string;
 }
+
+export const UNTITLED_BOOKMARK_FOLDER = "__pathmark_untitled_folder__";
 
 export interface BookmarkFolderSummary {
   key: string;
@@ -104,7 +107,7 @@ export function parseBookmarkHtml(html: string): BookmarkHtmlSnapshot {
   for (const match of html.matchAll(tokenPattern)) {
     const token = match[0];
     if (/^<\s*H3\b/i.test(token)) {
-      pendingFolder = cleanText(match[1] ?? "") || "未命名目录";
+      pendingFolder = cleanText(match[1] ?? "") || UNTITLED_BOOKMARK_FOLDER;
       continue;
     }
     if (/^<\s*DL\b/i.test(token)) {
@@ -127,10 +130,10 @@ export function parseBookmarkHtml(html: string): BookmarkHtmlSnapshot {
     try {
       parsedUrl = new URL(url);
       if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
-        throw new Error("只支持 HTTP 和 HTTPS 链接");
+        throw new Error(appErrorMessage("bookmarkHttpOnly"));
       }
     } catch (error) {
-      skipped.push({ title, url, reason: error instanceof Error ? error.message : "URL 无效" });
+      skipped.push({ title, url, reason: error instanceof Error ? error.message : appErrorMessage("urlInvalid") });
       continue;
     }
 
@@ -144,8 +147,8 @@ export function parseBookmarkHtml(html: string): BookmarkHtmlSnapshot {
     });
   }
 
-  if (!/<\s*A\b/i.test(html)) errors.push("文件中没有找到浏览器收藏夹链接");
-  if (!candidates.length && skipped.length) errors.push("文件中的链接都不是可导入的 HTTP 或 HTTPS 地址");
+  if (!/<\s*A\b/i.test(html)) errors.push(appErrorMessage("bookmarkHtmlNoLinks"));
+  if (!candidates.length && skipped.length) errors.push(appErrorMessage("bookmarkHtmlNoHttpLinks"));
 
   return createSnapshot(candidates, skipped, errors);
 }
@@ -162,10 +165,10 @@ export function parseBrowserBookmarkTree(roots: BrowserBookmarkTreeNode[]): Book
       try {
         parsedUrl = new URL(node.url);
         if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
-          throw new Error("只支持 HTTP 和 HTTPS 链接");
+          throw new Error(appErrorMessage("bookmarkHttpOnly"));
         }
       } catch (error) {
-        skipped.push({ title, url: node.url, reason: error instanceof Error ? error.message : "URL 无效" });
+        skipped.push({ title, url: node.url, reason: error instanceof Error ? error.message : appErrorMessage("urlInvalid") });
         return;
       }
       candidates.push({
@@ -186,8 +189,8 @@ export function parseBrowserBookmarkTree(roots: BrowserBookmarkTreeNode[]): Book
   for (const root of roots) visit(root, []);
   if (!candidates.length) errors.push(
     skipped.length
-      ? "浏览器收藏夹中的链接都不是可导入的 HTTP 或 HTTPS 地址"
-      : "浏览器收藏夹中没有找到可导入的链接",
+      ? appErrorMessage("bookmarkNoHttpLinks")
+      : appErrorMessage("bookmarkNoLinks"),
   );
   return createSnapshot(candidates, skipped, errors);
 }
@@ -202,10 +205,10 @@ export function buildBookmarkImportPreview(
   const mappings = new Map(request.siteMappings.map((mapping) => [normalizeEndpoint(mapping.origin), mapping.target]));
   const selected = request.candidates.filter((candidate) => rules.get(bookmarkFolderKey(candidate.folderPath))?.selected);
 
-  if (!selected.length) errors.push("至少选择一个包含链接的收藏夹目录");
+  if (!selected.length) errors.push(appErrorMessage("bookmarkFolderRequired"));
   for (const rule of request.folderRules) {
-    if (rule.collectionPath.length > 5) errors.push(`分类路径“${rule.collectionPath.join(" / ")}”超过 5 层`);
-    if (rule.collectionPath.some((segment) => !segment.trim())) errors.push("分类路径不能包含空名称");
+    if (rule.collectionPath.length > 5) errors.push(appErrorMessage("collectionPathTooDeep", { path: rule.collectionPath.join(" / ") }));
+    if (rule.collectionPath.some((segment) => !segment.trim())) errors.push(appErrorMessage("collectionPathEmptySegment"));
   }
 
   let workingSites = structuredClone(environment.sites);
@@ -224,7 +227,7 @@ export function buildBookmarkImportPreview(
     } else if (target.type === "new") {
       const name = target.siteName.trim();
       if (!name) {
-        errors.push(`域名 ${origin} 选择了新建站点，但没有填写站点名称`);
+        errors.push(appErrorMessage("bookmarkSiteNameRequired", { origin }));
         continue;
       }
       const key = name.toLocaleLowerCase();
@@ -237,7 +240,7 @@ export function buildBookmarkImportPreview(
   for (const [siteId, origins] of existingTargets) {
     const current = workingSites.find((site) => site.id === siteId);
     if (!current) {
-      errors.push("站点映射引用了不存在的站点");
+      errors.push(appErrorMessage("bookmarkSiteMissing"));
       continue;
     }
     const draft = siteToDraft(current);
@@ -313,7 +316,7 @@ export function buildBookmarkImportPreview(
           : site.name.trim().toLocaleLowerCase() === target.siteName.trim().toLocaleLowerCase());
       const identity = identifyUrl(candidate.url, identitySites, environment.settings);
       if (target.type !== "unassigned" && identity.kind !== "site") {
-        errors.push(`链接“${candidate.title}”没有命中所选站点的 Endpoint`);
+        errors.push(appErrorMessage("bookmarkSiteEndpointMismatch", { title: candidate.title }));
         continue;
       }
       if (existingKeys.has(identity.canonicalKey)) {
@@ -351,12 +354,12 @@ export function buildBookmarkImportPreview(
         }
       }
     } catch (error) {
-      errors.push(`链接“${candidate.title}”：${error instanceof Error ? error.message : String(error)}`);
+      errors.push(`${candidate.title}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
-  if (collapsedDuplicates) warnings.push(`有 ${collapsedDuplicates} 条重复链接被合并；状态冲突时保留已读程度更高的记录`);
-  if (skippedExisting) warnings.push(`有 ${skippedExisting} 条链接已存在于资料库，将保持现有记录不变`);
+  if (collapsedDuplicates) warnings.push(appErrorMessage("bookmarkDuplicatesMerged", { count: collapsedDuplicates }));
+  if (skippedExisting) warnings.push(appErrorMessage("bookmarkExistingSkipped", { count: skippedExisting }));
   const items = [...incomingByKey.values()].map(({ item }) => item);
   const plan = errors.length ? null : { collections: collectionsToPut, sites: sitesToPut, items };
   return {

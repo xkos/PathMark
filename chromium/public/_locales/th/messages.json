@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "คลังบทอ่านในเครื่อง" },
+  "extensionShortName": { "message": "คลังบทอ่าน" },
+  "extensionDescription": { "message": "บันทึกแหล่งข้อมูลในคอลเลกชัน ติดตามสถานะการอ่าน และจดจำเนื้อหาเดียวกันในหลายเว็บไซต์และ endpoint" }
+}

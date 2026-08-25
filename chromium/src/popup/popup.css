@@ -195,7 +195,8 @@
 
 .popup__identity-details summary {
   position: relative;
-  padding: 11px 36px 11px 13px;
+  padding: 11px 13px;
+  padding-inline-end: 36px;
   color: #475467;
   cursor: pointer;
   font-size: 12px;
@@ -211,7 +212,7 @@
 .popup__identity-details summary::after {
   position: absolute;
   top: 50%;
-  right: 14px;
+  inset-inline-end: 14px;
   color: #667085;
   content: "⌄";
   transform: translateY(-55%);

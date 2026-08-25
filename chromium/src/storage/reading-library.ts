@@ -1,5 +1,6 @@
 import type { Collection, Item, ReadingState, SavePageInput, Site } from "../domain/models";
 import type { Table } from "dexie";
+import { AppError } from "../domain/app-error";
 import { DEFAULT_SETTINGS } from "../domain/models";
 import { identifyUrl, type UrlIdentity } from "../domain/identity";
 import { transitionReadingState } from "../domain/reading";
@@ -150,7 +151,7 @@ export class ReadingLibrary {
 
   async setReadingState(itemId: string, state: ReadingState): Promise<Item> {
     const item = await this.database.items.get(itemId);
-    if (!item) throw new Error("收藏条目不存在");
+    if (!item) throw new AppError("savedItemMissing");
     const updated = transitionReadingState(item, state, this.now());
     await this.database.items.put(updated);
     return updated;
@@ -159,10 +160,12 @@ export class ReadingLibrary {
   async updateItem(itemId: string, input: ItemUpdateInput): Promise<Item> {
     return this.database.transaction("rw", this.database.items, this.database.collections, async () => {
       const item = await this.database.items.get(itemId);
-      if (!item) throw new Error("收藏条目不存在或已被删除");
-      if (input.collectionId && !(await this.database.collections.get(input.collectionId))) throw new Error("目标分类不存在或已被删除");
+      if (!item) throw new AppError("savedItemMissing");
+      if (input.collectionId && !(await this.database.collections.get(input.collectionId))) {
+        throw new AppError("collectionTargetMissing");
+      }
       const title = input.title.trim();
-      if (!title) throw new Error("标题不能为空");
+      if (!title) throw new AppError("itemTitleRequired");
       const updated: Item = {
         ...transitionReadingState(item, input.readingState, this.now()),
         title,
@@ -183,7 +186,7 @@ export class ReadingLibrary {
 
   async recordItemOpened(itemId: string, resolvedUrl: string): Promise<Item> {
     const item = await this.database.items.get(itemId);
-    if (!item) throw new Error("收藏条目不存在或已被删除");
+    if (!item) throw new AppError("savedItemMissing");
     const updated: Item = {
       ...item,
       lastResolvedUrl: resolvedUrl,
@@ -246,7 +249,7 @@ export class ReadingLibrary {
       async () => {
         const preview = previewLibraryImport(raw, mode, await this.readAllData(), sameIdPolicy);
         if (!preview.canApply || !preview.plan) {
-          throw new Error([...preview.errors, ...preview.conflicts].join("\n") || "导入校验未通过");
+          throw new Error([...preview.errors, ...preview.conflicts].join("\n") || new AppError("importValidationFailed").message);
         }
         if (mode === "replace") {
           await Promise.all([
@@ -287,7 +290,7 @@ export class ReadingLibrary {
           createId: this.createId,
         });
         if (!preview.canApply || !preview.plan) {
-          throw new Error(preview.errors.join("\n") || "收藏夹导入校验未通过，或没有可新增的链接");
+          throw new Error(preview.errors.join("\n") || new AppError("bookmarkImportValidationFailed").message);
         }
         await this.database.collections.bulkPut(preview.plan.collections);
         await this.database.sites.bulkPut(preview.plan.sites);
@@ -311,7 +314,7 @@ export class ReadingLibrary {
   async moveCollection(collectionId: string, direction: -1 | 1): Promise<void> {
     await this.database.transaction("rw", this.database.collections, async () => {
       const collection = await this.database.collections.get(collectionId);
-      if (!collection) throw new CollectionConfigurationError("分类不存在或已被删除");
+      if (!collection) throw new CollectionConfigurationError("collectionMissing");
       const siblings = (await this.database.collections.toArray())
         .filter((candidate) => candidate.parentId === collection.parentId)
         .sort((left, right) => left.sortOrder - right.sortOrder);
@@ -346,7 +349,7 @@ export class ReadingLibrary {
     return this.database.transaction("rw", this.database.collections, this.database.items, async () => {
       const collections = await this.database.collections.toArray();
       if (!collections.some((collection) => collection.id === collectionId)) {
-        throw new CollectionConfigurationError("分类不存在或已被删除");
+        throw new CollectionConfigurationError("collectionMissing");
       }
       const collectionIds = collectDescendantIds(collectionId, collections);
       collectionIds.add(collectionId);
@@ -367,7 +370,7 @@ export class ReadingLibrary {
   async bulkMoveItems(itemIds: string[], collectionId: string | null): Promise<Item[]> {
     return this.updateItems(itemIds, async (items) => {
       if (collectionId && !(await this.database.collections.get(collectionId))) {
-        throw new CollectionConfigurationError("目标分类不存在或已被删除");
+        throw new CollectionConfigurationError("collectionTargetMissing");
       }
       const now = this.now();
       return items.map((item) => ({ ...item, collectionId, updatedAt: now }));
@@ -466,7 +469,7 @@ export class ReadingLibrary {
         this.database.sites.toArray(),
         this.database.settings.get("app"),
       ]);
-      if (items.some((item) => !item)) throw new SiteConfigurationError("部分待重映射条目不存在");
+      if (items.some((item) => !item)) throw new SiteConfigurationError("remapItemsMissing");
 
       const settings = settingsRecord?.value ?? DEFAULT_SETTINGS;
       const selectedIds = new Set(uniqueItemIds);
@@ -476,7 +479,7 @@ export class ReadingLibrary {
         const existing = item!;
         const identity = identifyUrl(existing.originalUrl, sites, settings);
         if (occupiedKeys.has(identity.canonicalKey)) {
-          throw new SiteConfigurationError(`条目“${existing.title}”重映射后会产生规范键冲突`);
+          throw new SiteConfigurationError("remapConflict", { title: existing.title });
         }
         occupiedKeys.add(identity.canonicalKey);
         return {
@@ -498,7 +501,7 @@ export class ReadingLibrary {
       this.database.sites.toArray(),
       this.database.settings.get("app"),
     ]);
-    if (!item) throw new SiteConfigurationError("收藏条目不存在或已被删除");
+    if (!item) throw new SiteConfigurationError("savedItemMissing");
 
     const settings = settingsRecord?.value ?? DEFAULT_SETTINGS;
     const recognizedBefore = identifyUrl(item.originalUrl, sites, settings);
@@ -525,7 +528,7 @@ export class ReadingLibrary {
         this.database.sites.toArray(),
         this.database.settings.get("app"),
       ]);
-      if (!item) throw new SiteConfigurationError("收藏条目不存在或已被删除");
+      if (!item) throw new SiteConfigurationError("savedItemMissing");
 
       const identity = identifyItemForTargetSite(
         item,
@@ -535,7 +538,7 @@ export class ReadingLibrary {
       );
       const conflictingItem = await this.database.items.where("canonicalKey").equals(identity.canonicalKey).first();
       if (conflictingItem && conflictingItem.id !== item.id) {
-        throw new SiteConfigurationError(`迁移后会与条目“${conflictingItem.title}”产生规范键冲突`);
+        throw new SiteConfigurationError("migrationConflict", { title: conflictingItem.title });
       }
 
       const updated: Item = {
@@ -557,7 +560,7 @@ export class ReadingLibrary {
   async deleteSite(siteId: string, strategy: DeleteSiteStrategy): Promise<number> {
     return this.database.transaction("rw", this.database.sites, this.database.items, this.database.settings, async () => {
       const site = await this.database.sites.get(siteId);
-      if (!site) throw new SiteConfigurationError("站点不存在或已被删除");
+      if (!site) throw new SiteConfigurationError("siteMissing");
 
       const impactedItems = await this.database.items.where("siteId").equals(siteId).toArray();
       if (strategy === "delete-items") {
@@ -570,7 +573,7 @@ export class ReadingLibrary {
         const updates = impactedItems.map((item) => {
           const identity = identifyUrl(item.originalUrl, [], settings);
           if (occupiedKeys.has(identity.canonicalKey)) {
-            throw new SiteConfigurationError(`条目“${item.title}”转为未归站后会产生规范键冲突`);
+            throw new SiteConfigurationError("unassignConflict", { title: item.title });
           }
           occupiedKeys.add(identity.canonicalKey);
           return {
@@ -598,7 +601,7 @@ export class ReadingLibrary {
     if (!uniqueIds.length) return [];
     return this.database.transaction("rw", [this.database.items, ...extraTables], async () => {
       const records = await this.database.items.bulkGet(uniqueIds);
-      if (records.some((item) => !item)) throw new Error("部分收藏条目不存在或已被删除");
+      if (records.some((item) => !item)) throw new AppError("selectedItemsMissing");
       const updated = await update(records as Item[]);
       await this.database.items.bulkPut(updated);
       return updated;
@@ -648,10 +651,10 @@ function identifyItemForTargetSite(
 ): UrlIdentity {
   if (targetSiteId === null) return identifyUrl(item.originalUrl, [], settings);
   const targetSite = sites.find((site) => site.id === targetSiteId);
-  if (!targetSite) throw new SiteConfigurationError("目标站点不存在或已被删除");
+  if (!targetSite) throw new SiteConfigurationError("targetSiteMissing");
   const identity = identifyUrl(item.originalUrl, [targetSite], settings);
   if (identity.siteId !== targetSiteId) {
-    throw new SiteConfigurationError(`原始 URL 未命中站点“${targetSite.name}”的任何已启用 Endpoint`);
+    throw new SiteConfigurationError("originalUrlNoEndpoint", { site: targetSite.name });
   }
   return identity;
 }

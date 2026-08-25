@@ -1,303 +1,83 @@
-export type AppLocale = "zh-CN" | "en";
+import { localizeAppErrorTokens, type AppErrorCode } from "../domain/app-error";
+import chromeLocales from "./supported-locales.json";
+import * as ar from "./locales/ar";
+import * as de from "./locales/de";
+import * as en from "./locales/en";
+import type { MessageKey } from "./locales/en";
+import * as es from "./locales/es";
+import * as fr from "./locales/fr";
+import * as hi from "./locales/hi";
+import * as id from "./locales/id";
+import * as it from "./locales/it";
+import * as ja from "./locales/ja";
+import * as ko from "./locales/ko";
+import * as nl from "./locales/nl";
+import * as ptBR from "./locales/pt-BR";
+import * as pl from "./locales/pl";
+import * as ru from "./locales/ru";
+import * as th from "./locales/th";
+import * as tr from "./locales/tr";
+import * as vi from "./locales/vi";
+import * as zhCN from "./locales/zh-CN";
+import * as zhTW from "./locales/zh-TW";
 
-const zh = {
-  appName: "本地阅读收藏",
-  appShortName: "阅读收藏",
-  libraryTitle: "本地阅读资料库",
-  loadingPage: "正在识别当前页面…",
-  currentPage: "当前页面",
-  title: "标题",
-  site: "站点",
-  siteDescription: "站点把多个域名或地址前缀归为同一内容来源。",
-  autoMatched: "已自动匹配",
-  selectSite: "选择站点",
-  autoRecognize: "自动识别",
-  unassigned: "未归站",
-  createSite: "＋ 创建新站点",
-  newSiteName: "新站点名称",
-  newSitePlaceholder: "例如：Example Papers",
-  firstEndpoint: "首个 Endpoint",
-  addEndpoint: "加入所选站点的 Endpoint",
-  endpointWillBeAdded: "当前网址尚未命中该站点；保存时会明确加入这个地址前缀。",
-  endpointPrefilled: "已根据当前页面域名预填，可按需增加路径前缀。",
-  noteOptional: "笔记（可选）",
-  notePlaceholder: "为什么收藏，之后重点看什么？",
-  collection: "收藏分类",
-  inbox: "收件箱",
-  tags: "标签",
-  tagsPlaceholder: "论文, RAG",
-  readingState: "阅读状态",
-  unread: "未读",
-  reading: "阅读中",
-  read: "已读",
-  archived: "归档",
-  viewIdentity: "查看最终识别信息",
-  viewIdentityDetails: "查看识别详情",
-  saving: "正在保存…",
-  saveToLibrary: "保存到资料库",
-  manageLibrary: "管理资料库",
-  savedUnread: "已收藏 · 未读",
-  savedReading: "已收藏 · 阅读中",
-  savedRead: "已收藏 · 已读",
-  readBefore: "曾读过",
-  noNote: "尚未添加笔记",
-  markUnreadAgain: "重新标为未读",
-  markRead: "标为已读",
-  deleteCurrent: "删除当前收藏",
-  deleteCurrentQuestion: "删除当前收藏？",
-  deleteCurrentHint: "只删除这条网页记录，不影响所属站点、Endpoint 或其他资料。",
-  cancel: "取消",
-  deleting: "正在删除…",
-  confirmDelete: "确认删除",
-  identityInfo: "识别信息",
-  endpoint: "Endpoint",
-  resourceKey: "资源键",
-  matchMethod: "匹配方式",
-  notMatched: "未匹配",
-  fullUrlIdentity: "按规范化完整 URL 识别",
-  siteResourceMatch: "通过同站点资源键匹配",
-  normalizedUrlMatch: "通过规范化 URL 匹配",
-  unknownError: "发生未知错误",
-  unknownSite: "未知站点",
-  siteNotFound: "所选站点不存在或已被删除",
-  siteNotValidated: "站点配置尚未通过校验",
-  createdFromPopup: "通过 Popup 从当前页面创建",
-  navLabel: "资料库导航",
-  allItems: "全部条目",
-  collections: "收藏分类",
-  sitesAndEndpoints: "站点与 Endpoint",
-  settingsAndData: "设置与数据",
-  library: "资料库",
-  category: "分类",
-  allCollections: "全部分类",
-  search: "搜索",
-  searchPlaceholder: "搜索标题、说明、网址或标签",
-  filtersAndSort: "筛选与排序",
-  allSites: "全部站点",
-  tagsAll: "标签（多个为同时包含）",
-  savedFrom: "收藏日期起",
-  savedTo: "收藏日期止",
-  readFrom: "已读日期起",
-  readTo: "已读日期止",
-  sort: "排序",
-  savedAt: "收藏时间",
-  updatedAt: "更新时间",
-  lastOpened: "最近打开",
-  direction: "方向",
-  descending: "降序",
-  ascending: "升序",
-  selectedCount: "已选择 {count} 条",
-  moveCollection: "移动分类",
-  unarchive: "取消归档",
-  cancelSelection: "取消选择",
-  loadingLibrary: "正在加载资料库…",
-  savedItems: "收藏条目",
-  noMatchingItems: "没有符合条件的条目",
-  emptyLibrary: "资料库还是空的",
-  adjustFilters: "调整搜索词或筛选条件后再试。",
-  emptyLibraryHint: "打开任意网页，通过扩展 Popup 保存第一条资料。",
-  edit: "编辑",
-  delete: "删除",
-  migrate: "迁移站点",
-  openOriginal: "打开原网页",
-  createdAt: "收藏于 {date}",
-  selectItem: "选择 {title}",
-  noDescription: "尚未添加说明",
-  noTags: "无标签",
-  chooseOpenAddress: "选择 {title} 的打开地址",
-  openWith: "打开方式…",
-  originalAddress: "原始地址",
-  bulkActions: "批量操作",
-  bulkMoveTarget: "批量移动目标分类",
-  deleteItemQuestion: "确定彻底删除“{title}”吗？删除后将不再用于已读判断。",
-  close: "关闭", editItem: "编辑收藏条目", editItemHint: "编辑说明和整理状态不会改变资料的 URL 身份。",
-  personalNote: "个人说明", commaSeparatedTags: "标签（逗号分隔）", archivedWithoutState: "已归档（不改变阅读状态）",
-  savingShort: "保存中…", saveChanges: "保存修改", migrateItemSite: "迁移条目站点", closeMigration: "关闭迁移窗口",
-  originalUrl: "原始 URL", currentSite: "当前归属", targetSite: "目标站点", previewMigration: "预览迁移结果",
-  migratedSite: "迁移后归属", matchedEndpoint: "命中 Endpoint", canonicalKey: "规范键",
-  migrationConflict: "与条目“{title}”产生规范键冲突，不能迁移。", migrationUnchanged: "目标身份与当前身份相同，无需迁移。",
-  migrating: "迁移中…", confirmMigration: "确认迁移", collectionsHint: "分类回答“资料放在哪里”，不会参与 URL 身份判断，最多支持 5 层。",
-  newCollection: "新建分类", collectionList: "分类列表", noCollections: "尚未创建分类", collectionEditor: "分类编辑器",
-  collectionName: "分类名称", collectionPlaceholder: "例如：待读论文", parentCollection: "父分类", topLevelCollection: "顶层分类",
-  itemsCount: "{total} 条 · {unread} 未读", moveUp: "上移", moveDown: "下移", deleteCollectionMove: "删除，{count} 条移入收件箱",
-  deleteCollectionItems: "删除分类及条目", deleteCollection: "删除分类", saveCollection: "保存分类", collectionSaved: "分类已保存。",
-  deleteItemsStrategy: "同时删除其中条目", moveItemsStrategy: "将其中条目移入收件箱",
-  deleteCollectionQuestion: "确定删除分类“{name}”及其子分类，并{action}吗？", collectionDeleted: "已删除 {collections} 个分类，处理 {items} 条资料。",
-  sitesHint: "把历史域名和新域名归入同一站点，让同一资源保持稳定身份。", newSite: "新建站点", siteList: "站点列表",
-  endpointsCount: "{count} 个 Endpoint", noSites: "尚未创建站点", siteEditor: "站点编辑器", siteName: "站点名称",
-  description: "说明", siteDescriptionPlaceholder: "可选，记录站点用途或来源", endpointOrderHint: "顺序越靠前，解析资料地址时优先级越高。",
-  addEndpointButton: "添加 Endpoint", resolutionPriority: "解析优先级", endpointPrefixLabel: "Endpoint {index} 前缀", enabled: "启用",
-  removeEndpoint: "移除 Endpoint", remove: "移除", noEndpoints: "此站点还没有 Endpoint，仍可保存后稍后配置。",
-  queryPolicy: "查询参数策略", keepExceptIgnored: "保留全部，但忽略指定参数", keepIdentityOnly: "仅保留身份参数",
-  identityParams: "身份参数", extraIgnoredParams: "额外忽略参数", paramsPlaceholder: "例如：ref, source 或 id, lang",
-  impactPreview: "配置影响预演", impactPreviewHint: "保存前检查身份匹配与默认打开地址变化；预演本身不会写入条目。",
-  previewImpact: "预演配置影响", impactStale: "配置已再次变化，请重新预演。", associatedItems: "当前关联条目",
-  defaultAddressChanges: "默认地址变化", identityChanges: "身份匹配变化", canonicalConflicts: "规范键冲突",
-  defaultOpenChanges: "默认打开地址变化", noEndpointAvailable: "无可用 Endpoint", remappableItems: "可显式重映射的条目",
-  remapSelected: "重映射选中项", remapConflict: "重映射后会产生规范键冲突", noRemapNeeded: "没有条目的存储身份需要重映射。",
-  urlMatchPreview: "URL 匹配预览", urlMatchHint: "使用尚未保存的当前配置试算，不会修改历史条目。", previewUrl: "需要预览的 URL",
-  previewMatch: "预览匹配", endpointSaveHint: "保存 Endpoint 变更不会自动重算现有条目的资源键或规范键。",
-  deleteSiteMove: "删除，{count} 条转未归站", deleteSiteItems: "删除站点及条目", deleteSite: "删除站点", saveSite: "保存站点",
-  matchResult: "匹配结果", matchesCurrentSite: "命中当前站点", matchesOtherSite: "命中其他站点：{site}", genericSite: "站点",
-  sitePreviewRequired: "Endpoint 或查询参数策略已变化，请先运行配置影响预演", siteSaved: "站点配置已保存。历史条目的身份没有被自动重算。",
-  saveBeforeRemap: "请先保存已经预演的站点配置，再执行条目身份重映射", remappedCount: "已按当前配置重映射 {count} 条资料。",
-  deleteRelatedItems: "同时删除关联条目", unassignRelatedItems: "将关联条目转为未归站", deleteSiteQuestion: "确定删除站点“{name}”并{action}吗？",
-  siteDeleted: "站点已删除，处理了 {count} 条关联资料。",
-  settingsHint: "管理 URL 规范化默认值及本地备份；卸载扩展可能清除数据，请定期导出。", normalizationDefaults: "规范化与默认值",
-  normalizationHint: "修改规则只影响后续识别，不会静默改写现有条目的规范键。", ignoredQueryParams: "全局忽略查询参数（逗号分隔，* 表示前缀）",
-  defaultReadingState: "默认阅读状态", defaultLibraryView: "默认资料库视图", all: "全部", stripTrailingSlash: "除根路径外移除尾部斜杠",
-  saveSettings: "保存设置", exportLibrary: "导出完整资料库", exportHint: "生成可读的 UTF-8 JSON，包含设置、分类、站点、Endpoint、全部条目和归档条目。",
-  exportJson: "导出 JSON 备份", importJson: "导入 JSON 备份", importHint: "先校验和预览，再确认写入。冲突或错误未解决时不会修改本地数据。",
-  backupFile: "备份文件", selectedFile: "已选择：{file}", importMode: "导入模式", mergeKeep: "合并：保留现有数据", replaceRestore: "替换：校验后清空并恢复",
-  sameIdPolicy: "同 ID 记录的选择规则", keepNewer: "保留 updatedAt 较新的版本（默认）", incomingWins: "以导入文件覆盖同 ID 记录",
-  validatePreview: "校验并预览", clearAll: "清空全部数据", clearAllHint: "永久删除本地分类、站点和条目。操作前建议先导出 JSON 备份。",
-  clearAllButton: "清空全部本地数据", categoriesSummary: "分类", sitesSummary: "站点", itemsSummary: "条目", archivedItemsSummary: "归档条目",
-  validationPreview: "校验预览", formatMode: "格式版本 v{version} · {mode}模式", merge: "合并", replace: "替换", confirmMerge: "确认合并", confirmReplace: "确认替换",
-  added: "新增", updated: "更新", skipped: "跳过", conflicts: "冲突", errors: "错误", validationErrors: "校验错误",
-  conflictsToResolve: "需要处理的冲突", validationPassed: "校验通过。写入将在单个数据库事务中完成。",
-  bookmarkImport: "导入浏览器收藏夹", bookmarkImportHint: "直接读取当前浏览器，或导入其他浏览器导出的 HTML；先映射目录状态和站点，再一次性写入。",
-  recommended: "推荐", readCurrentBrowserBookmarks: "读取当前浏览器收藏夹", readCurrentBrowserBookmarksHint: "直接读取当前 Chrome 或 Edge 配置文件中的目录和链接，无需先导出文件。",
-  permissionRequest: "可选权限", bookmarkPermissionExplanation: "点击后浏览器会请求“读取和更改书签”权限；PathMark 只调用读取接口，不会修改或删除原收藏夹。",
-  authorizeAndRead: "授权并读取", currentBrowserBookmarks: "当前浏览器收藏夹", bookmarkPermissionDenied: "未获得收藏夹权限。原收藏夹和 PathMark 数据均未发生变化，你仍可使用 HTML 导入。",
-  bookmarkBrowserReadFailed: "读取浏览器收藏夹失败：{error}", importBookmarkHtml: "导入收藏夹 HTML", importBookmarkHtmlHint: "适合跨浏览器、其他设备或离线备份；不需要收藏夹权限。",
-  bookmarkHtmlFile: "收藏夹 HTML 文件", bookmarkHtmlSelected: "已解析 {folders} 个目录、{items} 条可用链接",
-  chooseBookmarkHtml: "请先选择收藏夹 HTML 文件", bookmarkParseFailed: "解析收藏夹失败：{error}",
-  bookmarkFolderRules: "1. 目录与状态", bookmarkFolderRulesHint: "目录决定每条资料的阅读状态和可选分类，不影响站点身份。",
-  importFolder: "导入", sourceFolder: "来源目录", linkCount: "链接数", archiveOnImport: "导入后归档",
-  createCollectionFromFolder: "创建分类", collectionPath: "分类路径", collectionPathPlaceholder: "例如：AI / Papers",
-  bookmarkRootFolder: "根目录", bookmarkSiteMapping: "2. 域名与站点", bookmarkSiteMappingHint: "多个域名可选择同一已有站点，或填写相同的新站点名称以合并为一个站点。",
-  candidateDomain: "候选域名", createNewSiteOption: "新建站点…", newSiteNameForImport: "新站点名称",
-  unassignedImport: "暂不归站", exactEndpointMatch: "已精确匹配 Endpoint", bookmarkPreviewAction: "3. 检查导入计划",
-  bookmarkPreviewHint: "现有条目默认跳过；同批重复链接按“已读优先”合并。",
-  previewBookmarkImport: "生成导入预览", applyBookmarkImport: "确认导入", bookmarkImportDone: "收藏夹导入完成：新增 {items} 条资料。",
-  selectedLinks: "已选择", newItems: "新增条目", existingSkipped: "已存在跳过", duplicatesMerged: "重复合并",
-  newCollections: "新建分类", newSites: "新建站点", updatedSites: "扩展站点", importWarnings: "导入提示",
-  bookmarkInvalidSkipped: "另有 {count} 条不支持或无效的链接不会导入。", bookmarkNoNewItems: "没有可新增的链接。",
-  exportDone: "备份文件已生成，导出不会修改本地数据。", fileReadFailed: "读取文件失败：{error}", chooseBackup: "请先选择 JSON 备份文件",
-  replaceQuestion: "替换会删除当前 {count} 条资料并写入备份内容。确定继续吗？", replaceDone: "已用备份完整替换本地资料库。",
-  mergeDone: "合并完成：新增 {added}，更新 {updated}，跳过 {skipped}。", writeFailed: "写入失败，本次事务未留下半份数据：{error}",
-  settingsSaved: "规范化与默认视图设置已保存。", clearQuestion: "清空会永久删除全部分类、站点和收藏条目。建议先导出备份。是否进入最终确认？",
-  clearFinalQuestion: "最终确认：立即清空全部本地业务数据？此操作无法撤销。", clearDone: "全部本地业务数据已清空，设置已恢复默认值。",
-  previewPageTitle: "Popup 站点识别与收藏流程预览", cannotReadTab: "无法读取当前标签页地址", unsupportedPage: "当前页面不是可收藏的 HTTP 或 HTTPS 页面",
-  httpOnly: "只支持 HTTP 和 HTTPS 页面", urlMatchesAdjust: "当前网址仍优先命中站点“{site}”，请调整 Endpoint",
-  urlMatchesManage: "当前网址仍优先命中站点“{site}”，请到管理页调整 Endpoint",
-  actionUnrecorded: "本地阅读收藏：当前页面未记录",
-  actionTodo: "本地阅读收藏：当前页面待读",
-  actionRead: "本地阅读收藏：当前页面已读",
-  actionArchived: "本地阅读收藏：当前页面已归档",
-} as const;
+interface LocaleDefinition {
+  aliases: readonly string[];
+  chromeLocale: string;
+  direction?: "rtl";
+  messages: Record<MessageKey, string>;
+  errors: Record<AppErrorCode, string>;
+}
 
-type MessageKey = keyof typeof zh;
+const localeDefinitions = {
+  en: { aliases: ["en"], chromeLocale: chromeLocales.en, messages: en.messages, errors: en.errors },
+  ar: { aliases: ["ar", "ar-sa", "ar-eg", "ar-ae"], chromeLocale: chromeLocales.ar, direction: "rtl", messages: ar.messages, errors: ar.errors },
+  de: { aliases: ["de", "de-de", "de-at", "de-ch"], chromeLocale: chromeLocales.de, messages: de.messages, errors: de.errors },
+  es: { aliases: ["es", "es-es", "es-419"], chromeLocale: chromeLocales.es, messages: es.messages, errors: es.errors },
+  fr: { aliases: ["fr", "fr-fr", "fr-ca"], chromeLocale: chromeLocales.fr, messages: fr.messages, errors: fr.errors },
+  hi: { aliases: ["hi", "hi-in"], chromeLocale: chromeLocales.hi, messages: hi.messages, errors: hi.errors },
+  id: { aliases: ["id", "id-id", "in", "in-id"], chromeLocale: chromeLocales.id, messages: id.messages, errors: id.errors },
+  it: { aliases: ["it", "it-it", "it-ch"], chromeLocale: chromeLocales.it, messages: it.messages, errors: it.errors },
+  ja: { aliases: ["ja", "ja-jp"], chromeLocale: chromeLocales.ja, messages: ja.messages, errors: ja.errors },
+  ko: { aliases: ["ko", "ko-kr"], chromeLocale: chromeLocales.ko, messages: ko.messages, errors: ko.errors },
+  nl: { aliases: ["nl", "nl-nl", "nl-be"], chromeLocale: chromeLocales.nl, messages: nl.messages, errors: nl.errors },
+  "pt-BR": { aliases: ["pt", "pt-br"], chromeLocale: chromeLocales["pt-BR"], messages: ptBR.messages, errors: ptBR.errors },
+  pl: { aliases: ["pl", "pl-pl"], chromeLocale: chromeLocales.pl, messages: pl.messages, errors: pl.errors },
+  ru: { aliases: ["ru", "ru-ru"], chromeLocale: chromeLocales.ru, messages: ru.messages, errors: ru.errors },
+  th: { aliases: ["th", "th-th"], chromeLocale: chromeLocales.th, messages: th.messages, errors: th.errors },
+  tr: { aliases: ["tr", "tr-tr"], chromeLocale: chromeLocales.tr, messages: tr.messages, errors: tr.errors },
+  vi: { aliases: ["vi", "vi-vn"], chromeLocale: chromeLocales.vi, messages: vi.messages, errors: vi.errors },
+  "zh-CN": { aliases: ["zh", "zh-cn", "zh-hans", "zh-sg"], chromeLocale: chromeLocales["zh-CN"], messages: zhCN.messages, errors: zhCN.errors },
+  "zh-TW": { aliases: ["zh-tw", "zh-hant", "zh-hk", "zh-mo"], chromeLocale: chromeLocales["zh-TW"], messages: zhTW.messages, errors: zhTW.errors },
+} satisfies Record<string, LocaleDefinition>;
 
-const en: Record<MessageKey, string> = {
-  appName: "Local Reading Library", appShortName: "Reading Library", libraryTitle: "Local Reading Library",
-  loadingPage: "Identifying the current page…", currentPage: "Current page", title: "Title", site: "Site",
-  siteDescription: "A site groups multiple domains or URL prefixes as one content source.", autoMatched: "Matched automatically",
-  selectSite: "Choose a site", autoRecognize: "Auto-detect", unassigned: "Unassigned", createSite: "+ Create new site",
-  newSiteName: "New site name", newSitePlaceholder: "Example: Example Papers", firstEndpoint: "First endpoint",
-  addEndpoint: "Endpoint to add to the selected site", endpointWillBeAdded: "This URL does not match the site yet. This prefix will be added when you save.",
-  endpointPrefilled: "Prefilled from the current page. Add a path prefix if needed.", noteOptional: "Note (optional)",
-  notePlaceholder: "Why save this, and what should you focus on later?", collection: "Collection", inbox: "Inbox", tags: "Tags",
-  tagsPlaceholder: "papers, RAG", readingState: "Reading status", unread: "Unread", reading: "Reading", read: "Read", archived: "Archived",
-  viewIdentity: "View final identity", viewIdentityDetails: "View identity details", saving: "Saving…", saveToLibrary: "Save to library",
-  manageLibrary: "Manage library", savedUnread: "Saved · Unread", savedReading: "Saved · Reading", savedRead: "Saved · Read",
-  readBefore: "Read before", noNote: "No note yet", markUnreadAgain: "Mark as unread", markRead: "Mark as read",
-  deleteCurrent: "Delete this bookmark", deleteCurrentQuestion: "Delete this bookmark?",
-  deleteCurrentHint: "Only this page record will be removed. Its site, endpoints, and other items are unaffected.", cancel: "Cancel",
-  deleting: "Deleting…", confirmDelete: "Delete", identityInfo: "Identity", endpoint: "Endpoint", resourceKey: "Resource key",
-  matchMethod: "Match method", notMatched: "Not matched", fullUrlIdentity: "Identified by normalized full URL",
-  siteResourceMatch: "Matched by resource key within the site", normalizedUrlMatch: "Matched by normalized URL",
-  unknownError: "An unknown error occurred", unknownSite: "Unknown site", siteNotFound: "The selected site no longer exists",
-  siteNotValidated: "The site configuration has not passed validation", createdFromPopup: "Created from the current page in the popup",
-  navLabel: "Library navigation", allItems: "All items", collections: "Collections", sitesAndEndpoints: "Sites & endpoints",
-  settingsAndData: "Settings & data", library: "Library", category: "Collection", allCollections: "All collections", search: "Search",
-  searchPlaceholder: "Search titles, notes, URLs, or tags", filtersAndSort: "Filters and sorting", allSites: "All sites",
-  tagsAll: "Tags (must include all)", savedFrom: "Saved from", savedTo: "Saved to", readFrom: "Read from", readTo: "Read to",
-  sort: "Sort by", savedAt: "Date saved", updatedAt: "Last updated", lastOpened: "Last opened", direction: "Direction",
-  descending: "Descending", ascending: "Ascending", selectedCount: "{count} selected", moveCollection: "Move",
-  unarchive: "Unarchive", cancelSelection: "Clear selection", loadingLibrary: "Loading library…", savedItems: "Saved items",
-  noMatchingItems: "No items match", emptyLibrary: "Your library is empty", adjustFilters: "Try adjusting your search or filters.",
-  emptyLibraryHint: "Open any page and save your first item from the extension popup.", edit: "Edit", delete: "Delete",
-  migrate: "Move to site", openOriginal: "Open original page", createdAt: "Saved {date}",
-  selectItem: "Select {title}", noDescription: "No description yet", noTags: "No tags", chooseOpenAddress: "Choose where to open {title}",
-  openWith: "Open with…", originalAddress: "Original URL",
-  bulkActions: "Bulk actions", bulkMoveTarget: "Target collection", deleteItemQuestion: "Permanently delete “{title}”? It will no longer count as read.",
-  close: "Close", editItem: "Edit saved item", editItemHint: "Editing notes and organization does not change this item's URL identity.",
-  personalNote: "Personal note", commaSeparatedTags: "Tags (comma-separated)", archivedWithoutState: "Archived (reading status is unchanged)",
-  savingShort: "Saving…", saveChanges: "Save changes", migrateItemSite: "Move item to site", closeMigration: "Close migration dialog",
-  originalUrl: "Original URL", currentSite: "Current site", targetSite: "Target site", previewMigration: "Preview migration",
-  migratedSite: "Site after migration", matchedEndpoint: "Matched endpoint", canonicalKey: "Canonical key",
-  migrationConflict: "Migration would conflict with “{title}”.", migrationUnchanged: "The target identity is unchanged; no migration is needed.",
-  migrating: "Migrating…", confirmMigration: "Confirm migration", collectionsHint: "Collections organize where items live and do not affect URL identity. Up to five levels are supported.",
-  newCollection: "New collection", collectionList: "Collection list", noCollections: "No collections yet", collectionEditor: "Collection editor",
-  collectionName: "Collection name", collectionPlaceholder: "Example: Papers to read", parentCollection: "Parent collection", topLevelCollection: "Top level",
-  itemsCount: "{total} items · {unread} unread", moveUp: "Move up", moveDown: "Move down", deleteCollectionMove: "Delete; move {count} items to Inbox",
-  deleteCollectionItems: "Delete collection and items", deleteCollection: "Delete collection", saveCollection: "Save collection", collectionSaved: "Collection saved.",
-  deleteItemsStrategy: "delete its items", moveItemsStrategy: "move its items to Inbox",
-  deleteCollectionQuestion: "Delete “{name}”, its subcollections, and {action}?", collectionDeleted: "Deleted {collections} collections and processed {items} items.",
-  sitesHint: "Group old and new domains into one site so the same resource keeps a stable identity.", newSite: "New site", siteList: "Site list",
-  endpointsCount: "{count} endpoints", noSites: "No sites yet", siteEditor: "Site editor", siteName: "Site name",
-  description: "Description", siteDescriptionPlaceholder: "Optional purpose or source", endpointOrderHint: "Endpoints nearer the top have higher priority when resolving a resource URL.",
-  addEndpointButton: "Add endpoint", resolutionPriority: "Resolution priority", endpointPrefixLabel: "Endpoint {index} prefix", enabled: "Enabled",
-  removeEndpoint: "Remove endpoint", remove: "Remove", noEndpoints: "This site has no endpoints. You can save it and configure them later.",
-  queryPolicy: "Query parameter policy", keepExceptIgnored: "Keep all except ignored parameters", keepIdentityOnly: "Keep identity parameters only",
-  identityParams: "Identity parameters", extraIgnoredParams: "Additional ignored parameters", paramsPlaceholder: "Example: ref, source or id, lang",
-  impactPreview: "Configuration impact preview", impactPreviewHint: "Check identity and default URL changes before saving. Previewing does not modify items.",
-  previewImpact: "Preview impact", impactStale: "The configuration changed again. Run a new preview.", associatedItems: "Associated items",
-  defaultAddressChanges: "Default URL changes", identityChanges: "Identity changes", canonicalConflicts: "Canonical conflicts",
-  defaultOpenChanges: "Default open URL changes", noEndpointAvailable: "No available endpoint", remappableItems: "Items available to remap",
-  remapSelected: "Remap selected", remapConflict: "Remapping would create a canonical-key conflict", noRemapNeeded: "No stored item identities need remapping.",
-  urlMatchPreview: "URL match preview", urlMatchHint: "Test the unsaved configuration without modifying existing items.", previewUrl: "URL to preview",
-  previewMatch: "Preview match", endpointSaveHint: "Saving endpoint changes does not recalculate existing resource or canonical keys.",
-  deleteSiteMove: "Delete; unassign {count} items", deleteSiteItems: "Delete site and items", deleteSite: "Delete site", saveSite: "Save site",
-  matchResult: "Match result", matchesCurrentSite: "Matches current site", matchesOtherSite: "Matches another site: {site}", genericSite: "Site",
-  sitePreviewRequired: "Endpoints or the query policy changed. Preview the configuration impact first.", siteSaved: "Site saved. Existing item identities were not recalculated.",
-  saveBeforeRemap: "Save the previewed site configuration before remapping item identities.", remappedCount: "Remapped {count} items using the current configuration.",
-  deleteRelatedItems: "delete associated items", unassignRelatedItems: "unassign associated items", deleteSiteQuestion: "Delete site “{name}” and {action}?",
-  siteDeleted: "Site deleted; {count} associated items were processed.",
-  settingsHint: "Manage URL normalization defaults and local backups. Uninstalling the extension may remove data, so export regularly.", normalizationDefaults: "Normalization & defaults",
-  normalizationHint: "Rule changes only affect future recognition and never silently rewrite existing canonical keys.", ignoredQueryParams: "Globally ignored query parameters (comma-separated; * is a prefix)",
-  defaultReadingState: "Default reading status", defaultLibraryView: "Default library view", all: "All", stripTrailingSlash: "Remove trailing slash except for the root path",
-  saveSettings: "Save settings", exportLibrary: "Export full library", exportHint: "Generate readable UTF-8 JSON with settings, collections, sites, endpoints, and all active and archived items.",
-  exportJson: "Export JSON backup", importJson: "Import JSON backup", importHint: "Validate and preview before writing. Unresolved errors or conflicts never modify local data.",
-  backupFile: "Backup file", selectedFile: "Selected: {file}", importMode: "Import mode", mergeKeep: "Merge: keep existing data", replaceRestore: "Replace: validate, clear, and restore",
-  sameIdPolicy: "Policy for records with the same ID", keepNewer: "Keep the record with the newer updatedAt (default)", incomingWins: "Overwrite same-ID records with imported data",
-  validatePreview: "Validate & preview", clearAll: "Clear all data", clearAllHint: "Permanently delete local collections, sites, and items. Export a JSON backup first.",
-  clearAllButton: "Clear all local data", categoriesSummary: "Collections", sitesSummary: "Sites", itemsSummary: "Items", archivedItemsSummary: "Archived",
-  validationPreview: "Validation preview", formatMode: "Format v{version} · {mode} mode", merge: "Merge", replace: "Replace", confirmMerge: "Confirm merge", confirmReplace: "Confirm replace",
-  added: "Added", updated: "Updated", skipped: "Skipped", conflicts: "Conflicts", errors: "Errors", validationErrors: "Validation errors",
-  conflictsToResolve: "Conflicts to resolve", validationPassed: "Validation passed. Changes will be written in a single database transaction.",
-  bookmarkImport: "Import browser bookmarks", bookmarkImportHint: "Read this browser directly or import HTML exported elsewhere. Map folder status and sites before one atomic write.",
-  recommended: "Recommended", readCurrentBrowserBookmarks: "Read this browser's bookmarks", readCurrentBrowserBookmarksHint: "Read folders and links directly from the current Chrome or Edge profile without exporting a file first.",
-  permissionRequest: "Optional permission", bookmarkPermissionExplanation: "The browser will request permission to “read and change bookmarks.” PathMark only calls the read API and never modifies or deletes your original bookmarks.",
-  authorizeAndRead: "Authorize & read", currentBrowserBookmarks: "Current browser bookmarks", bookmarkPermissionDenied: "Bookmark permission was not granted. Neither your bookmarks nor PathMark data changed; HTML import remains available.",
-  bookmarkBrowserReadFailed: "Could not read browser bookmarks: {error}", importBookmarkHtml: "Import bookmark HTML", importBookmarkHtmlHint: "Use this for another browser, another device, or an offline export. No bookmark permission is required.",
-  bookmarkHtmlFile: "Bookmark HTML file", bookmarkHtmlSelected: "Parsed {folders} folders and {items} usable links",
-  chooseBookmarkHtml: "Choose a bookmark HTML file first", bookmarkParseFailed: "Could not parse bookmarks: {error}",
-  bookmarkFolderRules: "1. Folders & status", bookmarkFolderRulesHint: "Folders determine each item's reading status and optional collection, independently of site identity.",
-  importFolder: "Import", sourceFolder: "Source folder", linkCount: "Links", archiveOnImport: "Archive after import",
-  createCollectionFromFolder: "Create collection", collectionPath: "Collection path", collectionPathPlaceholder: "Example: AI / Papers",
-  bookmarkRootFolder: "Root folder", bookmarkSiteMapping: "2. Domains & sites", bookmarkSiteMappingHint: "Choose one existing site for multiple domains, or use the same new-site name to group them.",
-  candidateDomain: "Candidate domain", createNewSiteOption: "Create a new site…", newSiteNameForImport: "New site name",
-  unassignedImport: "Leave unassigned", exactEndpointMatch: "Exact Endpoint match", bookmarkPreviewAction: "3. Review import plan",
-  bookmarkPreviewHint: "Existing items are skipped. Duplicates in this batch are merged with the more-read status winning.",
-  previewBookmarkImport: "Generate preview", applyBookmarkImport: "Confirm import", bookmarkImportDone: "Bookmark import complete: {items} items added.",
-  selectedLinks: "Selected", newItems: "New items", existingSkipped: "Existing skipped", duplicatesMerged: "Duplicates merged",
-  newCollections: "New collections", newSites: "New sites", updatedSites: "Sites extended", importWarnings: "Import notes",
-  bookmarkInvalidSkipped: "{count} unsupported or invalid links will not be imported.", bookmarkNoNewItems: "There are no new links to add.",
-  exportDone: "Backup generated. Exporting did not modify local data.", fileReadFailed: "Could not read the file: {error}", chooseBackup: "Choose a JSON backup file first",
-  replaceQuestion: "Replace {count} current items with the backup contents?", replaceDone: "The local library was fully replaced with the backup.",
-  mergeDone: "Merge complete: {added} added, {updated} updated, {skipped} skipped.", writeFailed: "Write failed; the transaction left no partial data: {error}",
-  settingsSaved: "Normalization and default-view settings saved.", clearQuestion: "This permanently deletes all collections, sites, and saved items. Export a backup first. Continue to final confirmation?",
-  clearFinalQuestion: "Final confirmation: clear all local data now? This cannot be undone.", clearDone: "All local data was cleared and settings were reset.",
-  previewPageTitle: "Popup site recognition and save-flow preview", cannotReadTab: "Could not read the current tab URL", unsupportedPage: "The current page is not a saveable HTTP or HTTPS page",
-  httpOnly: "Only HTTP and HTTPS pages are supported", urlMatchesAdjust: "This URL still matches “{site}” first. Adjust the endpoint.",
-  urlMatchesManage: "This URL still matches “{site}” first. Adjust its endpoint in the library.",
-  actionUnrecorded: "Local Reading Library: current page is not saved", actionTodo: "Local Reading Library: current page is unread",
-  actionRead: "Local Reading Library: current page is read", actionArchived: "Local Reading Library: current page is archived",
-};
+export type AppLocale = keyof typeof localeDefinitions;
+
+export const DEFAULT_LOCALE: AppLocale = "en";
+export const SUPPORTED_LOCALES = Object.freeze(Object.keys(localeDefinitions) as AppLocale[]);
+export const CHROME_LOCALE_BY_APP_LOCALE = Object.freeze(chromeLocales) as Readonly<Record<AppLocale, string>>;
+export const LOCALE_DIRECTION = Object.freeze(Object.fromEntries(
+  SUPPORTED_LOCALES.map((locale) => [locale, "direction" in localeDefinitions[locale] ? "rtl" : "ltr"]),
+)) as Readonly<Record<AppLocale, "ltr" | "rtl">>;
+
+const localeAliases = Object.fromEntries(
+  SUPPORTED_LOCALES.flatMap((locale) => localeDefinitions[locale].aliases.map((alias) => [alias, locale])),
+) as Record<string, AppLocale>;
 
 let localeOverride: AppLocale | null = null;
+
+export function resolveLocale(locale: string | null | undefined): AppLocale {
+  if (!locale) return DEFAULT_LOCALE;
+  const normalized = locale.trim().replaceAll("_", "-").toLowerCase();
+  const exact = SUPPORTED_LOCALES.find((candidate) => candidate.toLowerCase() === normalized);
+  if (exact) return exact;
+  if (localeAliases[normalized]) return localeAliases[normalized];
+  const alias = Object.entries(localeAliases)
+    .sort(([left], [right]) => right.length - left.length)
+    .find(([prefix]) => normalized.startsWith(`${prefix}-`));
+  if (alias) return alias[1];
+  return DEFAULT_LOCALE;
+}
 
 export function getLocale(): AppLocale {
   if (localeOverride) return localeOverride;
@@ -305,57 +85,34 @@ export function getLocale(): AppLocale {
   const browserLocale = queryLocale
     ?? (typeof chrome !== "undefined" && chrome.i18n?.getUILanguage ? chrome.i18n.getUILanguage() : null)
     ?? (typeof navigator === "undefined" || navigator.userAgent === "Node.js" ? null : navigator.language);
-  if (!browserLocale) return "zh-CN";
-  const normalized = browserLocale.toLowerCase();
-  if (normalized.startsWith("en")) return "en";
-  return "zh-CN";
+  return resolveLocale(browserLocale);
 }
 
 export function t(key: MessageKey, values: Record<string, string | number> = {}): string {
-  const template = (getLocale() === "en" ? en : zh)[key];
-  return template.replace(/\{(\w+)\}/g, (match, name: string) => String(values[name] ?? match));
+  const template = localeDefinitions[getLocale()].messages[key];
+  return formatTemplate(template, values);
 }
 
 export function initializeDocument(title: MessageKey): void {
   if (typeof document === "undefined") return;
-  document.documentElement.lang = getLocale();
+  const locale = getLocale();
+  document.documentElement.lang = locale;
+  document.documentElement.dir = LOCALE_DIRECTION[locale];
   document.title = t(title);
 }
 
 export function localizeError(error: unknown): string {
   const source = error instanceof Error ? error.message : String(error);
-  if (getLocale() !== "en") return source;
-  const exact: Record<string, string> = {
-    "站点名称不能为空": "Site name is required", "分类名称不能为空": "Collection name is required",
-    "分类不能以自身作为父分类": "A collection cannot be its own parent", "父分类不存在或已被删除": "The parent collection no longer exists",
-    "分类不能移动到自己的后代中": "A collection cannot be moved into one of its descendants", "分类最多支持 5 层": "Collections support up to five levels",
-    "同一父分类下不能存在同名分类": "Sibling collections cannot have the same name", "分类结构存在循环引用": "The collection hierarchy contains a cycle",
-    "Endpoint 必须是合法 URL": "The endpoint must be a valid URL", "Endpoint 不能包含凭据、查询参数或片段": "Endpoints cannot contain credentials, query parameters, or fragments",
-    "当前页面不是合法 URL": "The current page is not a valid URL", "只支持 HTTP 和 HTTPS 页面": "Only HTTP and HTTPS pages are supported",
-    "相同 Endpoint 被配置到了多个 Site": "The same endpoint is assigned to multiple sites", "收藏条目不存在": "The saved item does not exist",
-    "收藏条目不存在或已被删除": "The saved item no longer exists", "目标分类不存在或已被删除": "The target collection no longer exists",
-    "标题不能为空": "Title is required", "分类不存在或已被删除": "The collection no longer exists", "站点不存在或已被删除": "The site no longer exists",
-    "目标站点不存在或已被删除": "The target site no longer exists", "部分收藏条目不存在或已被删除": "Some selected items no longer exist",
-    "部分待重映射条目不存在": "Some items selected for remapping no longer exist", "文件不是合法的 JSON": "The file is not valid JSON",
-    "导入文件顶层必须是对象": "The import file root must be an object", "导入校验未通过": "Import validation failed",
-    "当前环境不支持浏览器收藏夹读取接口": "This environment does not support browser bookmark access",
-    "浏览器未提供收藏夹读取接口": "The browser did not expose the bookmarks read API",
-    "浏览器收藏夹中没有找到可导入的链接": "No importable links were found in the browser bookmarks",
-    "浏览器收藏夹中的链接都不是可导入的 HTTP 或 HTTPS 地址": "None of the browser bookmarks are importable HTTP or HTTPS URLs",
-    "只支持 HTTP 和 HTTPS 链接": "Only HTTP and HTTPS links are supported",
-  };
-  if (exact[source]) return exact[source];
-  return source
-    .replace(/必须是对象/g, "must be an object").replace(/必须是数组/g, "must be an array")
-    .replace(/必须是 UUID 或 null/g, "must be a UUID or null").replace(/必须是 UUID/g, "must be a UUID")
-    .replace(/必须是非负整数/g, "must be a non-negative integer").replace(/必须是字符串/g, "must be a string")
-    .replace(/必须是布尔值/g, "must be a boolean").replace(/必须是 HTTP\(S\) URL 或 null/g, "must be an HTTP(S) URL or null")
-    .replace(/必须是 HTTP\(S\) URL/g, "must be an HTTP(S) URL").replace(/必须是 ISO 日期时间/g, "must be an ISO date-time")
-    .replace(/不能为空/g, "is required").replace(/无效/g, "is invalid").replace(/格式错误/g, "has an invalid format")
-    .replace(/缺少必填字段：/g, "is missing required fields: ").replace(/引用了不存在的/g, "references a missing ")
-    .replace(/规范键冲突/g, "canonical-key conflict").replace(/查询参数策略/g, "query parameter policy")
-    .replace(/分类/g, "collection").replace(/站点/g, "site").replace(/条目/g, "item")
-    .replace(/未归站/g, "unassigned").replace(/已读/g, "read").replace(/重复/g, "duplicate");
+  const locale = getLocale();
+  const localizedTokens = localizeAppErrorTokens(
+    source,
+    (code, values) => formatTemplate(localeDefinitions[locale].errors[code], values),
+  );
+  return localizedTokens;
+}
+
+function formatTemplate(template: string, values: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (match, name: string) => String(values[name] ?? match));
 }
 
 export function setLocaleForTesting(locale: AppLocale | null): void {

@@ -1,3 +1,4 @@
+import { AppError } from "./app-error";
 import { normalizeEndpoint } from "./identity";
 import type { Endpoint, QueryPolicy, Site, UUID } from "./models";
 
@@ -21,18 +22,18 @@ export interface PrepareSiteOptions {
   createId: () => UUID;
 }
 
-export class SiteConfigurationError extends Error {}
+export class SiteConfigurationError extends AppError {}
 
 export function prepareSite(draft: SiteDraft, options: PrepareSiteOptions): Site {
   const name = draft.name.trim();
-  if (!name) throw new SiteConfigurationError("站点名称不能为空");
+  if (!name) throw new SiteConfigurationError("siteNameRequired");
 
   const current = draft.id ? options.existingSites.find((site) => site.id === draft.id) : undefined;
   const endpointPrefixes = new Set<string>();
   const endpoints: Endpoint[] = draft.endpoints.map((endpoint, priority) => {
     const normalizedPrefix = normalizeEndpoint(endpoint.prefix.trim());
     if (endpointPrefixes.has(normalizedPrefix)) {
-      throw new SiteConfigurationError(`同一站点内不能重复配置 Endpoint：${normalizedPrefix}`);
+      throw new SiteConfigurationError("duplicateEndpointWithinSite", { endpoint: normalizedPrefix });
     }
     endpointPrefixes.add(normalizedPrefix);
     const previous = current?.endpoints.find((candidate) => candidate.id === endpoint.id);
@@ -51,7 +52,7 @@ export function prepareSite(draft: SiteDraft, options: PrepareSiteOptions): Site
     for (const endpoint of site.endpoints) {
       const normalizedPrefix = normalizeEndpoint(endpoint.prefix);
       if (endpointPrefixes.has(normalizedPrefix)) {
-        throw new SiteConfigurationError(`Endpoint 已属于站点“${site.name}”：${normalizedPrefix}`);
+        throw new SiteConfigurationError("endpointOwnedBySite", { site: site.name, endpoint: normalizedPrefix });
       }
     }
   }

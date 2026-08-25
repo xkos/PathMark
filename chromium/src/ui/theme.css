@@ -189,14 +189,14 @@ textarea.field__input {
 .segmented__option {
   min-height: 36px;
   border: 0;
-  border-right: 1px solid var(--color-border);
+  border-inline-end: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
   cursor: pointer;
 }
 
 .segmented__option:last-child {
-  border-right: 0;
+  border-inline-end: 0;
 }
 
 .segmented__option[aria-pressed="true"] {

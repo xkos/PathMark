@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 
 const distPath = resolve(import.meta.dirname, "../dist");
 const manifest = JSON.parse(readFileSync(resolve(distPath, "manifest.json"), "utf8"));
+const supportedLocales = JSON.parse(readFileSync(resolve(import.meta.dirname, "../src/i18n/supported-locales.json"), "utf8"));
 const background = manifest.background;
 
 if (
@@ -22,6 +23,16 @@ if (/^\s*(?:import|export)\b/m.test(workerSource) || /\bimport\s*\(/.test(worker
 for (const relativePath of Object.values(manifest.action.default_icon)) {
   if (!existsSync(resolve(distPath, relativePath))) {
     throw new Error(`Missing action icon: ${relativePath}`);
+  }
+}
+
+const manifestLocaleKeys = Object.keys(JSON.parse(readFileSync(resolve(distPath, "_locales/en/messages.json"), "utf8"))).sort();
+for (const [appLocale, chromeLocale] of Object.entries(supportedLocales)) {
+  const localePath = resolve(distPath, `_locales/${chromeLocale}/messages.json`);
+  if (!existsSync(localePath)) throw new Error(`Missing Chrome locale catalog for ${appLocale}: ${chromeLocale}`);
+  const keys = Object.keys(JSON.parse(readFileSync(localePath, "utf8"))).sort();
+  if (JSON.stringify(keys) !== JSON.stringify(manifestLocaleKeys)) {
+    throw new Error(`Chrome locale catalog keys do not match English: ${appLocale}`);
   }
 }
 

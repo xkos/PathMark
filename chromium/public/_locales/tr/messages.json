@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "Yerel Okuma Kitaplığı" },
+  "extensionShortName": { "message": "Okuma Kitaplığı" },
+  "extensionDescription": { "message": "Kaynakları koleksiyonlara kaydedin, okuma durumunu izleyin ve farklı siteler ile endpoint'lerde aynı içeriği tanıyın." }
+}

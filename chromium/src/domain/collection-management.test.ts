@@ -8,6 +8,16 @@ function collection(id: string, name: string, parentId: string | null, sortOrder
   return { id, name, parentId, sortOrder, createdAt: now, updatedAt: now };
 }
 
+function expectCollectionError(action: () => unknown, code: CollectionConfigurationError["code"]): void {
+  try {
+    action();
+    expect.fail(`Expected CollectionConfigurationError(${code})`);
+  } catch (error) {
+    expect(error).toBeInstanceOf(CollectionConfigurationError);
+    expect(error).toMatchObject({ code });
+  }
+}
+
 describe("prepareCollection", () => {
   it("accepts a client-generated stable id for a new collection", () => {
     const prepared = prepareCollection(
@@ -29,10 +39,10 @@ describe("prepareCollection", () => {
       collection("root", "Root", null),
       collection("child", "Child", "root"),
     ];
-    expect(() => prepareCollection(
+    expectCollectionError(() => prepareCollection(
       { id: "root", name: "Root", parentId: "child" },
       { existingCollections: collections, now, createId: () => "unused" },
-    )).toThrow("后代");
+    ), "collectionIntoDescendant");
   });
 
   it("enforces the five-level maximum when adding a child", () => {
@@ -43,9 +53,9 @@ describe("prepareCollection", () => {
       collection("4", "Four", "3"),
       collection("5", "Five", "4"),
     ];
-    expect(() => prepareCollection(
+    expectCollectionError(() => prepareCollection(
       { name: "Six", parentId: "5" },
       { existingCollections: collections, now, createId: () => "6" },
-    )).toThrow("5 层");
+    ), "collectionDepthExceeded");
   });
 });

@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "로컬 리딩 라이브러리" },
+  "extensionShortName": { "message": "리딩 라이브러리" },
+  "extensionDescription": { "message": "자료를 컬렉션에 저장하고 읽기 상태를 기록하며 여러 사이트 엔드포인트에 걸친 동일한 콘텐츠를 식별합니다." }
+}

@@ -4,6 +4,7 @@ import { ReadingLibrary } from "./reading-library";
 import { DEFAULT_SETTINGS, type Item } from "../domain/models";
 import type { LibraryExportDocument } from "../domain/library-transfer";
 import { bookmarkFolderKey, parseBookmarkHtml } from "../domain/bookmark-import";
+import { localizeError } from "../i18n";
 
 const databases: ReadingLibraryDatabase[] = [];
 
@@ -231,7 +232,7 @@ describe("ReadingLibrary", () => {
       queryPolicy: { mode: "keep-all-except-ignored", ignoredParams: [] },
     });
 
-    await expect(library.remapItems([first.id, second.id])).rejects.toThrow("规范键冲突");
+    await expect(library.remapItems([first.id, second.id])).rejects.toMatchObject({ code: "remapConflict" });
     expect((await library.database.items.get(first.id))?.siteId).toBeNull();
     expect((await library.database.items.get(second.id))?.siteId).toBeNull();
   });
@@ -280,7 +281,7 @@ describe("ReadingLibrary", () => {
       queryPolicy: { mode: "keep-all-except-ignored", ignoredParams: [] },
     });
 
-    await expect(library.previewItemMigration(item.id, site.id)).rejects.toThrow("未命中站点");
+    await expect(library.previewItemMigration(item.id, site.id)).rejects.toMatchObject({ code: "originalUrlNoEndpoint" });
     expect((await library.database.items.get(item.id))?.siteId).toBeNull();
   });
 
@@ -315,7 +316,7 @@ describe("ReadingLibrary", () => {
 
     const preview = await library.previewItemMigration(candidate.id, site.id);
     expect(preview.conflictingItem).toEqual({ id: existing.id, title: "Existing" });
-    await expect(library.migrateItem(candidate.id, site.id)).rejects.toThrow("规范键冲突");
+    await expect(library.migrateItem(candidate.id, site.id)).rejects.toMatchObject({ code: "migrationConflict" });
     expect((await library.database.items.get(candidate.id))?.siteId).toBeNull();
   });
 
@@ -388,7 +389,13 @@ describe("ReadingLibrary", () => {
     const library = createLibrary();
     await library.savePage({ title: "Existing", url: "https://existing.example.com", note: "", tags: [], collectionId: null, readingState: "unread" });
 
-    await expect(library.applyImport({ format: "reading-bookmarks", formatVersion: 99 }, "replace")).rejects.toThrow("格式版本");
+    let failure: unknown;
+    try {
+      await library.applyImport({ format: "reading-bookmarks", formatVersion: 99 }, "replace");
+    } catch (error) {
+      failure = error;
+    }
+    expect(localizeError(failure)).toContain("Unsupported major format version: 99");
     expect((await library.listItems()).map((item) => item.title)).toEqual(["Existing"]);
   });
 

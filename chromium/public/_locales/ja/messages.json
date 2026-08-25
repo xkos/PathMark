@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "ローカルリーディングライブラリ" },
+  "extensionShortName": { "message": "リーディングライブラリ" },
+  "extensionDescription": { "message": "資料をコレクションに保存し、読書状況を記録して、複数のサイト Endpoint にまたがる同じコンテンツを識別します。" }
+}

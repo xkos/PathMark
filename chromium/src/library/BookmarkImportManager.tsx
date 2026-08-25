@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import {
   bookmarkFolderKey,
   parseBookmarkHtml,
+  UNTITLED_BOOKMARK_FOLDER,
   type BookmarkFolderRule,
   type BookmarkImportSnapshot,
   type BookmarkImportPreview,
@@ -86,7 +87,7 @@ export function BookmarkImportManager({ onImported }: { onImported: () => Promis
 
   async function activateSnapshot(parsed: BookmarkImportSnapshot, label: string): Promise<void> {
     const existingSites = await readingLibrary.listSites();
-    const rules = parsed.folders.map((folder) => createDefaultFolderRule(folder.key, folder.path));
+    const rules = parsed.folders.map((folder) => createDefaultFolderRule(folder.key, localizeFolderPath(folder.path)));
     const mappings = [...new Set(parsed.candidates.map((candidate) => candidate.origin))].map((origin) => ({
       origin,
       target: inferSiteTarget(origin, existingSites),
@@ -192,16 +193,17 @@ export function BookmarkImportManager({ onImported }: { onImported: () => Promis
             {snapshot.folders.map((folder) => {
               const rule = folderRules.find((candidate) => candidate.folderKey === folder.key);
               if (!rule) return null;
+              const displayPath = localizeFolderPath(folder.path);
               return <div className={`bookmark-folder-row${rule.selected ? "" : " bookmark-row--disabled"}`} role="row" key={folder.key}>
                 <label className="bookmark-check"><input type="checkbox" checked={rule.selected} onChange={(event) => updateFolderRule(rule.folderKey, { selected: event.target.checked })} /><span className="sr-only">{t("importFolder")}</span></label>
-                <strong title={folder.path.join(" / ")}>{folder.path.length ? folder.path.join(" / ") : t("bookmarkRootFolder")}</strong>
+                <strong title={displayPath.join(" / ")}>{displayPath.length ? displayPath.join(" / ") : t("bookmarkRootFolder")}</strong>
                 <span className="bookmark-count">{folder.itemCount}</span>
                 <select className="field__input" disabled={!rule.selected} value={rule.readingState} onChange={(event) => updateFolderRule(rule.folderKey, { readingState: event.target.value as ReadingState })}>
                   <option value="unread">{t("unread")}</option><option value="reading">{t("reading")}</option><option value="read">{t("read")}</option>
                 </select>
                 <label className="bookmark-check"><input type="checkbox" disabled={!rule.selected} checked={rule.isArchived} onChange={(event) => updateFolderRule(rule.folderKey, { isArchived: event.target.checked })} /><span className="sr-only">{t("archiveOnImport")}</span></label>
                 <div className="bookmark-collection-control">
-                  <label className="check-field"><input type="checkbox" disabled={!rule.selected} checked={rule.collectionPath.length > 0} onChange={(event) => updateFolderRule(rule.folderKey, { collectionPath: event.target.checked ? defaultCollectionPath(folder.path, true) : [] })} /> {t("createCollectionFromFolder")}</label>
+                  <label className="check-field"><input type="checkbox" disabled={!rule.selected} checked={rule.collectionPath.length > 0} onChange={(event) => updateFolderRule(rule.folderKey, { collectionPath: event.target.checked ? defaultCollectionPath(displayPath, true) : [] })} /> {t("createCollectionFromFolder")}</label>
                   {rule.collectionPath.length ? <input className="field__input" aria-label={t("collectionPath")} placeholder={t("collectionPathPlaceholder")} value={rule.collectionPath.join(" / ")} onChange={(event) => updateFolderRule(rule.folderKey, { collectionPath: parseCollectionPath(event.target.value) })} /> : null}
                 </div>
               </div>;
@@ -274,6 +276,10 @@ function createDefaultFolderRule(folderKey: string, path: string[]): BookmarkFol
     ? "read"
     : normalized.some((segment) => ["reading", "在读", "阅读中"].includes(segment)) ? "reading" : "unread";
   return { folderKey, selected: true, readingState, isArchived, collectionPath: defaultCollectionPath(path, false) };
+}
+
+function localizeFolderPath(path: string[]): string[] {
+  return path.map((segment) => segment === UNTITLED_BOOKMARK_FOLDER ? t("bookmarkUntitledFolder") : segment);
 }
 
 function defaultCollectionPath(path: string[], force: boolean): string[] {

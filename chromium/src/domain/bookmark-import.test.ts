@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { localizeError } from "../i18n";
 import { DEFAULT_SETTINGS, type Site } from "./models";
 import {
   bookmarkFolderKey,
@@ -133,8 +134,7 @@ describe("browser bookmark tree import", () => {
   });
 
   it("reports an empty browser tree", () => {
-    expect(parseBrowserBookmarkTree([{ id: "0", title: "", children: [] }]).errors).toEqual([
-      "浏览器收藏夹中没有找到可导入的链接",
-    ]);
+    const [error] = parseBrowserBookmarkTree([{ id: "0", title: "", children: [] }]).errors;
+    expect(localizeError(new Error(error))).toBe("No importable links were found in the browser bookmarks");
   });
 });

@@ -1,0 +1,5 @@
+{
+  "extensionName": { "message": "Lokalna biblioteka lektur" },
+  "extensionShortName": { "message": "Biblioteka lektur" },
+  "extensionDescription": { "message": "Zapisuj materiały w kolekcjach, śledź stan czytania i rozpoznawaj tę samą treść w różnych witrynach i endpointach." }
+}

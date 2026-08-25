@@ -1,3 +1,4 @@
+import { AppError } from "./app-error";
 import type { Collection, UUID } from "./models";
 
 export interface CollectionDraft {
@@ -12,29 +13,29 @@ export interface PrepareCollectionOptions {
   createId: () => UUID;
 }
 
-export class CollectionConfigurationError extends Error {}
+export class CollectionConfigurationError extends AppError {}
 
 export function prepareCollection(draft: CollectionDraft, options: PrepareCollectionOptions): Collection {
   const name = draft.name.trim();
-  if (!name) throw new CollectionConfigurationError("分类名称不能为空");
+  if (!name) throw new CollectionConfigurationError("collectionNameRequired");
 
   const current = draft.id
     ? options.existingCollections.find((collection) => collection.id === draft.id)
     : undefined;
-  if (draft.parentId === draft.id) throw new CollectionConfigurationError("分类不能以自身作为父分类");
+  if (draft.parentId === draft.id) throw new CollectionConfigurationError("collectionSelfParent");
   if (draft.parentId && !options.existingCollections.some((collection) => collection.id === draft.parentId)) {
-    throw new CollectionConfigurationError("父分类不存在或已被删除");
+    throw new CollectionConfigurationError("collectionParentMissing");
   }
 
   const descendants = current ? collectDescendantIds(current.id, options.existingCollections) : new Set<string>();
   if (draft.parentId && descendants.has(draft.parentId)) {
-    throw new CollectionConfigurationError("分类不能移动到自己的后代中");
+    throw new CollectionConfigurationError("collectionIntoDescendant");
   }
 
   const parentDepth = getCollectionDepth(draft.parentId, options.existingCollections);
   const descendantHeight = current ? getDescendantHeight(current.id, options.existingCollections) : 0;
   if (parentDepth + 1 + descendantHeight > 5) {
-    throw new CollectionConfigurationError("分类最多支持 5 层");
+    throw new CollectionConfigurationError("collectionDepthExceeded");
   }
 
   const normalizedName = name.toLocaleLowerCase();
@@ -44,7 +45,7 @@ export function prepareCollection(draft: CollectionDraft, options: PrepareCollec
       collection.parentId === draft.parentId &&
       collection.name.trim().toLocaleLowerCase() === normalizedName,
   );
-  if (duplicate) throw new CollectionConfigurationError("同一父分类下不能存在同名分类");
+  if (duplicate) throw new CollectionConfigurationError("collectionSiblingDuplicate");
 
   const siblings = options.existingCollections.filter(
     (collection) => collection.parentId === draft.parentId && collection.id !== draft.id,
@@ -78,7 +79,7 @@ export function flattenCollections(collections: Collection[]): Array<{ collectio
   const appendChildren = (parentId: string | null, depth: number) => {
     collections
       .filter((collection) => collection.parentId === parentId)
-      .sort((left, right) => left.sortOrder - right.sortOrder || left.name.localeCompare(right.name, "zh-CN"))
+      .sort((left, right) => left.sortOrder - right.sortOrder || left.name.localeCompare(right.name))
       .forEach((collection) => {
         result.push({ collection, depth });
         appendChildren(collection.id, depth + 1);
@@ -93,10 +94,10 @@ function getCollectionDepth(collectionId: string | null, collections: Collection
   let currentId = collectionId;
   const visited = new Set<string>();
   while (currentId) {
-    if (visited.has(currentId)) throw new CollectionConfigurationError("分类结构存在循环引用");
+    if (visited.has(currentId)) throw new CollectionConfigurationError("collectionCycle");
     visited.add(currentId);
     const collection = collections.find((candidate) => candidate.id === currentId);
-    if (!collection) throw new CollectionConfigurationError("父分类不存在或已被删除");
+    if (!collection) throw new CollectionConfigurationError("collectionParentMissing");
     depth += 1;
     currentId = collection.parentId;
   }
