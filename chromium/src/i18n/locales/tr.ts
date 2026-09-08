@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "Bu alan adındaki tüm URL’leri bu içe aktarmadan çıkar",
+  excludedImportDomains: "Bu içe aktarmadan çıkarılan alan adları",
+  restoreImportDomain: "Yeniden dahil et",
+
+  clearItems: "Öğe verilerini temizle",
+  clearItemsHint: "Arşivlenenler dahil tüm öğeleri kalıcı olarak siler. Siteler, koleksiyonlar ve ayarlar korunur. Bu işlem geri alınamaz.",
+  clearItemsDone: "Öğeler temizlendi. Siteler, koleksiyonlar ve ayarlar korundu.",
+
+  existingImportCollections: "Mevcut koleksiyonlar",
+  importCollectionHint: "Mevcut bir koleksiyon seçin veya yeni oluşturun. Klasör adları koleksiyon oluşturmaz. Yeni koleksiyonlar içe aktarma onaylandığında kaydedilir.",
+  finishImportCollection: "Oluşturmayı tamamlayın veya mevcut bir koleksiyon ya da Koleksiyonsuz seçin.",
+
+  itemsPerPage: "Sayfa başına öğe",
+  itemRange: "{total} öğeden {start}–{end}",
+
+  selectAll: "Tümünü seç",
+  selectResults: "Tüm sonuçları seç",
+  previousPage: "Önceki sayfa",
+  nextPage: "Sonraki sayfa",
+  syncSite: "Siteyi eşitle",
+  syncSiteHint: "Kaydettikten sonra atanmamış URL’leri seçin. Aynı kaynak yolları tek bir öğede birleştirilir.",
+  mergeOnSync: "Eşitlerken birleştir",
+  deleteSelectedQuestion: "Seçilen {count} öğe silinsin mi?",
+  draftOption: "Bu içe aktarmada yeni",
+
   appName: "Yerel Okuma Kitaplığı", appShortName: "Okuma Kitaplığı", libraryTitle: "Yerel Okuma Kitaplığı",
   loadingPage: "Geçerli sayfa tanımlanıyor…", currentPage: "Geçerli sayfa", title: "Başlık", site: "Site",
   siteDescription: "Bir site, birden fazla alan adını veya URL önekini tek bir içerik kaynağı olarak gruplar.", autoMatched: "Otomatik eşleştirildi",
@@ -9,7 +34,7 @@ export const messages: Record<MessageKey, string> = {
   newSiteName: "Yeni site adı", newSitePlaceholder: "Örnek: Örnek Makaleler", firstEndpoint: "İlk endpoint",
   addEndpoint: "Seçili siteye eklenecek endpoint", endpointWillBeAdded: "Bu URL henüz siteyle eşleşmiyor. Kaydettiğinizde bu önek eklenecek.",
   endpointPrefilled: "Geçerli sayfadan dolduruldu. Gerekirse bir yol öneki ekleyin.", noteOptional: "Not (isteğe bağlı)",
-  notePlaceholder: "Bunu neden kaydediyorsunuz ve daha sonra neye odaklanmalısınız?", collection: "Koleksiyon", inbox: "Gelen kutusu", tags: "Etiketler",
+  notePlaceholder: "Bunu neden kaydediyorsunuz ve daha sonra neye odaklanmalısınız?", collection: "Koleksiyon", uncategorized: "Koleksiyonsuz", tags: "Etiketler",
   tagsPlaceholder: "makaleler, RAG", readingState: "Okuma durumu", unread: "Okunmadı", reading: "Okunuyor", read: "Okundu", archived: "Arşivlendi",
   viewIdentity: "Son kimliği görüntüle", viewIdentityDetails: "Kimlik ayrıntılarını görüntüle", saving: "Kaydediliyor…", saveToLibrary: "Kitaplığa kaydet",
   manageLibrary: "Kitaplığı yönet", savedUnread: "Kaydedildi · Okunmadı", savedReading: "Kaydedildi · Okunuyor", savedRead: "Kaydedildi · Okundu",
@@ -43,9 +68,9 @@ export const messages: Record<MessageKey, string> = {
   migrating: "Taşınıyor…", confirmMigration: "Taşımayı onayla", collectionsHint: "Koleksiyonlar öğelerin yerini düzenler ve URL kimliğini etkilemez. En fazla beş düzey desteklenir.",
   newCollection: "Yeni koleksiyon", collectionList: "Koleksiyon listesi", noCollections: "Henüz koleksiyon yok", collectionEditor: "Koleksiyon düzenleyici",
   collectionName: "Koleksiyon adı", collectionPlaceholder: "Örnek: Okunacak makaleler", parentCollection: "Üst koleksiyon", topLevelCollection: "En üst düzey",
-  itemsCount: "{total} öğe · {unread} okunmadı", moveUp: "Yukarı taşı", moveDown: "Aşağı taşı", deleteCollectionMove: "Sil; {count} öğeyi Gelen kutusuna taşı",
+  itemsCount: "{total} öğe · {unread} okunmadı", moveUp: "Yukarı taşı", moveDown: "Aşağı taşı", deleteCollectionMove: "Sil; {count} öğeyi koleksiyonsuz tut",
   deleteCollectionItems: "Koleksiyonu ve öğeleri sil", deleteCollection: "Koleksiyonu sil", saveCollection: "Koleksiyonu kaydet", collectionSaved: "Koleksiyon kaydedildi.",
-  deleteItemsStrategy: "öğelerini sil", moveItemsStrategy: "öğelerini Gelen kutusuna taşı",
+  deleteItemsStrategy: "öğelerini sil", moveItemsStrategy: "öğeleri koleksiyonsuz tut",
   deleteCollectionQuestion: "“{name}”, alt koleksiyonları silinsin ve {action}?", collectionDeleted: "{collections} koleksiyon silindi ve {items} öğe işlendi.",
   sitesHint: "Aynı kaynağın kararlı bir kimliği koruması için eski ve yeni alan adlarını tek sitede gruplayın.", newSite: "Yeni site", siteList: "Site listesi",
   endpointsCount: "{count} endpoint", noSites: "Henüz site yok", siteEditor: "Site düzenleyici", siteName: "Site adı",

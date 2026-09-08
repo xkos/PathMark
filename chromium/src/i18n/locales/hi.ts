@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "इस आयात से इस डोमेन के सभी URL बाहर करें",
+  excludedImportDomains: "इस आयात से बाहर किए गए डोमेन",
+  restoreImportDomain: "फिर शामिल करें",
+
+  clearItems: "आइटम डेटा मिटाएँ",
+  clearItemsHint: "संग्रहीत आइटम सहित सभी आइटम स्थायी रूप से हटाएँ। साइट, संग्रह और सेटिंग बनी रहेंगी। इसे वापस नहीं किया जा सकता।",
+  clearItemsDone: "आइटम मिटा दिए गए। साइट, संग्रह और सेटिंग बनी हुई हैं।",
+
+  existingImportCollections: "मौजूदा संग्रह",
+  importCollectionHint: "मौजूदा संग्रह चुनें या नया बनाएँ। फ़ोल्डर के नाम से संग्रह नहीं बनता। नए संग्रह आयात की पुष्टि पर सहेजे जाते हैं।",
+  finishImportCollection: "बनाना पूरा करें या मौजूदा संग्रह या बिना संग्रह चुनें।",
+
+  itemsPerPage: "प्रति पृष्ठ आइटम",
+  itemRange: "{total} में से {start}–{end}",
+
+  selectAll: "सभी चुनें",
+  selectResults: "सभी परिणाम चुनें",
+  previousPage: "पिछला पृष्ठ",
+  nextPage: "अगला पृष्ठ",
+  syncSite: "साइट सिंक करें",
+  syncSiteHint: "साइट सहेजने के बाद सिंक करने के लिए असाइन न किए गए URL चुनें। समान संसाधन पथ एक आइटम में मर्ज होंगे।",
+  mergeOnSync: "सिंक करते समय एक में मर्ज करें",
+  deleteSelectedQuestion: "चुने गए {count} आइटम हटाएँ?",
+  draftOption: "इस आयात में नया",
+
   appName: "स्थानीय पठन लाइब्रेरी", appShortName: "पठन लाइब्रेरी", libraryTitle: "स्थानीय पठन लाइब्रेरी",
   loadingPage: "वर्तमान पृष्ठ की पहचान की जा रही है…", currentPage: "वर्तमान पृष्ठ", title: "शीर्षक", site: "साइट",
   siteDescription: "एक साइट कई डोमेन या URL उपसर्गों को एक सामग्री स्रोत के रूप में समूहित करती है।", autoMatched: "स्वचालित रूप से मिलान हुआ",
@@ -9,7 +34,7 @@ export const messages: Record<MessageKey, string> = {
   newSiteName: "नई साइट का नाम", newSitePlaceholder: "उदाहरण: उदाहरण शोधपत्र", firstEndpoint: "पहला endpoint",
   addEndpoint: "चुनी गई साइट में जोड़ने के लिए endpoint", endpointWillBeAdded: "यह URL अभी साइट से मेल नहीं खाता। सहेजने पर यह उपसर्ग जोड़ा जाएगा।",
   endpointPrefilled: "वर्तमान पृष्ठ से भरा गया। आवश्यकता हो तो पथ उपसर्ग जोड़ें।", noteOptional: "नोट (वैकल्पिक)",
-  notePlaceholder: "इसे क्यों सहेजें और बाद में किस बात पर ध्यान दें?", collection: "संग्रह", inbox: "इनबॉक्स", tags: "टैग",
+  notePlaceholder: "इसे क्यों सहेजें और बाद में किस बात पर ध्यान दें?", collection: "संग्रह", uncategorized: "बिना संग्रह", tags: "टैग",
   tagsPlaceholder: "शोधपत्र, RAG", readingState: "पठन स्थिति", unread: "अपठित", reading: "पढ़ रहे हैं", read: "पढ़ा गया", archived: "संग्रहित",
   viewIdentity: "अंतिम पहचान देखें", viewIdentityDetails: "पहचान विवरण देखें", saving: "सहेजा जा रहा है…", saveToLibrary: "लाइब्रेरी में सहेजें",
   manageLibrary: "लाइब्रेरी प्रबंधित करें", savedUnread: "सहेजा गया · अपठित", savedReading: "सहेजा गया · पढ़ रहे हैं", savedRead: "सहेजा गया · पढ़ा गया",
@@ -43,9 +68,9 @@ export const messages: Record<MessageKey, string> = {
   migrating: "स्थानांतरित हो रहा है…", confirmMigration: "स्थानांतरण की पुष्टि करें", collectionsHint: "संग्रह आइटम का स्थान व्यवस्थित करते हैं और URL पहचान को प्रभावित नहीं करते। अधिकतम पाँच स्तर समर्थित हैं।",
   newCollection: "नया संग्रह", collectionList: "संग्रह सूची", noCollections: "अभी कोई संग्रह नहीं", collectionEditor: "संग्रह संपादक",
   collectionName: "संग्रह का नाम", collectionPlaceholder: "उदाहरण: पढ़ने के लिए शोधपत्र", parentCollection: "मूल संग्रह", topLevelCollection: "शीर्ष स्तर",
-  itemsCount: "{total} आइटम · {unread} अपठित", moveUp: "ऊपर ले जाएँ", moveDown: "नीचे ले जाएँ", deleteCollectionMove: "हटाएँ; {count} आइटम इनबॉक्स में ले जाएँ",
+  itemsCount: "{total} आइटम · {unread} अपठित", moveUp: "ऊपर ले जाएँ", moveDown: "नीचे ले जाएँ", deleteCollectionMove: "हटाएँ; {count} आइटम बिना संग्रह के रखें",
   deleteCollectionItems: "संग्रह और आइटम हटाएँ", deleteCollection: "संग्रह हटाएँ", saveCollection: "संग्रह सहेजें", collectionSaved: "संग्रह सहेजा गया।",
-  deleteItemsStrategy: "इसके आइटम हटाएँ", moveItemsStrategy: "इसके आइटम इनबॉक्स में ले जाएँ",
+  deleteItemsStrategy: "इसके आइटम हटाएँ", moveItemsStrategy: "आइटम बिना संग्रह के रखें",
   deleteCollectionQuestion: "“{name}”, इसके उप-संग्रह हटाएँ और {action}?", collectionDeleted: "{collections} संग्रह हटाए और {items} आइटम संसाधित किए गए।",
   sitesHint: "पुराने और नए डोमेन को एक साइट में समूहित करें, ताकि वही संसाधन स्थिर पहचान बनाए रखे।", newSite: "नई साइट", siteList: "साइट सूची",
   endpointsCount: "{count} endpoint", noSites: "अभी कोई साइट नहीं", siteEditor: "साइट संपादक", siteName: "साइट का नाम",

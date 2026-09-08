@@ -1,13 +1,31 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { AppError } from "../domain/app-error";
-import { CHROME_LOCALE_BY_APP_LOCALE, DEFAULT_LOCALE, initializeDocument, LOCALE_DIRECTION, localizeError, resolveLocale, setLocaleForTesting, SUPPORTED_LOCALES, t } from ".";
+import { CHROME_LOCALE_BY_APP_LOCALE, DEFAULT_LOCALE, getLocale, saveLocale, initializeDocument, LOCALE_DIRECTION, localizeError, resolveLocale, setLocaleForTesting, SUPPORTED_LOCALES, t } from ".";
 import { errors as englishErrors, messages as englishMessages } from "./locales/en";
 
 const localeModules = import.meta.glob<{ messages: Record<string, string>; errors: Record<string, string> }>("./locales/*.ts", { eager: true });
 const placeholders = (value: string) => [...value.matchAll(/\{[A-Za-z][A-Za-z0-9]*\}/g)].map(([token]) => token).sort();
 
 describe("i18n", () => {
-  afterEach(() => setLocaleForTesting(null));
+  afterEach(() => { setLocaleForTesting(null); vi.unstubAllGlobals(); });
+
+  it("defaults to English even with a Chinese browser", () => {
+    vi.stubGlobal("navigator", { language: "zh-CN" });
+    vi.stubGlobal("chrome", { i18n: { getUILanguage: () => "zh-CN" } });
+    vi.stubGlobal("localStorage", { getItem: () => null });
+    expect(getLocale()).toBe("en");
+  });
+
+  it("persists the selected language and uses it immediately", () => {
+    const storage = new Map<string, string>();
+    vi.stubGlobal("localStorage", { getItem: (key: string) => storage.get(key), setItem: (key: string, value: string) => storage.set(key, value) });
+    vi.stubGlobal("window", { dispatchEvent: vi.fn() });
+    saveLocale("zh-CN");
+    expect(getLocale()).toBe("zh-CN");
+    expect(t("uncategorized")).toBe("未分类");
+    saveLocale("en");
+    expect(getLocale()).toBe("en");
+  });
 
   it("renders Chinese placeholders", () => {
     setLocaleForTesting("zh-CN");

@@ -34,7 +34,7 @@ export interface PageRecognition {
 }
 
 export type DeleteSiteStrategy = "unassign-items" | "delete-items";
-export type DeleteCollectionStrategy = "move-items-to-inbox" | "delete-items";
+export type DeleteCollectionStrategy = "unclassify-items" | "delete-items";
 
 export interface SiteIdentityImpact {
   itemId: string;
@@ -223,6 +223,10 @@ export class ReadingLibrary {
       defaultView: settings.defaultView,
     };
     await this.database.settings.put({ id: "app", value: normalized });
+  }
+
+  async clearItems(): Promise<void> {
+    await this.database.items.clear();
   }
 
   async clearAllData(): Promise<void> {
@@ -459,6 +463,37 @@ export class ReadingLibrary {
     };
   }
 
+  async syncSiteItems(siteId: string, itemIds: string[]): Promise<Item[]> {
+    return this.database.transaction("rw", this.database.items, this.database.sites, this.database.settings, async () => {
+      const [site, allItems, settingsRecord] = await Promise.all([
+        this.database.sites.get(siteId), this.database.items.toArray(), this.database.settings.get("app"),
+      ]);
+      if (!site) throw new SiteConfigurationError("siteMissing");
+      const selected = new Set(itemIds);
+      const owners = new Map(allItems.map((item) => [item.canonicalKey, item]));
+      const updates = new Map<string, Item>();
+      const removed = new Set<string>();
+      for (const item of allItems) {
+        if (!selected.has(item.id) || item.siteId !== null) continue;
+        const identity = identifyUrl(item.originalUrl, [site], settingsRecord?.value ?? DEFAULT_SETTINGS);
+        if (identity.siteId !== siteId) continue;
+        const incoming: Item = { ...item, siteId, resourceKey: identity.resourceKey, canonicalKey: identity.canonicalKey, updatedAt: this.now() };
+        const existing = owners.get(identity.canonicalKey);
+        const result = existing && existing.id !== item.id ? mergeSiteItems(existing, incoming, this.now()) : incoming;
+        if (existing && existing.id !== item.id) removed.add(item.id);
+        owners.set(identity.canonicalKey, result);
+        updates.set(result.id, result);
+      }
+      await this.database.items.bulkDelete([...removed]);
+      await this.database.items.bulkPut([...updates.values()]);
+      return [...updates.values()];
+    });
+  }
+
+  async deleteItems(itemIds: string[]): Promise<void> {
+    await this.database.items.bulkDelete([...new Set(itemIds)]);
+  }
+
   async remapItems(itemIds: string[]): Promise<Item[]> {
     const uniqueItemIds = [...new Set(itemIds)];
     if (!uniqueItemIds.length) return [];
@@ -674,4 +709,24 @@ function normalizeTags(tags: string[]): string[] {
 
 function getAppVersion(): string {
   try { return chrome.runtime.getManifest().version; } catch { return "0.1.0"; }
+}
+
+function mergeSiteItems(existing: Item, incoming: Item, now: string): Item {
+  const earliest = (a: string | null, b: string | null) => [a, b].filter((v): v is string => !!v).sort()[0] ?? null;
+  const latest = (a: string | null, b: string | null) => [a, b].filter((v): v is string => !!v).sort().at(-1) ?? null;
+  const rank = { unread: 0, reading: 1, read: 2 };
+  const readingState = rank[existing.readingState] >= rank[incoming.readingState] ? existing.readingState : incoming.readingState;
+  return {
+    ...existing,
+    note: [...new Set([existing.note, incoming.note].filter(Boolean))].join("\n\n"),
+    tags: normalizeTags([...existing.tags, ...incoming.tags]),
+    collectionId: existing.collectionId ?? incoming.collectionId,
+    readingState,
+    isArchived: existing.isArchived && incoming.isArchived,
+    createdAt: earliest(existing.createdAt, incoming.createdAt)!, updatedAt: now,
+    firstReadAt: earliest(existing.firstReadAt, incoming.firstReadAt),
+    readAt: readingState === "read" ? latest(existing.readAt, incoming.readAt) : null,
+    lastOpenedAt: latest(existing.lastOpenedAt, incoming.lastOpenedAt),
+    openCount: existing.openCount + incoming.openCount,
+  };
 }

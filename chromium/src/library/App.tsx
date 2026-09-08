@@ -25,60 +25,50 @@ export function App() {
   const [sites, setSites] = useState<Site[]>([]);
   const [migrationItem, setMigrationItem] = useState<Item | null>(null);
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [collectionFilter, setCollectionFilter] = useState("all");
+  const [collectionFilter, setCollectionFilter] = useState("uncategorized");
   const [selectedItemIds, setSelectedItemIds] = useState<Set<string>>(() => new Set());
-  const [bulkTargetCollectionId, setBulkTargetCollectionId] = useState("inbox");
+  const [bulkTargetCollectionId, setBulkTargetCollectionId] = useState("uncategorized");
   const [bulkError, setBulkError] = useState("");
   const [editingItem, setEditingItem] = useState<Item | null>(null);
-  const [siteFilter, setSiteFilter] = useState("all");
-  const [tagFilter, setTagFilter] = useState("");
-  const [createdFrom, setCreatedFrom] = useState("");
-  const [createdTo, setCreatedTo] = useState("");
-  const [readFrom, setReadFrom] = useState("");
-  const [readTo, setReadTo] = useState("");
+  const [siteFilter, setSiteFilter] = useState("unassigned");
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(() => {
+    try {
+      const stored = Number(localStorage.getItem("pathmark.library.pageSize"));
+      return PAGE_SIZES.includes(stored) ? stored : 100;
+    } catch { return 100; }
+  });
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortDescending, setSortDescending] = useState(true);
 
   useEffect(() => {
-    Promise.all([readingLibrary.listItems(), readingLibrary.listSites(), readingLibrary.listCollections(), readingLibrary.getSettings()])
-      .then(([loadedItems, loadedSites, loadedCollections, settings]) => {
-        setItems(loadedItems);
-        setSites(loadedSites);
-        setCollections(loadedCollections);
-        if (settings.defaultView === "inbox") { setFilter("all"); setCollectionFilter("inbox"); }
-        else if (settings.defaultView === "unread") setFilter("unread");
+    if (section !== "items") return;
+    let active = true;
+    setLoading(true);
+    void Promise.all([readingLibrary.listItems(), readingLibrary.listSites(), readingLibrary.listCollections()])
+      .then(([loadedItems, loadedSites, loadedCollections]) => {
+        if (!active) return;
+        setItems(loadedItems); setSites(loadedSites); setCollections(loadedCollections);
       })
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    if (section === "items") {
-      void Promise.all([readingLibrary.listSites(), readingLibrary.listCollections()])
-        .then(([loadedSites, loadedCollections]) => {
-          setSites(loadedSites);
-          setCollections(loadedCollections);
-        });
-    }
+      .catch((error) => { if (active) setBulkError(localizeError(error)); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
   }, [section]);
 
+  const locale = getLocale();
   const visibleItems = useMemo(() => {
+    const siteNames = new Map(sites.map((site) => [site.id, site.name]));
     const normalizedQuery = query.trim().toLocaleLowerCase();
-    const selectedTags = tagFilter.split(/[，,]/).map((tag) => tag.trim().toLocaleLowerCase()).filter(Boolean);
     return items.filter((item) => {
       if (filter === "unread" && (item.isArchived || item.readingState === "read")) return false;
       if (filter === "read" && (item.isArchived || item.readingState !== "read")) return false;
       if (filter === "archived" && !item.isArchived) return false;
-      if (collectionFilter === "inbox" && item.collectionId !== null) return false;
-      if (collectionFilter !== "all" && collectionFilter !== "inbox" && item.collectionId !== collectionFilter) return false;
+      if (collectionFilter === "uncategorized" && item.collectionId !== null) return false;
+      if (collectionFilter !== "all" && collectionFilter !== "uncategorized" && item.collectionId !== collectionFilter) return false;
       if (siteFilter === "unassigned" && item.siteId !== null) return false;
       if (siteFilter !== "all" && siteFilter !== "unassigned" && item.siteId !== siteFilter) return false;
-      if (selectedTags.length && !selectedTags.every((tag) => item.tags.some((itemTag) => itemTag.toLocaleLowerCase() === tag))) return false;
-      if (createdFrom && item.createdAt < `${createdFrom}T00:00:00`) return false;
-      if (createdTo && item.createdAt > `${createdTo}T23:59:59.999`) return false;
-      if (readFrom && (!item.readAt || item.readAt < `${readFrom}T00:00:00`)) return false;
-      if (readTo && (!item.readAt || item.readAt > `${readTo}T23:59:59.999`)) return false;
       if (!normalizedQuery) return true;
-      return [item.title, item.note, item.originalUrl, item.resourceKey ?? "", sites.find((site) => site.id === item.siteId)?.name ?? "", ...item.tags]
+      return [item.title, item.note, item.originalUrl, item.resourceKey ?? "", siteNames.get(item.siteId ?? "") ?? "", ...item.tags]
         .join("\n")
         .toLocaleLowerCase()
         .includes(normalizedQuery);
@@ -88,12 +78,29 @@ export function App() {
       const order = leftValue.localeCompare(rightValue, getLocale());
       return sortDescending ? -order : order;
     });
-  }, [collectionFilter, createdFrom, createdTo, filter, items, query, readFrom, readTo, siteFilter, sites, sortDescending, sortField, tagFilter]);
+  }, [collectionFilter, filter, items, query, siteFilter, sites, sortDescending, sortField, locale]);
+
+  useEffect(() => { setPage(0); setSelectedItemIds(new Set()); }, [query, filter, collectionFilter, siteFilter, sortField, sortDescending, section]);
+  const pageCount = Math.max(1, Math.ceil(visibleItems.length / pageSize));
+  const currentPage = Math.min(page, pageCount - 1);
+  const pageItems = visibleItems.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
+  const selectedVisibleCount = visibleItems.filter((item) => selectedItemIds.has(item.id)).length;
+  const allResultsSelected = visibleItems.length > 0 && selectedVisibleCount === visibleItems.length;
+  const selectionTip = `${t("selectResults")} (${visibleItems.length}) · ${t("selectedCount", { count: selectedVisibleCount })}`;
+  const pageNumbers = [...new Set([0, pageCount - 1, ...Array.from({ length: Math.min(5, pageCount) }, (_, offset) => Math.max(0, Math.min(currentPage - 2, pageCount - 5)) + offset)])].sort((a, b) => a - b);
+  async function deleteSelectedItems() {
+    if (!window.confirm(t("deleteSelectedQuestion", { count: selectedItemIds.size }))) return;
+    try {
+      await readingLibrary.deleteItems([...selectedItemIds]);
+      setItems((current) => current.filter((item) => !selectedItemIds.has(item.id)));
+      setSelectedItemIds(new Set()); requestActionIconRefresh();
+    } catch (error) { setBulkError(localizeError(error)); }
+  }
 
   async function moveSelectedItems(): Promise<void> {
     await runBulkAction(() => readingLibrary.bulkMoveItems(
       [...selectedItemIds],
-      bulkTargetCollectionId === "inbox" ? null : bulkTargetCollectionId,
+      bulkTargetCollectionId === "uncategorized" ? null : bulkTargetCollectionId,
     ));
   }
 
@@ -125,7 +132,7 @@ export function App() {
     <div className="library-shell">
       <nav className="library-nav" aria-label={t("navLabel")}>
         <h1 className="library-nav__brand">{t("appName")}</h1>
-        <NavItem label={t("allItems")} count={counts.all} active={section === "items" && filter === "all"} onClick={() => { setSection("items"); setFilter("all"); }} />
+        <NavItem label={t("allItems")} count={counts.all} active={section === "items" && filter === "all"} onClick={() => { setSection("items"); setFilter("all"); setSiteFilter("unassigned"); setCollectionFilter("uncategorized"); }} />
         <NavItem label={t("unread")} count={counts.unread} active={section === "items" && filter === "unread"} onClick={() => { setSection("items"); setFilter("unread"); }} />
         <NavItem label={t("read")} count={counts.read} active={section === "items" && filter === "read"} onClick={() => { setSection("items"); setFilter("read"); }} />
         <NavItem label={t("archived")} count={counts.archived} active={section === "items" && filter === "archived"} onClick={() => { setSection("items"); setFilter("archived"); }} />
@@ -139,17 +146,21 @@ export function App() {
         {section === "sites" ? <SiteManager /> : section === "collections" ? <CollectionManager /> : section === "transfer" ? <DataTransferManager /> : <>
         <header className="library-header">
           <h2 className="library-title">{t("library")}</h2>
-          <div className="library-header__filters">
+
+        </header>
+
+        <section className="library-advanced-filters" aria-label={t("filtersAndSort")}>
             <label className="field library-collection-filter">
               <span className="field__label">{t("category")}</span>
               <select className="field__input" value={collectionFilter} onChange={(event) => { setCollectionFilter(event.target.value); setSelectedItemIds(new Set()); }}>
                 <option value="all">{t("allCollections")}</option>
-                <option value="inbox">{t("inbox")}</option>
+                <option value="uncategorized">{t("uncategorized")}</option>
                 {flattenCollections(collections).map(({ collection, depth }) => (
                   <option value={collection.id} key={collection.id}>{`${"　".repeat(depth)}${collection.name}`}</option>
                 ))}
               </select>
             </label>
+          <label className="field"><span className="field__label">{t("site")}</span><select className="field__input" aria-label={t("site")} value={siteFilter} onChange={(event) => setSiteFilter(event.target.value)}><option value="all">{t("allSites")}</option><option value="unassigned">{t("unassigned")}</option>{sites.map((site) => <option key={site.id} value={site.id}>{site.name}</option>)}</select></label>
             <label className="field library-search">
               <span className="field__label">{t("search")}</span>
               <input
@@ -160,25 +171,44 @@ export function App() {
                 placeholder={t("searchPlaceholder")}
               />
             </label>
-          </div>
-        </header>
-
-        <section className="library-advanced-filters" aria-label={t("filtersAndSort")}>
-          <label className="field"><span className="field__label">{t("site")}</span><select className="field__input" value={siteFilter} onChange={(event) => setSiteFilter(event.target.value)}><option value="all">{t("allSites")}</option><option value="unassigned">{t("unassigned")}</option>{sites.map((site) => <option key={site.id} value={site.id}>{site.name}</option>)}</select></label>
-          <label className="field"><span className="field__label">{t("tagsAll")}</span><input className="field__input" value={tagFilter} onChange={(event) => setTagFilter(event.target.value)} placeholder={t("tagsPlaceholder")} /></label>
-          <label className="field"><span className="field__label">{t("savedFrom")}</span><input className="field__input" type="date" value={createdFrom} onChange={(event) => setCreatedFrom(event.target.value)} /></label>
-          <label className="field"><span className="field__label">{t("savedTo")}</span><input className="field__input" type="date" value={createdTo} onChange={(event) => setCreatedTo(event.target.value)} /></label>
-          <label className="field"><span className="field__label">{t("readFrom")}</span><input className="field__input" type="date" value={readFrom} onChange={(event) => setReadFrom(event.target.value)} /></label>
-          <label className="field"><span className="field__label">{t("readTo")}</span><input className="field__input" type="date" value={readTo} onChange={(event) => setReadTo(event.target.value)} /></label>
           <label className="field"><span className="field__label">{t("sort")}</span><select className="field__input" value={sortField} onChange={(event) => setSortField(event.target.value as SortField)}><option value="createdAt">{t("savedAt")}</option><option value="updatedAt">{t("updatedAt")}</option><option value="lastOpenedAt">{t("lastOpened")}</option><option value="title">{t("title")}</option></select></label>
           <label className="field"><span className="field__label">{t("direction")}</span><select className="field__input" value={sortDescending ? "desc" : "asc"} onChange={(event) => setSortDescending(event.target.value === "desc")}><option value="desc">{t("descending")}</option><option value="asc">{t("ascending")}</option></select></label>
         </section>
 
+        <div className="library-list-toolbar">
+          <label className="library-select-all">
+            <input type="checkbox" disabled={loading || !visibleItems.length} checked={allResultsSelected}
+              aria-label={`${t("selectResults")} (${visibleItems.length})`} aria-describedby="library-select-all-tip"
+              ref={(input) => { if (input) input.indeterminate = selectedVisibleCount > 0 && !allResultsSelected; }}
+              onChange={(event) => setSelectedItemIds(event.target.checked ? new Set(visibleItems.map((item) => item.id)) : new Set())} />
+            <span className="library-selection-tip" id="library-select-all-tip" role="tooltip">{selectionTip}</span>
+          </label>
+          <div className="library-pagination-settings">
+            <label className="pagination-size">{t("itemsPerPage")}
+              <select className="field__input" value={pageSize} onChange={(event) => {
+                const nextSize = Number(event.target.value);
+                setPageSize(nextSize); setPage(0);
+                try { localStorage.setItem("pathmark.library.pageSize", String(nextSize)); } catch { /* Keep the selection for this session. */ }
+              }}>
+                {PAGE_SIZES.map((size) => <option value={size} key={size}>{size}</option>)}
+              </select>
+            </label>
+            <span className="library-pagination-range" aria-live="polite">{t("itemRange", { start: visibleItems.length ? currentPage * pageSize + 1 : 0, end: Math.min((currentPage + 1) * pageSize, visibleItems.length), total: visibleItems.length })}</span>
+          </div>
+          <nav className="library-pagination">
+            <button type="button" disabled={loading || currentPage === 0} aria-label={t("previousPage")} title={t("previousPage")} onClick={() => setPage(currentPage - 1)}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m10 3-5 5 5 5" /></svg></button>
+            {pageNumbers.map((number, index) => <span className="library-pagination-slot" key={number}>
+              {index > 0 && number - pageNumbers[index - 1] > 1 ? <span className="library-pagination-gap" aria-hidden="true">…</span> : null}
+              <button type="button" disabled={loading} aria-current={number === currentPage ? "page" : undefined} onClick={() => setPage(number)}>{number + 1}</button>
+            </span>)}
+            <button type="button" disabled={loading || currentPage + 1 >= pageCount} aria-label={t("nextPage")} title={t("nextPage")} onClick={() => setPage(currentPage + 1)}><svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5" /></svg></button>
+          </nav>
+        </div>
         {selectedItemIds.size ? (
           <section className="bulk-toolbar" aria-label={t("bulkActions")}>
             <strong>{t("selectedCount", { count: selectedItemIds.size })}</strong>
             <select className="field__input" value={bulkTargetCollectionId} onChange={(event) => setBulkTargetCollectionId(event.target.value)} aria-label={t("bulkMoveTarget")}>
-              <option value="inbox">{t("inbox")}</option>
+              <option value="uncategorized">{t("uncategorized")}</option>
               {flattenCollections(collections).map(({ collection, depth }) => (
                 <option value={collection.id} key={collection.id}>{`${"　".repeat(depth)}${collection.name}`}</option>
               ))}
@@ -186,6 +216,7 @@ export function App() {
             <button type="button" onClick={() => void moveSelectedItems()}>{t("moveCollection")}</button>
             <button type="button" onClick={() => void setSelectedArchived(true)}>{t("archived")}</button>
             <button type="button" onClick={() => void setSelectedArchived(false)}>{t("unarchive")}</button>
+            <button type="button" onClick={() => void deleteSelectedItems()}>{t("delete")}</button>
             <button type="button" onClick={() => setSelectedItemIds(new Set())}>{t("cancelSelection")}</button>
           </section>
         ) : null}
@@ -195,7 +226,7 @@ export function App() {
           <div className="loading">{t("loadingLibrary")}</div>
         ) : visibleItems.length ? (
           <section className="item-list" aria-label={t("savedItems")}>
-            {visibleItems.map((item) => (
+            {pageItems.map((item) => (
               <ItemRow
                 item={item}
                 sites={sites}
@@ -287,6 +318,7 @@ function ItemRow({
   onArchive: () => void;
   onOpened: (item: Item) => void;
 }) {
+  const itemDateFormatter = useMemo(() => new Intl.DateTimeFormat(getLocale(), { month: "2-digit", day: "2-digit" }), [getLocale()]);
   const tone = item.readingState === "read" ? "success" : item.readingState === "reading" ? "info" : "warning";
   const label = item.readingState === "read" ? t("read") : item.readingState === "reading" ? t("reading") : t("unread");
   const site = sites.find((candidate) => candidate.id === item.siteId);
@@ -305,7 +337,7 @@ function ItemRow({
           {item.title}
         </a>
         <p className="item-row__note">{item.note || t("noDescription")}</p>
-        <p className="item-row__url">{item.originalUrl}</p>
+        <p className="item-row__url">{defaultUrl}</p>
       </div>
       <div>
         <Badge tone={tone}>{label}</Badge>
@@ -315,11 +347,11 @@ function ItemRow({
         {item.tags.length ? item.tags.map((tag) => <Badge key={tag}>{tag}</Badge>) : <span className="muted">{t("noTags")}</span>}
       </div>
       <time className="item-row__date muted" dateTime={item.createdAt}>
-        {new Intl.DateTimeFormat(getLocale(), { month: "2-digit", day: "2-digit" }).format(new Date(item.createdAt))}
+        {itemDateFormatter.format(new Date(item.createdAt))}
       </time>
       <div className="item-row__actions">
         <span className="muted">{site?.name ?? t("unassigned")}</span>
-        {site && item.resourceKey ? <select className="item-row__endpoint" aria-label={t("chooseOpenAddress", { title: item.title })} defaultValue="" onChange={(event) => { openAlternative(event.target.value); event.target.value = ""; }}><option value="">{t("openWith")}</option>{site.endpoints.filter((endpoint) => endpoint.enabled).sort((left, right) => left.priority - right.priority).map((endpoint) => <option key={endpoint.id} value={resolveResourceUrlWithEndpoint(endpoint, item.resourceKey!)}>{new URL(endpoint.prefix).host}</option>)}<option value={item.originalUrl}>{t("originalAddress")}</option></select> : null}
+        {site && item.resourceKey ? <select className="item-row__endpoint" aria-label={t("chooseOpenAddress", { title: item.title })} defaultValue="" onChange={(event) => { openAlternative(event.target.value); event.target.value = ""; }}><option value="">{t("openWith")}</option>{site.endpoints.filter((endpoint) => endpoint.enabled).sort((left, right) => left.priority - right.priority).map((endpoint) => <option key={endpoint.id} value={resolveResourceUrlWithEndpoint(endpoint, item.resourceKey!)}>{new URL(endpoint.prefix).host}</option>)}</select> : null}
         <button type="button" onClick={onEdit}>{t("edit")}</button>
         <button type="button" onClick={onMigrate}>{t("migrate")}</button>
         <button type="button" onClick={onArchive}>{item.isArchived ? t("unarchive") : t("archived")}</button>
@@ -335,3 +367,6 @@ function toggleSetValue(current: Set<string>, value: string, checked: boolean): 
   else next.delete(value);
   return next;
 }
+
+
+const PAGE_SIZES = [25, 50, 100, 200];

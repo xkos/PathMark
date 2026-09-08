@@ -25,6 +25,48 @@ function createLibrary(): ReadingLibrary {
 }
 
 describe("ReadingLibrary", () => {
+  it("clears all items including archived ones but preserves sites, collections and settings", async () => {
+    const library = createLibrary();
+    const site = await library.saveSite({ name: "Keep site", description: "", endpoints: [{ prefix: "https://keep.test", enabled: true }], queryPolicy: { mode: "keep-all-except-ignored", ignoredParams: [] } });
+    const collection = await library.saveCollection({ name: "Keep collection", parentId: null });
+    const settings = { ...DEFAULT_SETTINGS, stripTrailingSlash: false };
+    await library.saveSettings(settings);
+    for (const id of [1, 2]) {
+      const item = await library.savePage({ title: `${id}`, url: `https://keep.test/${id}`, note: "", tags: [], collectionId: collection.id, readingState: "read" });
+      if (id === 2) await library.bulkSetArchived([item.id], true);
+    }
+    await library.clearItems();
+    expect(await library.listItems()).toEqual([]);
+    expect(await library.listSites()).toEqual([site]);
+    expect(await library.listCollections()).toEqual([collection]);
+    expect(await library.getSettings()).toEqual(settings);
+  });
+
+  it("excludes every URL of a hostname from preview and import, without changing saved data", async () => {
+    const library = createLibrary();
+    const existing = await library.savePage({ title: "Existing", url: "https://skip.test/saved", note: "", tags: [], collectionId: null, readingState: "unread" });
+    const snapshot = parseBookmarkHtml(`<DL><DT><H3>Skip</H3><DL><DT><A HREF="http://skip.test/a">A</A><DT><A HREF="https://skip.test:8443/b">B</A></DL><DT><H3>Keep</H3><DL><DT><A HREF="https://keep.test/a">C</A></DL></DL>`);
+    const request = {
+      candidates: snapshot.candidates,
+      folderRules: snapshot.folders.map((folder) => ({ folderKey: folder.key, selected: true, readingState: "unread" as const, isArchived: false, collectionPath: folder.path })),
+      siteMappings: snapshot.candidates.map((candidate) => ({ origin: candidate.origin, target: { type: "new" as const, siteName: candidate.origin.includes("skip.test") ? "Skip" : "Keep" } })),
+      excludedHostnames: ["skip.test"],
+    };
+    const preview = await library.previewBookmarkImport(request);
+    expect(preview.selectedItems).toBe(1);
+    expect(preview.createdSites).toBe(1);
+    expect(preview.createdCollections).toBe(1);
+    await library.applyBookmarkImport(request);
+    expect(await library.database.items.get(existing.id)).toEqual(existing);
+    expect((await library.listItems()).map((item) => item.title).sort()).toEqual(["C", "Existing"]);
+    expect((await library.listSites()).map((site) => site.name)).toEqual(["Keep"]);
+    expect((await library.listCollections()).map((collection) => collection.name)).toEqual(["Keep"]);
+    const restored = await library.previewBookmarkImport({ ...request, excludedHostnames: [] });
+    expect(restored.selectedItems).toBe(3);
+    const empty = await library.previewBookmarkImport({ ...request, excludedHostnames: ["skip.test", "keep.test"] });
+    expect(empty.canApply).toBe(false);
+  });
+
   it("persists and recognizes a saved page without creating a duplicate", async () => {
     const library = createLibrary();
     await library.savePage({
@@ -204,6 +246,70 @@ describe("ReadingLibrary", () => {
     expect(updated.canonicalKey).toContain(`v1:site:${site.id}:`);
   });
 
+  it("sync merges into the existing item, retains history and leaves unrelated items alone", async () => {
+    const library = createLibrary();
+    const site = await library.saveSite({ name: "Site", description: "", endpoints: [{ prefix: "https://old.test", enabled: true }], queryPolicy: { mode: "keep-all-except-ignored", ignoredParams: [] } });
+    const collection = await library.saveCollection({ name: "Keep", parentId: null });
+    const original = await library.savePage({ title: "Keep title", url: "https://old.test/path", note: "Old note", tags: ["old"], collectionId: collection.id, readingState: "unread" });
+    await library.recordItemOpened(original.id, original.originalUrl);
+    const incoming = await library.savePage({ title: "Mirror", url: "https://new.test/path", note: "New note", tags: ["new"], collectionId: null, readingState: "read" });
+    const untouched = await library.savePage({ title: "Unselected", url: "https://new.test/other", note: "", tags: [], collectionId: null, readingState: "unread" });
+    const unrelated = await library.savePage({ title: "Unrelated", url: "https://unrelated.test/path", note: "", tags: [], collectionId: null, readingState: "unread" });
+    await library.saveSite({ ...site, endpoints: [...site.endpoints, { prefix: "https://new.test", enabled: true }] });
+    await library.syncSiteItems(site.id, [incoming.id, unrelated.id]);
+    expect(await library.database.items.get(original.id)).toMatchObject({
+      title: "Keep title", note: "Old note\n\nNew note", tags: ["old", "new"], collectionId: collection.id,
+      readingState: "read", firstReadAt: incoming.firstReadAt, readAt: incoming.readAt, openCount: 1,
+    });
+    expect(await library.database.items.get(incoming.id)).toBeUndefined();
+    expect(await library.database.items.get(untouched.id)).toEqual(untouched);
+    expect(await library.database.items.get(unrelated.id)).toEqual(unrelated);
+    expect((await library.recognize(incoming.originalUrl)).item?.id).toBe(original.id);
+  });
+
+  it("bulk deletes only selected items", async () => {
+    const library = createLibrary();
+    const items = await Promise.all([1, 2, 3].map((id) => library.savePage({ title: `${id}`, url: `https://example.test/${id}`, note: "", tags: [], collectionId: null, readingState: "unread" })));
+    await library.deleteItems([items[0].id, items[2].id, items[0].id]);
+    expect((await library.listItems()).map((item) => item.id)).toEqual([items[1].id]);
+  });
+
+  it("syncs unassigned duplicates into one site resource", async () => {
+    const library = createLibrary();
+    const first = await library.savePage({
+      title: "Old URL",
+      url: "https://old.example.com/docs/paper/1",
+      note: "",
+      tags: [],
+      collectionId: null,
+      readingState: "unread",
+    });
+    const second = await library.savePage({
+      title: "New URL",
+      url: "https://new.example.org/archive/paper/1",
+      note: "",
+      tags: [],
+      collectionId: null,
+      readingState: "unread",
+    });
+    const site = await library.saveSite({
+      name: "Example Papers",
+      description: "",
+      endpoints: [
+        { prefix: "https://old.example.com/docs", enabled: true },
+        { prefix: "https://new.example.org/archive", enabled: true },
+      ],
+      queryPolicy: { mode: "keep-all-except-ignored", ignoredParams: [] },
+    });
+
+    await library.syncSiteItems(site.id, [first.id, second.id]);
+    const items = await library.listItems();
+    expect(items).toHaveLength(1);
+    expect(items[0].siteId).toBe(site.id);
+    expect(items[0].resourceKey).toBe("/paper/1");
+    await library.syncSiteItems(site.id, [items[0].id]);
+    expect(await library.listItems()).toHaveLength(1);
+  });
   it("blocks an explicit remap when two URLs collapse to the same canonical key", async () => {
     const library = createLibrary();
     const first = await library.savePage({
@@ -320,7 +426,7 @@ describe("ReadingLibrary", () => {
     expect((await library.database.items.get(candidate.id))?.siteId).toBeNull();
   });
 
-  it("moves items from a deleted collection subtree back to the inbox", async () => {
+  it("removes collection assignment from items in a deleted collection subtree", async () => {
     const library = createLibrary();
     const root = await library.saveCollection({ name: "Research", parentId: null });
     const child = await library.saveCollection({ name: "Papers", parentId: root.id });
@@ -333,7 +439,7 @@ describe("ReadingLibrary", () => {
       readingState: "unread",
     });
 
-    const result = await library.deleteCollection(root.id, "move-items-to-inbox");
+    const result = await library.deleteCollection(root.id, "unclassify-items");
     expect(result).toEqual({ collections: 2, items: 1 });
     expect(await library.database.collections.count()).toBe(0);
     expect((await library.database.items.get(item.id))?.collectionId).toBeNull();

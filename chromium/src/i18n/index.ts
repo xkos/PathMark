@@ -81,12 +81,33 @@ export function resolveLocale(locale: string | null | undefined): AppLocale {
 
 export function getLocale(): AppLocale {
   if (localeOverride) return localeOverride;
-  const queryLocale = typeof location === "undefined" ? null : new URLSearchParams(location.search).get("lang");
-  const browserLocale = queryLocale
-    ?? (typeof chrome !== "undefined" && chrome.i18n?.getUILanguage ? chrome.i18n.getUILanguage() : null)
-    ?? (typeof navigator === "undefined" || navigator.userAgent === "Node.js" ? null : navigator.language);
-  return resolveLocale(browserLocale);
+  try { return resolveLocale(globalThis.localStorage?.getItem("pathmark.language")); }
+  catch { return DEFAULT_LOCALE; }
 }
+
+export function saveLocale(locale: AppLocale): void {
+  localStorage.setItem("pathmark.language", locale);
+  window.dispatchEvent(new Event("pathmark-language-change"));
+}
+
+export function subscribeLocale(listener: () => void): () => void {
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === "pathmark.language" || event.key === null) listener();
+  };
+  window.addEventListener("storage", onStorage);
+  window.addEventListener("pathmark-language-change", listener);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener("pathmark-language-change", listener);
+  };
+}
+
+export const LOCALE_NAMES: Record<AppLocale, string> = {
+  en: "English", "zh-CN": "简体中文", "zh-TW": "繁體中文", ja: "日本語", ko: "한국어",
+  ar: "العربية", de: "Deutsch", es: "Español", fr: "Français", hi: "हिन्दी", id: "Bahasa Indonesia",
+  it: "Italiano", nl: "Nederlands", "pt-BR": "Português (Brasil)", pl: "Polski", ru: "Русский",
+  th: "ไทย", tr: "Türkçe", vi: "Tiếng Việt",
+};
 
 export function t(key: MessageKey, values: Record<string, string | number> = {}): string {
   const template = localeDefinitions[getLocale()].messages[key];

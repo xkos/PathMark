@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "이 도메인의 모든 URL을 이번 가져오기에서 제외",
+  excludedImportDomains: "이번 가져오기에서 제외된 도메인",
+  restoreImportDomain: "다시 포함",
+
+  clearItems: "항목 데이터 비우기",
+  clearItemsHint: "보관된 항목을 포함한 모든 항목을 영구 삭제합니다. 사이트, 컬렉션 및 설정은 유지됩니다. 이 작업은 취소할 수 없습니다.",
+  clearItemsDone: "항목을 모두 삭제했습니다. 사이트, 컬렉션 및 설정은 유지되었습니다.",
+
+  existingImportCollections: "기존 컬렉션",
+  importCollectionHint: "기존 컬렉션을 선택하거나 새로 만드세요. 폴더 이름으로 자동 생성하지 않습니다. 새 컬렉션은 가져오기를 확정할 때 저장됩니다.",
+  finishImportCollection: "생성을 완료하거나 기존 컬렉션 또는 미분류를 선택하세요.",
+
+  itemsPerPage: "페이지당 항목 수",
+  itemRange: "총 {total}개 중 {start}–{end}",
+
+  selectAll: "전체 선택",
+  selectResults: "검색 결과 전체 선택",
+  previousPage: "이전 페이지",
+  nextPage: "다음 페이지",
+  syncSite: "사이트 동기화",
+  syncSiteHint: "사이트를 저장한 후 동기화할 미지정 URL을 선택하세요. 같은 리소스 경로는 하나로 병합됩니다.",
+  mergeOnSync: "동기화 시 하나로 병합",
+  deleteSelectedQuestion: "선택한 {count}개 항목을 삭제할까요?",
+  draftOption: "이번 가져오기에서 생성",
+
   appName: "로컬 리딩 라이브러리",
   appShortName: "리딩 라이브러리",
   libraryTitle: "로컬 리딩 라이브러리",
@@ -24,7 +49,7 @@ export const messages: Record<MessageKey, string> = {
   noteOptional: "메모 (선택사항)",
   notePlaceholder: "왜 저장하는지, 나중에 무엇에 집중해야 할지?",
   collection: "컬렉션",
-  inbox: "받은편지함",
+  uncategorized: "미분류",
   tags: "태그",
   tagsPlaceholder: "논문, RAG",
   readingState: "읽기 상태",
@@ -144,13 +169,13 @@ export const messages: Record<MessageKey, string> = {
   itemsCount: "{total}개 아이템 · {unread}개 읽지 않음",
   moveUp: "위로 이동",
   moveDown: "아래로 이동",
-  deleteCollectionMove: "삭제; {count}개 아이템을 받은편지함으로 이동",
+  deleteCollectionMove: "삭제하고 {count}개 항목을 미분류로 변경",
   deleteCollectionItems: "컬렉션과 아이템 삭제",
   deleteCollection: "컬렉션 삭제",
   saveCollection: "컬렉션 저장",
   collectionSaved: "컬렉션이 저장되었습니다.",
   deleteItemsStrategy: "아이템 삭제",
-  moveItemsStrategy: "아이템을 받은편지함으로 이동",
+  moveItemsStrategy: "항목을 유지하고 분류 해제",
   deleteCollectionQuestion: "“{name}”과 그 하위 컬렉션, 그리고 {action}을 삭제하시겠습니까?",
   collectionDeleted: "{collections}개의 컬렉션을 삭제하고 {items}개의 아이템을 처리했습니다.",
   sitesHint: "오래된 도메인과 새로운 도메인을 하나의 사이트로 묶어 같은 리소스가 안정적인 정체성을 유지하도록 하세요.",

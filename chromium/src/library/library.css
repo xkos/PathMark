@@ -1582,3 +1582,79 @@
     transform: rotate(90deg);
   }
 }
+
+/* Only the folder-name cell is indented; settings stay aligned at every depth. */
+.selection-tree { margin: 8px 0; }
+.selection-tree__row { padding: 10px 12px; border-bottom: 1px solid var(--color-border-subtle); }
+.selection-tree__row:hover { background: var(--color-surface-subtle); }
+.selection-tree__identity { display: flex; align-items: center; gap: 8px; min-width: 0; padding-inline-start: calc(var(--tree-depth, 0) * 18px); }
+.selection-tree__identity > strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 500; }
+.selection-tree input[type="checkbox"] { width: 16px; height: 16px; margin: 0; flex-shrink: 0; accent-color: var(--color-action); }
+.selection-tree__toggle, .selection-tree__spacer { width: 24px; height: 24px; flex: 0 0 24px; }
+.selection-tree__toggle { display: inline-flex; align-items: center; justify-content: center; border: 0; padding: 4px; border-radius: var(--radius-sm); color: var(--color-text-muted); background: transparent; cursor: pointer; }
+.selection-tree__toggle:hover { color: var(--color-action); background: var(--color-action-subtle); }
+.selection-tree__toggle:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.selection-tree__toggle svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transition: transform 120ms ease; }
+.selection-tree__toggle[aria-expanded="true"] svg { transform: rotate(90deg); }
+.bookmark-folder-tree { --folder-columns: minmax(220px, 1.5fr) 56px 100px minmax(260px, 2fr); margin-top: 16px; overflow-x: auto; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); background: var(--color-surface); }
+.bookmark-folder-tree > .selection-tree { margin: 0; min-width: 830px; }
+.bookmark-folder-tree__head, .bookmark-folder-tree .selection-tree__row { display: grid; grid-template-columns: var(--folder-columns); align-items: center; gap: 12px; padding: 10px 12px; }
+.bookmark-folder-tree__head { min-width: 830px; background: var(--color-surface-subtle); color: var(--color-text-muted); font-size: 12px; font-weight: 500; border-bottom: 1px solid var(--color-border-subtle); }
+.bookmark-folder-tree__head > :first-child { padding-inline-start: 32px; }
+.bookmark-folder-tree__head > :nth-child(2) { text-align: center; }
+.bookmark-tree-controls { display: contents; }
+.bookmark-tree-controls .field__input { width: 100%; min-width: 0; height: 34px; padding: 5px 8px; font-size: 12px; box-shadow: none; }
+.bookmark-tree-count { color: var(--color-text-muted); font-size: 12px; font-variant-numeric: tabular-nums; text-align: center; }
+
+.pagination-size { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.bulk-toolbar .pagination-size .field__input { width: 80px; min-width: 0; }
+
+.bookmark-collection-picker { display: grid; gap: 8px; min-width: 0; }
+.bookmark-collection-create { display: flex; align-items: center; gap: 8px; }
+.bookmark-collection-create .button { flex-shrink: 0; padding: 6px 10px; min-height: 34px; font-size: 12px; }
+
+.bookmark-domain-heading { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.bookmark-domain-heading > strong { min-width: 0; overflow-wrap: anywhere; }
+.bookmark-domain-action { position: relative; display: inline-flex; flex-shrink: 0; }
+.bookmark-domain-exclude { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border: 0; border-radius: var(--radius-sm); padding: 5px; background: transparent; color: var(--color-text-muted); cursor: pointer; transition: background 120ms ease, color 120ms ease; }
+.bookmark-domain-exclude svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+.bookmark-domain-exclude:hover { background: var(--color-danger-bg); color: var(--color-danger-fg); }
+.bookmark-domain-exclude:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; background: var(--color-danger-bg); color: var(--color-danger-fg); }
+.bookmark-domain-exclude:disabled { opacity: .5; cursor: default; }
+.bookmark-site-row__origin .bookmark-domain-tooltip { position: absolute; inset-inline-start: 0; bottom: calc(100% + 8px); z-index: 5; width: max-content; max-width: 260px; padding: 7px 10px; border-radius: var(--radius-sm); background: var(--color-text-strong); color: var(--color-surface); font-size: 12px; line-height: 1.5; white-space: normal; overflow: visible; visibility: hidden; opacity: 0; pointer-events: none; transition: opacity 120ms ease; box-shadow: var(--shadow-popup); }
+.bookmark-domain-action:hover .bookmark-domain-tooltip, .bookmark-domain-action:focus-within .bookmark-domain-tooltip { visibility: visible; opacity: 1; }
+.bookmark-domain-address { padding-inline-start: 32px; }
+.bookmark-excluded-domains { margin-top: 16px; padding: 12px; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-md); color: var(--color-text-muted); }
+.bookmark-excluded-domains summary { cursor: pointer; }
+.bookmark-excluded-domains > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+
+.library-advanced-filters { grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) minmax(220px, 2fr) minmax(130px, 1fr) 100px; }
+.library-advanced-filters > .field { width: auto; min-width: 0; }
+@media (max-width: 1250px) {
+  .library-advanced-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .library-advanced-filters .library-search { grid-column: 1 / -1; }
+}
+@media (max-width: 700px) {
+  .library-advanced-filters { grid-template-columns: minmax(0, 1fr); }
+}
+
+.selection-tree__count { flex-shrink: 0; min-width: 24px; padding: 1px 7px; border: 1px solid var(--color-border-subtle); border-radius: 10px; background: var(--color-surface); color: var(--color-text-muted); font-size: 12px; line-height: 18px; text-align: center; font-variant-numeric: tabular-nums; }
+
+.library-list-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; padding: 12px 16px; margin-bottom: 12px; border: 1px solid var(--color-border-subtle); border-radius: var(--radius-lg); background: var(--color-surface); }
+.library-select-all { position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 6px; cursor: pointer; }
+.library-select-all input { width: 16px; height: 16px; margin: 0; accent-color: var(--color-action); cursor: pointer; }
+.library-selection-tip { position: absolute; z-index: 5; inset-inline-start: 0; bottom: calc(100% + 8px); width: max-content; max-width: 280px; padding: 7px 10px; color: var(--color-surface); background: var(--color-text-strong); border-radius: var(--radius-sm); font-size: 12px; visibility: hidden; pointer-events: none; }
+.library-select-all:hover .library-selection-tip, .library-select-all:focus-within .library-selection-tip { visibility: visible; }
+.library-pagination-settings { display: flex; align-items: center; flex-wrap: wrap; gap: 16px; margin-inline-start: auto; color: var(--color-text-muted); font-size: 12px; }
+.library-pagination-settings .field__input { width: 72px; min-height: 32px; padding: 5px 8px; font-size: 12px; }
+.library-pagination-range { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.library-pagination, .library-pagination-slot { display: inline-flex; align-items: center; gap: 4px; }
+.library-pagination button { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 32px; padding: 0 8px; border: 1px solid transparent; border-radius: var(--radius-md); background: transparent; color: var(--color-text); font: inherit; font-size: 13px; cursor: pointer; }
+.library-pagination button:hover:not(:disabled) { background: var(--color-surface-subtle); border-color: var(--color-border); }
+.library-pagination button[aria-current="page"] { color: var(--color-action); border-color: var(--color-action); background: var(--color-action-subtle); font-weight: 600; }
+.library-pagination button:disabled { color: var(--color-text-disabled); cursor: default; }
+.library-pagination button:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.library-pagination svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+[dir="rtl"] .library-pagination svg { transform: rotate(180deg); }
+.library-pagination-gap { padding: 0 4px; color: var(--color-text-muted); }
+@media (max-width: 950px) { .library-list-toolbar { gap: 12px; } .library-pagination { margin-inline-start: auto; } }

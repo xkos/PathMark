@@ -57,6 +57,7 @@ export interface BookmarkSiteMapping {
 
 export interface BookmarkImportRequest {
   candidates: BookmarkCandidate[];
+  excludedHostnames?: string[];
   folderRules: BookmarkFolderRule[];
   siteMappings: BookmarkSiteMapping[];
 }
@@ -203,10 +204,13 @@ export function buildBookmarkImportPreview(
   const warnings: string[] = [];
   const rules = new Map(request.folderRules.map((rule) => [rule.folderKey, rule]));
   const mappings = new Map(request.siteMappings.map((mapping) => [normalizeEndpoint(mapping.origin), mapping.target]));
-  const selected = request.candidates.filter((candidate) => rules.get(bookmarkFolderKey(candidate.folderPath))?.selected);
+  const excludedHosts = new Set((request.excludedHostnames ?? []).map((host) => host.toLowerCase()));
+  const selected = request.candidates.filter((candidate) =>
+    !excludedHosts.has(new URL(candidate.url).hostname.toLowerCase()) && rules.get(bookmarkFolderKey(candidate.folderPath))?.selected);
+  const activeFolderKeys = new Set(selected.map((candidate) => bookmarkFolderKey(candidate.folderPath)));
 
   if (!selected.length) errors.push(appErrorMessage("bookmarkFolderRequired"));
-  for (const rule of request.folderRules) {
+  for (const rule of request.folderRules.filter((rule) => activeFolderKeys.has(rule.folderKey))) {
     if (rule.collectionPath.length > 5) errors.push(appErrorMessage("collectionPathTooDeep", { path: rule.collectionPath.join(" / ") }));
     if (rule.collectionPath.some((segment) => !segment.trim())) errors.push(appErrorMessage("collectionPathEmptySegment"));
   }
@@ -279,7 +283,7 @@ export function buildBookmarkImportPreview(
   const workingCollections = structuredClone(environment.collections);
   const collectionsToPut: Collection[] = [];
   const collectionIdsByRule = new Map<string, string | null>();
-  for (const rule of request.folderRules.filter((candidate) => candidate.selected)) {
+  for (const rule of request.folderRules.filter((candidate) => activeFolderKeys.has(candidate.folderKey))) {
     let parentId: string | null = null;
     for (const rawName of rule.collectionPath) {
       const name = rawName.trim();

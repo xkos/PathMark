@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "Excluir todos os URLs deste domínio desta importação",
+  excludedImportDomains: "Domínios excluídos desta importação",
+  restoreImportDomain: "Incluir novamente",
+
+  clearItems: "Limpar os itens",
+  clearItemsHint: "Exclui permanentemente todos os itens, incluindo os arquivados. Sites, coleções e configurações são mantidos. Esta ação não pode ser desfeita.",
+  clearItemsDone: "Itens excluídos. Sites, coleções e configurações foram mantidos.",
+
+  existingImportCollections: "Coleções existentes",
+  importCollectionHint: "Escolha uma coleção ou crie uma. Nomes de pastas não criam coleções. As novas são salvas ao confirmar a importação.",
+  finishImportCollection: "Conclua a criação ou escolha uma coleção existente ou Sem coleção.",
+
+  itemsPerPage: "Itens por página",
+  itemRange: "{start}–{end} de {total}",
+
+  selectAll: "Selecionar tudo",
+  selectResults: "Selecionar todos os resultados",
+  previousPage: "Página anterior",
+  nextPage: "Próxima página",
+  syncSite: "Sincronizar site",
+  syncSiteHint: "Após salvar, selecione os URLs não atribuídos. Caminhos de recurso iguais são mesclados em um único item.",
+  mergeOnSync: "Mesclar ao sincronizar",
+  deleteSelectedQuestion: "Excluir os {count} itens selecionados?",
+  draftOption: "Novo nesta importação",
+
   appName: "Biblioteca de leitura local",
   appShortName: "Biblioteca de leitura",
   libraryTitle: "Biblioteca de leitura local",
@@ -24,7 +49,7 @@ export const messages: Record<MessageKey, string> = {
   noteOptional: "Nota (opcional)",
   notePlaceholder: "Por que salvar isto e em que você deve prestar atenção depois?",
   collection: "Coleção",
-  inbox: "Caixa de entrada",
+  uncategorized: "Sem coleção",
   tags: "Tags",
   tagsPlaceholder: "artigos, RAG",
   readingState: "Status de leitura",
@@ -144,13 +169,13 @@ export const messages: Record<MessageKey, string> = {
   itemsCount: "{total} itens · {unread} não lidos",
   moveUp: "Mover para cima",
   moveDown: "Mover para baixo",
-  deleteCollectionMove: "Excluir e mover {count} itens para a Caixa de entrada",
+  deleteCollectionMove: "Excluir; manter {count} itens sem coleção",
   deleteCollectionItems: "Excluir coleção e itens",
   deleteCollection: "Excluir coleção",
   saveCollection: "Salvar coleção",
   collectionSaved: "Coleção salva.",
   deleteItemsStrategy: "excluir seus itens",
-  moveItemsStrategy: "mover seus itens para a Caixa de entrada",
+  moveItemsStrategy: "manter os itens sem coleção",
   deleteCollectionQuestion: "Excluir «{name}», suas subcoleções e {action}?",
   collectionDeleted: "Foram excluídas {collections} coleções e processados {items} itens.",
   sitesHint: "Agrupe domínios antigos e novos em um único site para que o mesmo recurso mantenha uma identidade estável.",

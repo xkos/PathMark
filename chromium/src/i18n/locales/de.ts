@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "Alle URLs dieser Domain von diesem Import ausschließen",
+  excludedImportDomains: "Von diesem Import ausgeschlossene Domains",
+  restoreImportDomain: "Wieder einschließen",
+
+  clearItems: "Einträge löschen",
+  clearItemsHint: "Alle Einträge einschließlich archivierter Einträge dauerhaft löschen. Websites, Sammlungen und Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+  clearItemsDone: "Alle Einträge gelöscht. Websites, Sammlungen und Einstellungen bleiben erhalten.",
+
+  existingImportCollections: "Vorhandene Sammlungen",
+  importCollectionHint: "Eine vorhandene Sammlung wählen oder eine neue erstellen. Ordnernamen erzeugen keine Sammlungen. Neue Sammlungen werden beim Bestätigen des Imports gespeichert.",
+  finishImportCollection: "Die Erstellung abschließen oder eine vorhandene Sammlung bzw. Ohne Sammlung wählen.",
+
+  itemsPerPage: "Einträge pro Seite",
+  itemRange: "{start}–{end} von {total}",
+
+  selectAll: "Alle auswählen",
+  selectResults: "Alle Ergebnisse auswählen",
+  previousPage: "Vorherige Seite",
+  nextPage: "Nächste Seite",
+  syncSite: "Website synchronisieren",
+  syncSiteHint: "Nach dem Speichern nicht zugeordnete URLs auswählen. Gleiche Ressourcenpfade werden zu einem Eintrag zusammengeführt.",
+  mergeOnSync: "Beim Synchronisieren zusammenführen",
+  deleteSelectedQuestion: "Die {count} ausgewählten Einträge löschen?",
+  draftOption: "Bei diesem Import neu",
+
   appName: "Lokale Lesebibliothek",
   appShortName: "Lesebibliothek",
   libraryTitle: "Lokale Lesebibliothek",
@@ -24,7 +49,7 @@ export const messages: Record<MessageKey, string> = {
   noteOptional: "Notiz (optional)",
   notePlaceholder: "Warum möchten Sie dies speichern und worauf sollten Sie später achten?",
   collection: "Sammlung",
-  inbox: "Posteingang",
+  uncategorized: "Ohne Sammlung",
   tags: "Tags",
   tagsPlaceholder: "Artikel, RAG",
   readingState: "Lesestatus",
@@ -144,13 +169,13 @@ export const messages: Record<MessageKey, string> = {
   itemsCount: "{total} Elemente · {unread} ungelesen",
   moveUp: "Nach oben",
   moveDown: "Nach unten",
-  deleteCollectionMove: "Löschen und {count} Elemente in den Posteingang verschieben",
+  deleteCollectionMove: "Löschen; {count} Einträge ohne Sammlung behalten",
   deleteCollectionItems: "Sammlung und Elemente löschen",
   deleteCollection: "Sammlung löschen",
   saveCollection: "Sammlung speichern",
   collectionSaved: "Sammlung gespeichert.",
   deleteItemsStrategy: "ihre Elemente löschen",
-  moveItemsStrategy: "ihre Elemente in den Posteingang verschieben",
+  moveItemsStrategy: "Einträge ohne Sammlung behalten",
   deleteCollectionQuestion: "„{name}“, ihre Untersammlungen und {action}?",
   collectionDeleted: "{collections} Sammlungen gelöscht und {items} Elemente verarbeitet.",
   sitesHint: "Fassen Sie alte und neue Domains in einer Website zusammen, damit dieselbe Ressource eine stabile Identität behält.",

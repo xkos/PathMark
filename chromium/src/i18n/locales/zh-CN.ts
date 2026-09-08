@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "本次不导入此域名下的全部地址",
+  excludedImportDomains: "本次已排除的域名",
+  restoreImportDomain: "恢复导入",
+
+  clearItems: "清空条目数据",
+  clearItemsHint: "永久删除全部条目（包括归档条目），保留站点、分类和设置。此操作无法撤销。",
+  clearItemsDone: "条目数据已清空，站点、分类和设置已保留。",
+
+  existingImportCollections: "已有分类",
+  importCollectionHint: "请选择已有分类，或选择“新建分类”。目录名不会自动变成分类；本次新建的分类会在确认导入时保存。",
+  finishImportCollection: "请先完成新建分类，或改选已有分类、未分类。",
+
+  itemsPerPage: "每页条数",
+  itemRange: "第 {start}–{end} 条，共 {total} 条",
+
+  selectAll: "全选",
+  selectResults: "全选筛选结果",
+  previousPage: "上一页",
+  nextPage: "下一页",
+  syncSite: "同步站点",
+  syncSiteHint: "保存站点后，选择要同步的未入站网址；相同资源路径会合并为一条。",
+  mergeOnSync: "同步时合并为一条",
+  deleteSelectedQuestion: "确定删除选中的 {count} 条资料？",
+  draftOption: "本次新建",
+
   appName: "本地阅读收藏",
   appShortName: "阅读收藏",
   libraryTitle: "本地阅读资料库",
@@ -24,7 +49,7 @@ export const messages: Record<MessageKey, string> = {
   noteOptional: "笔记（可选）",
   notePlaceholder: "为什么收藏，之后重点看什么？",
   collection: "收藏分类",
-  inbox: "收件箱",
+  uncategorized: "未分类",
   tags: "标签",
   tagsPlaceholder: "论文, RAG",
   readingState: "阅读状态",
@@ -120,9 +145,9 @@ export const messages: Record<MessageKey, string> = {
   migrating: "迁移中…", confirmMigration: "确认迁移", collectionsHint: "分类回答“资料放在哪里”，不会参与 URL 身份判断，最多支持 5 层。",
   newCollection: "新建分类", collectionList: "分类列表", noCollections: "尚未创建分类", collectionEditor: "分类编辑器",
   collectionName: "分类名称", collectionPlaceholder: "例如：待读论文", parentCollection: "父分类", topLevelCollection: "顶层分类",
-  itemsCount: "{total} 条 · {unread} 未读", moveUp: "上移", moveDown: "下移", deleteCollectionMove: "删除，{count} 条移入收件箱",
+  itemsCount: "{total} 条 · {unread} 未读", moveUp: "上移", moveDown: "下移", deleteCollectionMove: "删除，{count} 条设为未分类",
   deleteCollectionItems: "删除分类及条目", deleteCollection: "删除分类", saveCollection: "保存分类", collectionSaved: "分类已保存。",
-  deleteItemsStrategy: "同时删除其中条目", moveItemsStrategy: "将其中条目移入收件箱",
+  deleteItemsStrategy: "同时删除其中条目", moveItemsStrategy: "保留其中条目并取消分类",
   deleteCollectionQuestion: "确定删除分类“{name}”及其子分类，并{action}吗？", collectionDeleted: "已删除 {collections} 个分类，处理 {items} 条资料。",
   sitesHint: "把历史域名和新域名归入同一站点，让同一资源保持稳定身份。", newSite: "新建站点", siteList: "站点列表",
   endpointsCount: "{count} 个 Endpoint", noSites: "尚未创建站点", siteEditor: "站点编辑器", siteName: "站点名称",

@@ -4,7 +4,7 @@ import { readingLibrary } from "../storage/library-instance";
 import { Button } from "../ui/Button";
 import type { AppSettings } from "../domain/models";
 import { requestActionIconRefresh } from "../browser/action-refresh";
-import { localizeError, t } from "../i18n";
+import { getLocale, saveLocale, LOCALE_NAMES, type AppLocale, localizeError, t } from "../i18n";
 import { BookmarkImportManager } from "./BookmarkImportManager";
 
 interface ExportSummary {
@@ -105,6 +105,16 @@ export function DataTransferManager() {
     finally { setBusy(false); }
   }
 
+  async function clearItems(): Promise<void> {
+    if (!window.confirm(t("clearItemsHint"))) return;
+    setBusy(true); setError(""); setNotice("");
+    try {
+      await readingLibrary.clearItems(); setPreview(null);
+      await refreshSummary(); requestActionIconRefresh(); setNotice(t("clearItemsDone"));
+    } catch (error) { setError(describeError(error)); }
+    finally { setBusy(false); }
+  }
+
   async function clearAllData(): Promise<void> {
     if (!window.confirm(t("clearQuestion"))) return;
     if (!window.confirm(t("clearFinalQuestion"))) return;
@@ -123,12 +133,22 @@ export function DataTransferManager() {
         </div>
       </header>
 
+      <section className="transfer-card settings-card">
+        <label className="field"><span className="field__label">Language / 界面语言</span>
+          <select className="field__input" aria-label="Language / 界面语言" value={getLocale()} onChange={(event) => {
+            try { saveLocale(event.target.value as AppLocale); setError(""); }
+            catch (error) { setError(describeError(error)); }
+          }}>
+            {Object.entries(LOCALE_NAMES).map(([locale, name]) => <option key={locale} value={locale}>{name}</option>)}
+          </select>
+        </label>
+      </section>
+
       {settings ? <section className="transfer-card settings-card" aria-labelledby="settings-heading">
         <div><h3 id="settings-heading">{t("normalizationDefaults")}</h3><p>{t("normalizationHint")}</p></div>
         <div className="settings-grid">
           <label className="field"><span className="field__label">{t("ignoredQueryParams")}</span><input className="field__input" value={settings.globalIgnoredQueryParams.join(", ")} onChange={(event) => setSettings({ ...settings, globalIgnoredQueryParams: event.target.value.split(/[，,]/).map((value) => value.trim()).filter(Boolean) })} /></label>
           <label className="field"><span className="field__label">{t("defaultReadingState")}</span><select className="field__input" value={settings.defaultReadingState} onChange={(event) => setSettings({ ...settings, defaultReadingState: event.target.value as AppSettings["defaultReadingState"] })}><option value="unread">{t("unread")}</option><option value="reading">{t("reading")}</option><option value="read">{t("read")}</option></select></label>
-          <label className="field"><span className="field__label">{t("defaultLibraryView")}</span><select className="field__input" value={settings.defaultView} onChange={(event) => setSettings({ ...settings, defaultView: event.target.value as AppSettings["defaultView"] })}><option value="inbox">{t("inbox")}</option><option value="unread">{t("unread")}</option><option value="all">{t("all")}</option></select></label>
           <label className="check-field settings-check"><input type="checkbox" checked={settings.stripTrailingSlash} onChange={(event) => setSettings({ ...settings, stripTrailingSlash: event.target.checked })} /> {t("stripTrailingSlash")}</label>
         </div>
         <Button type="button" onClick={() => void saveSettings()} disabled={busy}>{t("saveSettings")}</Button>
@@ -177,6 +197,10 @@ export function DataTransferManager() {
       {preview ? <ImportPreviewPanel preview={preview} onApply={() => void applyImport()} busy={busy} /> : null}
       {error ? <div className="error-panel transfer-feedback" role="alert">{error}</div> : null}
       {notice ? <div className="notice-panel transfer-feedback" role="status">{notice}</div> : null}
+      <section className="danger-zone">
+        <div><h3>{t("clearItems")}</h3><p>{t("clearItemsHint")}</p></div>
+        <Button type="button" variant="ghost" disabled={busy || !summary?.items} onClick={() => void clearItems()}>{t("clearItems")}</Button>
+      </section>
       <section className="danger-zone">
         <div><h3>{t("clearAll")}</h3><p>{t("clearAllHint")}</p></div>
         <Button type="button" variant="ghost" disabled={busy || !summary?.items && !summary?.collections && !summary?.sites} onClick={() => void clearAllData()}>{t("clearAllButton")}</Button>

@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "ยกเว้นทุก URL ของโดเมนนี้จากการนำเข้าครั้งนี้",
+  excludedImportDomains: "โดเมนที่ยกเว้นจากการนำเข้าครั้งนี้",
+  restoreImportDomain: "รวมอีกครั้ง",
+
+  clearItems: "ล้างข้อมูลรายการ",
+  clearItemsHint: "ลบทุกรายการอย่างถาวร รวมถึงรายการที่เก็บถาวร โดยเก็บเว็บไซต์ คอลเลกชัน และการตั้งค่าไว้ การดำเนินการนี้ไม่สามารถย้อนกลับได้",
+  clearItemsDone: "ล้างรายการแล้ว โดยเก็บเว็บไซต์ คอลเลกชัน และการตั้งค่าไว้",
+
+  existingImportCollections: "คอลเลกชันที่มีอยู่",
+  importCollectionHint: "เลือกคอลเลกชันที่มีอยู่หรือสร้างใหม่ ชื่อโฟลเดอร์จะไม่สร้างคอลเลกชันโดยอัตโนมัติ คอลเลกชันใหม่จะถูกบันทึกเมื่อยืนยันการนำเข้า",
+  finishImportCollection: "สร้างให้เสร็จ หรือเลือกคอลเลกชันที่มีอยู่หรือไม่มีคอลเลกชัน",
+
+  itemsPerPage: "รายการต่อหน้า",
+  itemRange: "{start}–{end} จาก {total}",
+
+  selectAll: "เลือกทั้งหมด",
+  selectResults: "เลือกผลลัพธ์ทั้งหมด",
+  previousPage: "หน้าก่อนหน้า",
+  nextPage: "หน้าถัดไป",
+  syncSite: "ซิงค์เว็บไซต์",
+  syncSiteHint: "หลังบันทึก ให้เลือก URL ที่ยังไม่ได้กำหนดเว็บไซต์เพื่อซิงค์ เส้นทางทรัพยากรเดียวกันจะรวมเป็นรายการเดียว",
+  mergeOnSync: "รวมเป็นรายการเดียวเมื่อซิงค์",
+  deleteSelectedQuestion: "ลบ {count} รายการที่เลือกหรือไม่?",
+  draftOption: "สร้างใหม่ในการนำเข้าครั้งนี้",
+
   appName: "คลังบทอ่านในเครื่อง", appShortName: "คลังบทอ่าน", libraryTitle: "คลังบทอ่านในเครื่อง",
   loadingPage: "กำลังระบุหน้าปัจจุบัน…", currentPage: "หน้าปัจจุบัน", title: "ชื่อเรื่อง", site: "เว็บไซต์",
   siteDescription: "เว็บไซต์จะรวมหลายโดเมนหรือคำนำหน้า URL ให้เป็นแหล่งเนื้อหาเดียว", autoMatched: "จับคู่อัตโนมัติแล้ว",
@@ -9,7 +34,7 @@ export const messages: Record<MessageKey, string> = {
   newSiteName: "ชื่อเว็บไซต์ใหม่", newSitePlaceholder: "ตัวอย่าง: บทความตัวอย่าง", firstEndpoint: "Endpoint แรก",
   addEndpoint: "Endpoint ที่จะเพิ่มไปยังเว็บไซต์ที่เลือก", endpointWillBeAdded: "URL นี้ยังไม่ตรงกับเว็บไซต์ คำนำหน้านี้จะถูกเพิ่มเมื่อคุณบันทึก",
   endpointPrefilled: "กรอกจากหน้าปัจจุบันแล้ว เพิ่มคำนำหน้าเส้นทางหากจำเป็น", noteOptional: "บันทึกย่อ (ไม่บังคับ)",
-  notePlaceholder: "เหตุใดจึงบันทึก และภายหลังควรสนใจอะไร?", collection: "คอลเลกชัน", inbox: "กล่องขาเข้า", tags: "แท็ก",
+  notePlaceholder: "เหตุใดจึงบันทึก และภายหลังควรสนใจอะไร?", collection: "คอลเลกชัน", uncategorized: "ไม่มีคอลเลกชัน", tags: "แท็ก",
   tagsPlaceholder: "บทความ, RAG", readingState: "สถานะการอ่าน", unread: "ยังไม่ได้อ่าน", reading: "กำลังอ่าน", read: "อ่านแล้ว", archived: "เก็บถาวรแล้ว",
   viewIdentity: "ดูข้อมูลระบุสุดท้าย", viewIdentityDetails: "ดูรายละเอียดข้อมูลระบุ", saving: "กำลังบันทึก…", saveToLibrary: "บันทึกลงคลัง",
   manageLibrary: "จัดการคลัง", savedUnread: "บันทึกแล้ว · ยังไม่ได้อ่าน", savedReading: "บันทึกแล้ว · กำลังอ่าน", savedRead: "บันทึกแล้ว · อ่านแล้ว",
@@ -43,9 +68,9 @@ export const messages: Record<MessageKey, string> = {
   migrating: "กำลังย้าย…", confirmMigration: "ยืนยันการย้าย", collectionsHint: "คอลเลกชันจัดตำแหน่งของรายการและไม่กระทบข้อมูลระบุ URL รองรับสูงสุดห้าระดับ",
   newCollection: "คอลเลกชันใหม่", collectionList: "รายการคอลเลกชัน", noCollections: "ยังไม่มีคอลเลกชัน", collectionEditor: "ตัวแก้ไขคอลเลกชัน",
   collectionName: "ชื่อคอลเลกชัน", collectionPlaceholder: "ตัวอย่าง: บทความที่ต้องอ่าน", parentCollection: "คอลเลกชันหลัก", topLevelCollection: "ระดับบนสุด",
-  itemsCount: "ทั้งหมด {total} รายการ · ยังไม่ได้อ่าน {unread}", moveUp: "ย้ายขึ้น", moveDown: "ย้ายลง", deleteCollectionMove: "ลบและย้าย {count} รายการไปยังกล่องขาเข้า",
+  itemsCount: "ทั้งหมด {total} รายการ · ยังไม่ได้อ่าน {unread}", moveUp: "ย้ายขึ้น", moveDown: "ย้ายลง", deleteCollectionMove: "ลบและเก็บ {count} รายการโดยไม่มีคอลเลกชัน",
   deleteCollectionItems: "ลบคอลเลกชันและรายการ", deleteCollection: "ลบคอลเลกชัน", saveCollection: "บันทึกคอลเลกชัน", collectionSaved: "บันทึกคอลเลกชันแล้ว",
-  deleteItemsStrategy: "ลบรายการของคอลเลกชัน", moveItemsStrategy: "ย้ายรายการไปยังกล่องขาเข้า",
+  deleteItemsStrategy: "ลบรายการของคอลเลกชัน", moveItemsStrategy: "เก็บรายการไว้โดยไม่มีคอลเลกชัน",
   deleteCollectionQuestion: "ลบ “{name}” คอลเลกชันย่อย และ{action}หรือไม่?", collectionDeleted: "ลบ {collections} คอลเลกชันและประมวลผล {items} รายการแล้ว",
   sitesHint: "รวมโดเมนเก่าและใหม่เป็นเว็บไซต์เดียว เพื่อให้ทรัพยากรเดียวกันมีข้อมูลระบุที่คงที่", newSite: "เว็บไซต์ใหม่", siteList: "รายการเว็บไซต์",
   endpointsCount: "{count} endpoint", noSites: "ยังไม่มีเว็บไซต์", siteEditor: "ตัวแก้ไขเว็บไซต์", siteName: "ชื่อเว็บไซต์",

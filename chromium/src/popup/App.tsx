@@ -233,7 +233,7 @@ export function App() {
                 <label className="field">
                   <span className="field__label">{t("collection")}</span>
                   <select className="field__input" value={collectionId} onChange={(event) => setCollectionId(event.target.value)}>
-                    <option value="">{t("inbox")}</option>
+                    <option value="">{t("uncategorized")}</option>
                     {flattenCollections(collections).map(({ collection, depth }) => <option key={collection.id} value={collection.id}>{`${"　".repeat(depth)}${collection.name}`}</option>)}
                   </select>
                 </label>

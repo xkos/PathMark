@@ -2,11 +2,36 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "このドメインのすべてのURLを今回のインポートから除外",
+  excludedImportDomains: "今回のインポートから除外したドメイン",
+  restoreImportDomain: "再び含める",
+
+  clearItems: "項目データを消去",
+  clearItemsHint: "アーカイブ済みを含むすべての項目を完全に削除します。サイト、コレクション、設定は保持されます。この操作は取り消せません。",
+  clearItemsDone: "すべての項目を消去しました。サイト、コレクション、設定は保持されています。",
+
+  existingImportCollections: "既存のコレクション",
+  importCollectionHint: "既存のコレクションを選ぶか、新しく作成してください。フォルダー名から自動作成はしません。新規コレクションはインポート確定時に保存されます。",
+  finishImportCollection: "作成を完了するか、既存のコレクションまたは未分類を選んでください。",
+
+  itemsPerPage: "1ページの件数",
+  itemRange: "{total} 件中 {start}–{end} 件",
+
+  selectAll: "すべて選択",
+  selectResults: "検索結果をすべて選択",
+  previousPage: "前のページ",
+  nextPage: "次のページ",
+  syncSite: "サイトを同期",
+  syncSiteHint: "サイトを保存後、同期する未分類のURLを選択してください。同じリソースパスは1件に統合されます。",
+  mergeOnSync: "同期時に1件に統合",
+  deleteSelectedQuestion: "選択した {count} 件を削除しますか？",
+  draftOption: "今回新規作成",
+
   appName: "ローカルリーディングライブラリ", appShortName: "リーディングライブラリ", libraryTitle: "ローカルリーディングライブラリ",
   loadingPage: "現在のページを識別中…", currentPage: "現在のページ", title: "タイトル", site: "サイト",
   siteDescription: "1 つのサイトに複数のドメインや URL プレフィックスをまとめます。", autoMatched: "自動一致", selectSite: "サイトを選択", autoRecognize: "自動検出", unassigned: "未割り当て", createSite: "+ 新しいサイトを作成",
   newSiteName: "新しいサイト名", newSitePlaceholder: "例: Example Papers", firstEndpoint: "最初の Endpoint", addEndpoint: "選択したサイトに追加する Endpoint", endpointWillBeAdded: "この URL はまだサイトに一致しません。保存時にこのプレフィックスを追加します。", endpointPrefilled: "現在のページから入力済みです。必要に応じてパスプレフィックスを追加してください。",
-  noteOptional: "メモ（任意）", notePlaceholder: "保存する理由や、後で確認したい点を入力", collection: "コレクション", inbox: "受信トレイ", tags: "タグ", tagsPlaceholder: "論文, RAG", readingState: "読書ステータス", unread: "未読", reading: "読書中", read: "読了", archived: "アーカイブ",
+  noteOptional: "メモ（任意）", notePlaceholder: "保存する理由や、後で確認したい点を入力", collection: "コレクション", uncategorized: "未分類", tags: "タグ", tagsPlaceholder: "論文, RAG", readingState: "読書ステータス", unread: "未読", reading: "読書中", read: "読了", archived: "アーカイブ",
   viewIdentity: "最終識別情報を表示", viewIdentityDetails: "識別詳細を表示", saving: "保存中…", saveToLibrary: "ライブラリに保存", manageLibrary: "ライブラリを管理", savedUnread: "保存済み · 未読", savedReading: "保存済み · 読書中", savedRead: "保存済み · 読了",
   readBefore: "読了済み", noNote: "メモはまだありません", markUnreadAgain: "未読に戻す", markRead: "読了にする", deleteCurrent: "このブックマークを削除", deleteCurrentQuestion: "このブックマークを削除しますか？", deleteCurrentHint: "このページの記録だけを削除します。サイト、Endpoint、他の項目には影響しません。", cancel: "キャンセル", deleting: "削除中…", confirmDelete: "削除",
   identityInfo: "識別情報", endpoint: "Endpoint", resourceKey: "リソースキー", matchMethod: "一致方法", notMatched: "一致なし", fullUrlIdentity: "正規化した URL 全体で識別", siteResourceMatch: "サイト内のリソースキーで一致", normalizedUrlMatch: "正規化 URL で一致",
@@ -19,8 +44,8 @@ export const messages: Record<MessageKey, string> = {
   savingShort: "保存中…", saveChanges: "変更を保存", migrateItemSite: "項目のサイトを変更", closeMigration: "移行ダイアログを閉じる", originalUrl: "元の URL", currentSite: "現在のサイト", targetSite: "移行先サイト", previewMigration: "移行をプレビュー", migratedSite: "移行後のサイト", matchedEndpoint: "一致した Endpoint", canonicalKey: "正規キー",
   migrationConflict: "移行すると「{title}」と競合します。", migrationUnchanged: "移行先の識別情報は現在と同じです。移行は不要です。", migrating: "移行中…", confirmMigration: "移行を確定", collectionsHint: "コレクションは項目の保管場所を整理し、URL 識別には影響しません。最大 5 階層です。",
   newCollection: "新しいコレクション", collectionList: "コレクション一覧", noCollections: "コレクションはまだありません", collectionEditor: "コレクション編集", collectionName: "コレクション名", collectionPlaceholder: "例: 後で読む論文", parentCollection: "親コレクション", topLevelCollection: "最上位",
-  itemsCount: "{total} 件 · 未読 {unread} 件", moveUp: "上へ", moveDown: "下へ", deleteCollectionMove: "削除し、{count} 件を受信トレイへ移動", deleteCollectionItems: "コレクションと項目を削除", deleteCollection: "コレクションを削除", saveCollection: "コレクションを保存", collectionSaved: "コレクションを保存しました。",
-  deleteItemsStrategy: "含まれる項目を削除", moveItemsStrategy: "含まれる項目を受信トレイへ移動", deleteCollectionQuestion: "「{name}」とそのサブコレクションを削除し、{action}しますか？", collectionDeleted: "{collections} 個のコレクションを削除し、{items} 件を処理しました。",
+  itemsCount: "{total} 件 · 未読 {unread} 件", moveUp: "上へ", moveDown: "下へ", deleteCollectionMove: "削除し、{count} 件を未分類にする", deleteCollectionItems: "コレクションと項目を削除", deleteCollection: "コレクションを削除", saveCollection: "コレクションを保存", collectionSaved: "コレクションを保存しました。",
+  deleteItemsStrategy: "含まれる項目を削除", moveItemsStrategy: "項目を残して未分類にする", deleteCollectionQuestion: "「{name}」とそのサブコレクションを削除し、{action}しますか？", collectionDeleted: "{collections} 個のコレクションを削除し、{items} 件を処理しました。",
   sitesHint: "新旧のドメインを 1 つのサイトにまとめ、同じリソースの識別情報を安定させます。", newSite: "新しいサイト", siteList: "サイト一覧", endpointsCount: "Endpoint {count} 件", noSites: "サイトはまだありません", siteEditor: "サイト編集", siteName: "サイト名", description: "説明", siteDescriptionPlaceholder: "用途や出典（任意）", endpointOrderHint: "上にある Endpoint ほど URL 解決時の優先度が高くなります。",
   addEndpointButton: "Endpoint を追加", resolutionPriority: "解決優先度", endpointPrefixLabel: "Endpoint {index} プレフィックス", enabled: "有効", removeEndpoint: "Endpoint を削除", remove: "削除", noEndpoints: "このサイトに Endpoint はありません。保存後に設定できます。", queryPolicy: "クエリパラメーターポリシー", keepExceptIgnored: "無視するパラメーター以外をすべて保持", keepIdentityOnly: "識別パラメーターのみ保持", identityParams: "識別パラメーター", extraIgnoredParams: "追加の無視パラメーター", paramsPlaceholder: "例: ref, source または id, lang",
   impactPreview: "設定影響のプレビュー", impactPreviewHint: "保存前に識別情報と既定 URL の変更を確認します。プレビューで項目は変更されません。", previewImpact: "影響をプレビュー", impactStale: "設定が再度変更されました。新しいプレビューを実行してください。", associatedItems: "関連項目", defaultAddressChanges: "既定 URL の変更", identityChanges: "識別情報の変更", canonicalConflicts: "正規キーの競合",

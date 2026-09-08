@@ -1,6 +1,31 @@
 import type { AppErrorCode } from "../../domain/app-error";
 
 export const messages = {
+  excludeImportDomain: "Exclude all URLs under this domain from this import",
+  excludedImportDomains: "Domains excluded from this import",
+  restoreImportDomain: "Include again",
+
+  clearItems: "Clear item data",
+  clearItemsHint: "Permanently delete all items, including archived items. Sites, collections and settings will be kept. This cannot be undone.",
+  clearItemsDone: "All items cleared. Sites, collections and settings were kept.",
+
+  existingImportCollections: "Existing collections",
+  importCollectionHint: "Choose an existing collection or create one. Folder names do not create collections. New collections are saved when you confirm the import.",
+  finishImportCollection: "Finish creating the collection, or choose an existing collection or Uncategorized.",
+
+  itemsPerPage: "Items per page",
+  itemRange: "{start}–{end} of {total}",
+
+  selectAll: "Select all",
+  selectResults: "Select all results",
+  previousPage: "Previous page",
+  nextPage: "Next page",
+  syncSite: "Sync site",
+  syncSiteHint: "After saving, select unassigned URLs to sync. Matching resource paths merge into one item.",
+  mergeOnSync: "Merge into one item on sync",
+  deleteSelectedQuestion: "Delete the {count} selected items?",
+  draftOption: "New in this import",
+
   appName: "Local Reading Library", appShortName: "Reading Library", libraryTitle: "Local Reading Library",
   loadingPage: "Identifying the current page…", currentPage: "Current page", title: "Title", site: "Site",
   siteDescription: "A site groups multiple domains or URL prefixes as one content source.", autoMatched: "Matched automatically",
@@ -8,7 +33,7 @@ export const messages = {
   newSiteName: "New site name", newSitePlaceholder: "Example: Example Papers", firstEndpoint: "First endpoint",
   addEndpoint: "Endpoint to add to the selected site", endpointWillBeAdded: "This URL does not match the site yet. This prefix will be added when you save.",
   endpointPrefilled: "Prefilled from the current page. Add a path prefix if needed.", noteOptional: "Note (optional)",
-  notePlaceholder: "Why save this, and what should you focus on later?", collection: "Collection", inbox: "Inbox", tags: "Tags",
+  notePlaceholder: "Why save this, and what should you focus on later?", collection: "Collection", uncategorized: "Uncategorized", tags: "Tags",
   tagsPlaceholder: "papers, RAG", readingState: "Reading status", unread: "Unread", reading: "Reading", read: "Read", archived: "Archived",
   viewIdentity: "View final identity", viewIdentityDetails: "View identity details", saving: "Saving…", saveToLibrary: "Save to library",
   manageLibrary: "Manage library", savedUnread: "Saved · Unread", savedReading: "Saved · Reading", savedRead: "Saved · Read",
@@ -42,9 +67,9 @@ export const messages = {
   migrating: "Migrating…", confirmMigration: "Confirm migration", collectionsHint: "Collections organize where items live and do not affect URL identity. Up to five levels are supported.",
   newCollection: "New collection", collectionList: "Collection list", noCollections: "No collections yet", collectionEditor: "Collection editor",
   collectionName: "Collection name", collectionPlaceholder: "Example: Papers to read", parentCollection: "Parent collection", topLevelCollection: "Top level",
-  itemsCount: "{total} items · {unread} unread", moveUp: "Move up", moveDown: "Move down", deleteCollectionMove: "Delete; move {count} items to Inbox",
+  itemsCount: "{total} items · {unread} unread", moveUp: "Move up", moveDown: "Move down", deleteCollectionMove: "Delete; leave {count} items uncategorized",
   deleteCollectionItems: "Delete collection and items", deleteCollection: "Delete collection", saveCollection: "Save collection", collectionSaved: "Collection saved.",
-  deleteItemsStrategy: "delete its items", moveItemsStrategy: "move its items to Inbox",
+  deleteItemsStrategy: "delete its items", moveItemsStrategy: "leave its items uncategorized",
   deleteCollectionQuestion: "Delete “{name}”, its subcollections, and {action}?", collectionDeleted: "Deleted {collections} collections and processed {items} items.",
   sitesHint: "Group old and new domains into one site so the same resource keeps a stable identity.", newSite: "New site", siteList: "Site list",
   endpointsCount: "{count} endpoints", noSites: "No sites yet", siteEditor: "Site editor", siteName: "Site name",

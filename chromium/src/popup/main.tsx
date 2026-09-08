@@ -1,3 +1,4 @@
+import { LocalizedApp } from "../ui/LocalizedApp";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "../ui/theme.css";
@@ -9,6 +10,6 @@ initializeDocument("appName");
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <LocalizedApp component={App} title="appName" />
   </StrictMode>,
 );

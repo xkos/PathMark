@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "استبعاد جميع روابط هذا النطاق من هذا الاستيراد",
+  excludedImportDomains: "النطاقات المستبعدة من هذا الاستيراد",
+  restoreImportDomain: "تضمين مجدداً",
+
+  clearItems: "مسح العناصر",
+  clearItemsHint: "حذف جميع العناصر نهائياً، بما فيها المؤرشفة. ستُحفظ المواقع والمجموعات والإعدادات. لا يمكن التراجع عن هذا الإجراء.",
+  clearItemsDone: "مُسحت العناصر مع الاحتفاظ بالمواقع والمجموعات والإعدادات.",
+
+  existingImportCollections: "المجموعات الموجودة",
+  importCollectionHint: "اختر مجموعة موجودة أو أنشئ مجموعة. أسماء المجلدات لا تنشئ مجموعات تلقائياً. تُحفظ المجموعات الجديدة عند تأكيد الاستيراد.",
+  finishImportCollection: "أكمل الإنشاء أو اختر مجموعة موجودة أو بلا مجموعة.",
+
+  itemsPerPage: "العناصر في الصفحة",
+  itemRange: "{start}–{end} من {total}",
+
+  selectAll: "تحديد الكل",
+  selectResults: "تحديد كل النتائج",
+  previousPage: "الصفحة السابقة",
+  nextPage: "الصفحة التالية",
+  syncSite: "مزامنة الموقع",
+  syncSiteHint: "بعد الحفظ، حدد الروابط غير المرتبطة لمزامنتها. تُدمج مسارات الموارد المتطابقة في عنصر واحد.",
+  mergeOnSync: "دمج في عنصر واحد عند المزامنة",
+  deleteSelectedQuestion: "هل تريد حذف العناصر المحددة وعددها {count}؟",
+  draftOption: "جديد في هذا الاستيراد",
+
   appName: "مكتبة القراءة المحلية", appShortName: "مكتبة القراءة", libraryTitle: "مكتبة القراءة المحلية",
   loadingPage: "جارٍ التعرّف على الصفحة الحالية…", currentPage: "الصفحة الحالية", title: "العنوان", site: "الموقع",
   siteDescription: "يجمع الموقع عدة نطاقات أو بادئات URL بوصفها مصدر محتوى واحدًا.", autoMatched: "تمت المطابقة تلقائيًا",
@@ -9,7 +34,7 @@ export const messages: Record<MessageKey, string> = {
   newSiteName: "اسم الموقع الجديد", newSitePlaceholder: "مثال: أبحاث نموذجية", firstEndpoint: "نقطة النهاية الأولى",
   addEndpoint: "نقطة النهاية المراد إضافتها إلى الموقع المحدد", endpointWillBeAdded: "لا يطابق عنوان URL هذا الموقع بعد. ستُضاف هذه البادئة عند الحفظ.",
   endpointPrefilled: "معبّأ من الصفحة الحالية. أضف بادئة مسار عند الحاجة.", noteOptional: "ملاحظة (اختيارية)",
-  notePlaceholder: "لماذا تحفظ هذا، وما الذي ينبغي التركيز عليه لاحقًا؟", collection: "المجموعة", inbox: "الوارد", tags: "الوسوم",
+  notePlaceholder: "لماذا تحفظ هذا، وما الذي ينبغي التركيز عليه لاحقًا؟", collection: "المجموعة", uncategorized: "بلا مجموعة", tags: "الوسوم",
   tagsPlaceholder: "أبحاث، RAG", readingState: "حالة القراءة", unread: "غير مقروء", reading: "قيد القراءة", read: "مقروء", archived: "مؤرشف",
   viewIdentity: "عرض الهوية النهائية", viewIdentityDetails: "عرض تفاصيل الهوية", saving: "جارٍ الحفظ…", saveToLibrary: "حفظ في المكتبة",
   manageLibrary: "إدارة المكتبة", savedUnread: "محفوظ · غير مقروء", savedReading: "محفوظ · قيد القراءة", savedRead: "محفوظ · مقروء",
@@ -43,9 +68,9 @@ export const messages: Record<MessageKey, string> = {
   migrating: "جارٍ النقل…", confirmMigration: "تأكيد النقل", collectionsHint: "تنظّم المجموعات مواضع العناصر ولا تؤثر في هوية URL. يمكن استخدام خمسة مستويات كحد أقصى.",
   newCollection: "مجموعة جديدة", collectionList: "قائمة المجموعات", noCollections: "لا توجد مجموعات بعد", collectionEditor: "محرر المجموعة",
   collectionName: "اسم المجموعة", collectionPlaceholder: "مثال: أبحاث للقراءة", parentCollection: "المجموعة الأم", topLevelCollection: "المستوى الأعلى",
-  itemsCount: "{total} عنصر · {unread} غير مقروء", moveUp: "نقل إلى أعلى", moveDown: "نقل إلى أسفل", deleteCollectionMove: "حذف؛ نقل {count} عنصر إلى الوارد",
+  itemsCount: "{total} عنصر · {unread} غير مقروء", moveUp: "نقل إلى أعلى", moveDown: "نقل إلى أسفل", deleteCollectionMove: "حذف مع إبقاء {count} عناصر بلا مجموعة",
   deleteCollectionItems: "حذف المجموعة والعناصر", deleteCollection: "حذف المجموعة", saveCollection: "حفظ المجموعة", collectionSaved: "تم حفظ المجموعة.",
-  deleteItemsStrategy: "حذف عناصرها", moveItemsStrategy: "نقل عناصرها إلى الوارد",
+  deleteItemsStrategy: "حذف عناصرها", moveItemsStrategy: "إبقاء العناصر بلا مجموعة",
   deleteCollectionQuestion: "هل تريد حذف «{name}» ومجموعاتها الفرعية و{action}؟", collectionDeleted: "تم حذف {collections} مجموعة ومعالجة {items} عنصر.",
   sitesHint: "اجمع النطاقات القديمة والجديدة في موقع واحد كي يحتفظ المورد نفسه بهوية مستقرة.", newSite: "موقع جديد", siteList: "قائمة المواقع",
   endpointsCount: "{count} نقطة نهاية", noSites: "لا توجد مواقع بعد", siteEditor: "محرر الموقع", siteName: "اسم الموقع",

@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "Исключить все URL этого домена из текущего импорта",
+  excludedImportDomains: "Домены, исключённые из этого импорта",
+  restoreImportDomain: "Включить снова",
+
+  clearItems: "Очистить записи",
+  clearItemsHint: "Безвозвратно удалить все записи, включая архивные. Сайты, коллекции и настройки сохранятся. Это действие нельзя отменить.",
+  clearItemsDone: "Записи удалены. Сайты, коллекции и настройки сохранены.",
+
+  existingImportCollections: "Существующие коллекции",
+  importCollectionHint: "Выберите коллекцию или создайте новую. Названия папок не создают коллекции. Новые коллекции сохраняются при подтверждении импорта.",
+  finishImportCollection: "Завершите создание или выберите существующую коллекцию либо Без коллекции.",
+
+  itemsPerPage: "Записей на странице",
+  itemRange: "{start}–{end} из {total}",
+
+  selectAll: "Выбрать всё",
+  selectResults: "Выбрать все результаты",
+  previousPage: "Предыдущая страница",
+  nextPage: "Следующая страница",
+  syncSite: "Синхронизировать сайт",
+  syncSiteHint: "После сохранения выберите непривязанные URL. Одинаковые пути ресурсов будут объединены в одну запись.",
+  mergeOnSync: "Объединить при синхронизации",
+  deleteSelectedQuestion: "Удалить выбранные записи ({count})?",
+  draftOption: "Создано при этом импорте",
+
   appName: "Локальная библиотека чтения",
   appShortName: "Библиотека чтения",
   libraryTitle: "Локальная библиотека чтения",
@@ -24,7 +49,7 @@ export const messages: Record<MessageKey, string> = {
   noteOptional: "Заметка (необязательно)",
   notePlaceholder: "Почему это стоит сохранить и на что обратить внимание позже?",
   collection: "Коллекция",
-  inbox: "Входящие",
+  uncategorized: "Без коллекции",
   tags: "Теги",
   tagsPlaceholder: "статьи, RAG",
   readingState: "Статус чтения",
@@ -144,13 +169,13 @@ export const messages: Record<MessageKey, string> = {
   itemsCount: "Всего: {total} · не прочитано: {unread}",
   moveUp: "Переместить вверх",
   moveDown: "Переместить вниз",
-  deleteCollectionMove: "Удалить и переместить {count} элементов во Входящие",
+  deleteCollectionMove: "Удалить; оставить {count} записей без коллекции",
   deleteCollectionItems: "Удалить коллекцию и элементы",
   deleteCollection: "Удалить коллекцию",
   saveCollection: "Сохранить коллекцию",
   collectionSaved: "Коллекция сохранена.",
   deleteItemsStrategy: "удалить её элементы",
-  moveItemsStrategy: "переместить её элементы во Входящие",
+  moveItemsStrategy: "оставить записи без коллекции",
   deleteCollectionQuestion: "Удалить «{name}», вложенные коллекции и {action}?",
   collectionDeleted: "Удалено коллекций: {collections}; обработано элементов: {items}.",
   sitesHint: "Объединяйте старые и новые домены в один сайт, чтобы ресурс сохранял стабильную идентичность.",

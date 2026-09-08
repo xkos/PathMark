@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "Wyklucz wszystkie adresy URL tej domeny z tego importu",
+  excludedImportDomains: "Domeny wykluczone z tego importu",
+  restoreImportDomain: "Uwzględnij ponownie",
+
+  clearItems: "Wyczyść elementy",
+  clearItemsHint: "Trwale usuń wszystkie elementy, także zarchiwizowane. Witryny, kolekcje i ustawienia zostaną zachowane. Tej operacji nie można cofnąć.",
+  clearItemsDone: "Elementy usunięte. Witryny, kolekcje i ustawienia zachowane.",
+
+  existingImportCollections: "Istniejące kolekcje",
+  importCollectionHint: "Wybierz kolekcję lub utwórz nową. Nazwy folderów nie tworzą kolekcji. Nowe kolekcje są zapisywane po potwierdzeniu importu.",
+  finishImportCollection: "Dokończ tworzenie lub wybierz istniejącą kolekcję albo Bez kolekcji.",
+
+  itemsPerPage: "Elementy na stronę",
+  itemRange: "{start}–{end} z {total}",
+
+  selectAll: "Zaznacz wszystko",
+  selectResults: "Zaznacz wszystkie wyniki",
+  previousPage: "Poprzednia strona",
+  nextPage: "Następna strona",
+  syncSite: "Synchronizuj witrynę",
+  syncSiteHint: "Po zapisaniu wybierz nieprzypisane adresy URL. Identyczne ścieżki zasobów zostaną scalone w jeden element.",
+  mergeOnSync: "Scal podczas synchronizacji",
+  deleteSelectedQuestion: "Usunąć {count} zaznaczonych elementów?",
+  draftOption: "Nowe w tym imporcie",
+
   appName: "Lokalna biblioteka lektur", appShortName: "Biblioteka lektur", libraryTitle: "Lokalna biblioteka lektur",
   loadingPage: "Rozpoznawanie bieżącej strony…", currentPage: "Bieżąca strona", title: "Tytuł", site: "Witryna",
   siteDescription: "Witryna grupuje wiele domen lub prefiksów URL jako jedno źródło treści.", autoMatched: "Dopasowano automatycznie",
@@ -9,7 +34,7 @@ export const messages: Record<MessageKey, string> = {
   newSiteName: "Nazwa nowej witryny", newSitePlaceholder: "Przykład: Przykładowe artykuły", firstEndpoint: "Pierwszy endpoint",
   addEndpoint: "Endpoint do dodania do wybranej witryny", endpointWillBeAdded: "Ten URL nie pasuje jeszcze do witryny. Prefiks zostanie dodany podczas zapisywania.",
   endpointPrefilled: "Wypełniono na podstawie bieżącej strony. W razie potrzeby dodaj prefiks ścieżki.", noteOptional: "Notatka (opcjonalnie)",
-  notePlaceholder: "Dlaczego warto to zapisać i na czym skupić się później?", collection: "Kolekcja", inbox: "Skrzynka odbiorcza", tags: "Tagi",
+  notePlaceholder: "Dlaczego warto to zapisać i na czym skupić się później?", collection: "Kolekcja", uncategorized: "Bez kolekcji", tags: "Tagi",
   tagsPlaceholder: "artykuły, RAG", readingState: "Stan czytania", unread: "Nieprzeczytane", reading: "W trakcie", read: "Przeczytane", archived: "Zarchiwizowane",
   viewIdentity: "Pokaż końcową tożsamość", viewIdentityDetails: "Pokaż szczegóły tożsamości", saving: "Zapisywanie…", saveToLibrary: "Zapisz w bibliotece",
   manageLibrary: "Zarządzaj biblioteką", savedUnread: "Zapisano · Nieprzeczytane", savedReading: "Zapisano · W trakcie", savedRead: "Zapisano · Przeczytane",
@@ -43,9 +68,9 @@ export const messages: Record<MessageKey, string> = {
   migrating: "Przenoszenie…", confirmMigration: "Potwierdź przenoszenie", collectionsHint: "Kolekcje określają położenie elementów i nie wpływają na tożsamość URL. Obsługiwanych jest maksymalnie pięć poziomów.",
   newCollection: "Nowa kolekcja", collectionList: "Lista kolekcji", noCollections: "Brak kolekcji", collectionEditor: "Edytor kolekcji",
   collectionName: "Nazwa kolekcji", collectionPlaceholder: "Przykład: Artykuły do przeczytania", parentCollection: "Kolekcja nadrzędna", topLevelCollection: "Poziom główny",
-  itemsCount: "Elementy: {total} · nieprzeczytane: {unread}", moveUp: "Przenieś wyżej", moveDown: "Przenieś niżej", deleteCollectionMove: "Usuń; przenieś {count} elementów do Skrzynki odbiorczej",
+  itemsCount: "Elementy: {total} · nieprzeczytane: {unread}", moveUp: "Przenieś wyżej", moveDown: "Przenieś niżej", deleteCollectionMove: "Usuń; pozostaw {count} elementów bez kolekcji",
   deleteCollectionItems: "Usuń kolekcję i elementy", deleteCollection: "Usuń kolekcję", saveCollection: "Zapisz kolekcję", collectionSaved: "Kolekcja została zapisana.",
-  deleteItemsStrategy: "usunąć jej elementy", moveItemsStrategy: "przenieść jej elementy do Skrzynki odbiorczej",
+  deleteItemsStrategy: "usunąć jej elementy", moveItemsStrategy: "pozostaw elementy bez kolekcji",
   deleteCollectionQuestion: "Usunąć „{name}”, jej podkolekcje i {action}?", collectionDeleted: "Usunięto {collections} kolekcji i przetworzono {items} elementów.",
   sitesHint: "Grupuj stare i nowe domeny w jednej witrynie, aby ten sam zasób zachował stabilną tożsamość.", newSite: "Nowa witryna", siteList: "Lista witryn",
   endpointsCount: "Endpointy: {count}", noSites: "Brak witryn", siteEditor: "Edytor witryny", siteName: "Nazwa witryny",

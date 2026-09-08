@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "Kecualikan semua URL domain ini dari impor ini",
+  excludedImportDomains: "Domain yang dikecualikan dari impor ini",
+  restoreImportDomain: "Sertakan kembali",
+
+  clearItems: "Hapus data item",
+  clearItemsHint: "Hapus permanen semua item, termasuk yang diarsipkan. Situs, koleksi, dan pengaturan tetap disimpan. Tindakan ini tidak dapat dibatalkan.",
+  clearItemsDone: "Semua item dihapus. Situs, koleksi, dan pengaturan tetap disimpan.",
+
+  existingImportCollections: "Koleksi yang ada",
+  importCollectionHint: "Pilih koleksi yang ada atau buat baru. Nama folder tidak otomatis membuat koleksi. Koleksi baru disimpan saat impor dikonfirmasi.",
+  finishImportCollection: "Selesaikan pembuatan atau pilih koleksi yang ada atau Tanpa koleksi.",
+
+  itemsPerPage: "Item per halaman",
+  itemRange: "{start}–{end} dari {total}",
+
+  selectAll: "Pilih semua",
+  selectResults: "Pilih semua hasil",
+  previousPage: "Halaman sebelumnya",
+  nextPage: "Halaman berikutnya",
+  syncSite: "Sinkronkan situs",
+  syncSiteHint: "Setelah menyimpan, pilih URL yang belum ditetapkan. Jalur sumber daya yang sama digabung menjadi satu item.",
+  mergeOnSync: "Gabungkan saat sinkronisasi",
+  deleteSelectedQuestion: "Hapus {count} item yang dipilih?",
+  draftOption: "Baru dalam impor ini",
+
   appName: "Pustaka Bacaan Lokal", appShortName: "Pustaka Bacaan", libraryTitle: "Pustaka Bacaan Lokal",
   loadingPage: "Mengidentifikasi halaman saat ini…", currentPage: "Halaman saat ini", title: "Judul", site: "Situs",
   siteDescription: "Situs mengelompokkan beberapa domain atau awalan URL sebagai satu sumber konten.", autoMatched: "Dicocokkan otomatis",
@@ -9,7 +34,7 @@ export const messages: Record<MessageKey, string> = {
   newSiteName: "Nama situs baru", newSitePlaceholder: "Contoh: Artikel Contoh", firstEndpoint: "Endpoint pertama",
   addEndpoint: "Endpoint yang akan ditambahkan ke situs terpilih", endpointWillBeAdded: "URL ini belum cocok dengan situs. Awalan ini akan ditambahkan saat Anda menyimpan.",
   endpointPrefilled: "Diisi dari halaman saat ini. Tambahkan awalan jalur jika perlu.", noteOptional: "Catatan (opsional)",
-  notePlaceholder: "Mengapa ini disimpan, dan apa yang perlu diperhatikan nanti?", collection: "Koleksi", inbox: "Kotak masuk", tags: "Tag",
+  notePlaceholder: "Mengapa ini disimpan, dan apa yang perlu diperhatikan nanti?", collection: "Koleksi", uncategorized: "Tanpa koleksi", tags: "Tag",
   tagsPlaceholder: "artikel, RAG", readingState: "Status baca", unread: "Belum dibaca", reading: "Sedang dibaca", read: "Sudah dibaca", archived: "Diarsipkan",
   viewIdentity: "Lihat identitas akhir", viewIdentityDetails: "Lihat detail identitas", saving: "Menyimpan…", saveToLibrary: "Simpan ke pustaka",
   manageLibrary: "Kelola pustaka", savedUnread: "Tersimpan · Belum dibaca", savedReading: "Tersimpan · Sedang dibaca", savedRead: "Tersimpan · Sudah dibaca",
@@ -43,9 +68,9 @@ export const messages: Record<MessageKey, string> = {
   migrating: "Memindahkan…", confirmMigration: "Konfirmasi pemindahan", collectionsHint: "Koleksi mengatur tempat item berada dan tidak memengaruhi identitas URL. Mendukung hingga lima tingkat.",
   newCollection: "Koleksi baru", collectionList: "Daftar koleksi", noCollections: "Belum ada koleksi", collectionEditor: "Editor koleksi",
   collectionName: "Nama koleksi", collectionPlaceholder: "Contoh: Artikel untuk dibaca", parentCollection: "Koleksi induk", topLevelCollection: "Tingkat teratas",
-  itemsCount: "{total} item · {unread} belum dibaca", moveUp: "Pindahkan ke atas", moveDown: "Pindahkan ke bawah", deleteCollectionMove: "Hapus; pindahkan {count} item ke Kotak masuk",
+  itemsCount: "{total} item · {unread} belum dibaca", moveUp: "Pindahkan ke atas", moveDown: "Pindahkan ke bawah", deleteCollectionMove: "Hapus; simpan {count} item tanpa koleksi",
   deleteCollectionItems: "Hapus koleksi dan item", deleteCollection: "Hapus koleksi", saveCollection: "Simpan koleksi", collectionSaved: "Koleksi disimpan.",
-  deleteItemsStrategy: "hapus itemnya", moveItemsStrategy: "pindahkan itemnya ke Kotak masuk",
+  deleteItemsStrategy: "hapus itemnya", moveItemsStrategy: "simpan item tanpa koleksi",
   deleteCollectionQuestion: "Hapus “{name}”, subkoleksinya, dan {action}?", collectionDeleted: "Menghapus {collections} koleksi dan memproses {items} item.",
   sitesHint: "Kelompokkan domain lama dan baru dalam satu situs agar sumber daya yang sama memiliki identitas stabil.", newSite: "Situs baru", siteList: "Daftar situs",
   endpointsCount: "{count} endpoint", noSites: "Belum ada situs", siteEditor: "Editor situs", siteName: "Nama situs",

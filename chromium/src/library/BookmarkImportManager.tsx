@@ -1,3 +1,4 @@
+import { SelectionTree, TreeSelectionActions, type SelectionNode } from "./SelectionTree";
 import { useMemo, useState, type ReactNode } from "react";
 import {
   bookmarkFolderKey,
@@ -12,27 +13,22 @@ import {
 } from "../domain/bookmark-import";
 import { requestBrowserBookmarkSnapshot } from "../browser/bookmark-access";
 import { normalizeEndpoint } from "../domain/identity";
-import type { ReadingState, Site } from "../domain/models";
+import type { Collection, ReadingState, Site } from "../domain/models";
 import { requestActionIconRefresh } from "../browser/action-refresh";
 import { localizeError, t } from "../i18n";
 import { readingLibrary } from "../storage/library-instance";
 import { Button } from "../ui/Button";
 
-const STATUS_FOLDER_NAMES = new Set([
-  "todo", "to-do", "unread", "未读", "待读", "done", "read", "已读", "完成",
-  "reading", "在读", "阅读中", "archive", "archived", "归档",
-]);
-
-const BROWSER_ROOT_FOLDER_NAMES = new Set([
-  "bookmarks bar", "bookmarks menu", "other bookmarks", "mobile bookmarks",
-  "书签栏", "其他书签", "移动设备书签", "收藏夹栏", "其他收藏夹", "移动收藏夹",
-]);
-
 export function BookmarkImportManager({ onImported }: { onImported: () => Promise<void> }) {
   const [snapshot, setSnapshot] = useState<BookmarkImportSnapshot | null>(null);
   const [sourceLabel, setSourceLabel] = useState("");
   const [folderRules, setFolderRules] = useState<BookmarkFolderRule[]>([]);
+  const [newCollectionRows, setNewCollectionRows] = useState<Set<string>>(() => new Set());
+  const [collectionNames, setCollectionNames] = useState<Record<string, string>>({});
+  const [draftCollectionPaths, setDraftCollectionPaths] = useState<string[][]>([]);
+  const [excludedHostnames, setExcludedHostnames] = useState<Set<string>>(() => new Set());
   const [siteMappings, setSiteMappings] = useState<BookmarkSiteMapping[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
   const [preview, setPreview] = useState<BookmarkImportPreview | null>(null);
   const [busy, setBusy] = useState(false);
@@ -52,6 +48,72 @@ export function BookmarkImportManager({ onImported }: { onImported: () => Promis
     for (const candidate of selectedCandidates) counts.set(candidate.origin, (counts.get(candidate.origin) ?? 0) + 1);
     return [...counts.entries()].sort(([left], [right]) => left.localeCompare(right));
   }, [selectedCandidates]);
+
+  const excludedRows = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const candidate of selectedCandidates) {
+      const host = new URL(candidate.url).hostname;
+      if (excludedHostnames.has(host)) counts.set(host, (counts.get(host) ?? 0) + 1);
+    }
+    return [...counts];
+  }, [selectedCandidates, excludedHostnames]);
+  const includedCandidates = selectedCandidates.filter((candidate) => !excludedHostnames.has(new URL(candidate.url).hostname));
+  function excludeDomain(host: string, excluded: boolean) {
+    setExcludedHostnames((current) => {
+      const next = new Set(current);
+      if (excluded) next.add(host); else next.delete(host);
+      return next;
+    });
+    setPreview(null); setError(""); setNotice("");
+  }
+
+  const folderNodes = useMemo(() => {
+    const nodes = new Map<string, SelectionNode>((snapshot?.folders ?? []).map((folder) => [folder.key, { id: folder.key, label: localizeFolderPath(folder.path).at(-1) ?? t("bookmarkRootFolder"), children: [] }]));
+    const roots: SelectionNode[] = [];
+    for (const folder of snapshot?.folders ?? []) {
+      const node = nodes.get(folder.key)!;
+      const parent = folder.path.length ? nodes.get(bookmarkFolderKey(folder.path.slice(0, -1))) : undefined;
+      if (parent) parent.children!.push(node); else roots.push(node);
+    }
+    return roots;
+  }, [snapshot]);
+  const collectionPaths = useMemo(() => {
+    const paths = new Map<string, string[]>();
+    for (const collection of collections) {
+      const path = [collection.name]; let parentId = collection.parentId;
+      const seen = new Set([collection.id]);
+      while (parentId && !seen.has(parentId)) {
+        seen.add(parentId); const parent = collections.find((candidate) => candidate.id === parentId);
+        if (!parent) break; path.unshift(parent.name); parentId = parent.parentId;
+      }
+      paths.set(JSON.stringify(path), path);
+    }
+    return [...paths.values()];
+  }, [collections]);
+  const pendingCollectionPaths = draftCollectionPaths.filter((path) => !collectionPaths.some((existing) => JSON.stringify(existing) === JSON.stringify(path)));
+  function chooseCollection(folderKey: string, value: string) {
+    setNewCollectionRows((current) => {
+      const next = new Set(current);
+      if (value === "new") next.add(folderKey); else next.delete(folderKey);
+      return next;
+    });
+    if (value !== "new") updateFolderRule(folderKey, { collectionPath: JSON.parse(value) as string[] });
+    setPreview(null); setNotice("");
+  }
+  function createImportCollection(folderKey: string) {
+    const name = collectionNames[folderKey]?.trim();
+    if (!name) return;
+    const path = [name];
+    setDraftCollectionPaths((current) => current.some((candidate) => JSON.stringify(candidate) === JSON.stringify(path)) ? current : [...current, path]);
+    chooseCollection(folderKey, JSON.stringify(path));
+  }
+
+  const draftSiteNames = [...new Set(siteMappings.flatMap((mapping) => mapping.target.type === "new" && mapping.target.siteName.trim() ? [mapping.target.siteName] : []))];
+  function selectFolders(ids: string[], checked: boolean) {
+    const keys = new Set(ids);
+    setFolderRules((current) => current.map((rule) => keys.has(rule.folderKey) ? { ...rule, selected: checked } : rule));
+    setPreview(null); setNotice("");
+  }
 
   async function chooseBookmarkFile(file: File | undefined): Promise<void> {
     setPreview(null); setError(""); setNotice("");
@@ -86,7 +148,18 @@ export function BookmarkImportManager({ onImported }: { onImported: () => Promis
   }
 
   async function activateSnapshot(parsed: BookmarkImportSnapshot, label: string): Promise<void> {
-    const existingSites = await readingLibrary.listSites();
+    const [existingSites, existingCollections] = await Promise.all([readingLibrary.listSites(), readingLibrary.listCollections()]);
+    setCollections(existingCollections);
+    setExcludedHostnames(new Set());
+    setNewCollectionRows(new Set()); setCollectionNames({}); setDraftCollectionPaths([]);
+    const allFolders = new Map(parsed.folders.map((folder) => [folder.key, folder]));
+    for (const folder of parsed.folders) {
+      for (let depth = 1; depth < folder.path.length; depth++) {
+        const path = folder.path.slice(0, depth); const key = bookmarkFolderKey(path);
+        if (!allFolders.has(key)) allFolders.set(key, { key, path, itemCount: 0 });
+      }
+    }
+    parsed = { ...parsed, folders: [...allFolders.values()] };
     const rules = parsed.folders.map((folder) => createDefaultFolderRule(folder.key, localizeFolderPath(folder.path)));
     const mappings = [...new Set(parsed.candidates.map((candidate) => candidate.origin))].map((origin) => ({
       origin,
@@ -110,6 +183,7 @@ export function BookmarkImportManager({ onImported }: { onImported: () => Promis
       let target: BookmarkSiteTarget;
       if (value === "unassigned") target = { type: "unassigned" };
       else if (value === "new") target = { type: "new", siteName: defaultSiteName(origin) };
+      else if (value.startsWith("draft:")) target = { type: "new", siteName: value.slice(6) };
       else target = { type: "existing", siteId: value.slice("existing:".length) };
       return { ...mapping, target };
     }));
@@ -117,15 +191,17 @@ export function BookmarkImportManager({ onImported }: { onImported: () => Promis
   }
 
   function updateNewSiteName(origin: string, siteName: string): void {
+    const previous = siteMappings.find((mapping) => mapping.origin === origin)?.target;
     setSiteMappings((current) => current.map((mapping) =>
-      mapping.origin === origin && mapping.target.type === "new"
+      previous?.type === "new" && mapping.target.type === "new" && mapping.target.siteName === previous.siteName
         ? { ...mapping, target: { type: "new", siteName } }
         : mapping));
     setPreview(null); setNotice("");
   }
 
   function buildRequest(): BookmarkImportRequest {
-    return { candidates: snapshot?.candidates ?? [], folderRules, siteMappings };
+    if (folderRules.some((rule) => includedCandidates.some((candidate) => bookmarkFolderKey(candidate.folderPath) === rule.folderKey) && newCollectionRows.has(rule.folderKey))) throw new Error(t("finishImportCollection"));
+    return { candidates: snapshot?.candidates ?? [], folderRules, siteMappings, excludedHostnames: [...excludedHostnames] };
   }
 
   async function generatePreview(): Promise<void> {
@@ -143,7 +219,14 @@ export function BookmarkImportManager({ onImported }: { onImported: () => Promis
       const applied = await readingLibrary.applyBookmarkImport(buildRequest());
       setNotice(t("bookmarkImportDone", { items: applied.addedItems }));
       setPreview(null);
-      setSites(await readingLibrary.listSites());
+      const [savedSites, savedCollections] = await Promise.all([readingLibrary.listSites(), readingLibrary.listCollections()]);
+      setSites(savedSites); setCollections(savedCollections);
+      setSiteMappings((current) => current.map((mapping) => {
+        if (mapping.target.type !== "new") return mapping;
+        const name = mapping.target.siteName.trim().toLocaleLowerCase();
+        const saved = savedSites.find((site) => site.name.trim().toLocaleLowerCase() === name && site.endpoints.some((endpoint) => normalizeEndpoint(endpoint.prefix) === mapping.origin));
+        return saved ? { ...mapping, target: { type: "existing", siteId: saved.id } } : mapping;
+      }));
       await onImported();
       requestActionIconRefresh();
     } catch (applyError) {
@@ -184,56 +267,76 @@ export function BookmarkImportManager({ onImported }: { onImported: () => Promis
       </div> : null}
 
       {snapshot ? <>
-        <ImportStep heading={t("bookmarkFolderRules")} hint={t("bookmarkFolderRulesHint")}>
-          <div className="bookmark-folder-table" role="table">
-            <div className="bookmark-table-head" role="row">
-              <span>{t("importFolder")}</span><span>{t("sourceFolder")}</span><span>{t("linkCount")}</span>
-              <span>{t("readingState")}</span><span>{t("archiveOnImport")}</span><span>{t("createCollectionFromFolder")}</span>
-            </div>
-            {snapshot.folders.map((folder) => {
-              const rule = folderRules.find((candidate) => candidate.folderKey === folder.key);
-              if (!rule) return null;
-              const displayPath = localizeFolderPath(folder.path);
-              return <div className={`bookmark-folder-row${rule.selected ? "" : " bookmark-row--disabled"}`} role="row" key={folder.key}>
-                <label className="bookmark-check"><input type="checkbox" checked={rule.selected} onChange={(event) => updateFolderRule(rule.folderKey, { selected: event.target.checked })} /><span className="sr-only">{t("importFolder")}</span></label>
-                <strong title={displayPath.join(" / ")}>{displayPath.length ? displayPath.join(" / ") : t("bookmarkRootFolder")}</strong>
-                <span className="bookmark-count">{folder.itemCount}</span>
-                <select className="field__input" disabled={!rule.selected} value={rule.readingState} onChange={(event) => updateFolderRule(rule.folderKey, { readingState: event.target.value as ReadingState })}>
-                  <option value="unread">{t("unread")}</option><option value="reading">{t("reading")}</option><option value="read">{t("read")}</option>
+        <ImportStep heading={t("bookmarkFolderRules")} hint={t("importCollectionHint")}>
+          <TreeSelectionActions nodes={folderNodes} onSelect={selectFolders} />
+          <div className="bookmark-folder-tree">
+          <div className="bookmark-folder-tree__head"><span>{t("sourceFolder")}</span><span>{t("linkCount")}</span><span>{t("readingState")}</span><span>{t("collection")}</span></div>
+          <SelectionTree nodes={folderNodes} selected={selectedFolderKeys} onSelect={selectFolders} render={(node) => {
+            const rule = folderRules.find((candidate) => candidate.folderKey === node.id)!;
+            const folder = snapshot.folders.find((candidate) => candidate.key === node.id)!;
+            return <div className="bookmark-tree-controls">
+              <span className="bookmark-tree-count">{folder.itemCount}</span>
+              <select className="field__input" aria-label={t("readingState")} disabled={!rule.selected} value={rule.isArchived ? "archived" : rule.readingState} onChange={(event) => {
+                const value = event.target.value;
+                updateFolderRule(rule.folderKey, value === "archived" ? { isArchived: true } : { readingState: value as ReadingState, isArchived: false });
+              }}>
+                <option value="unread">{t("unread")}</option><option value="reading">{t("reading")}</option><option value="read">{t("read")}</option><option value="archived">{t("archived")}</option>
+              </select>
+              <div className="bookmark-collection-picker">
+                <select className="field__input" aria-label={t("collection")} disabled={!rule.selected} value={newCollectionRows.has(rule.folderKey) ? "new" : JSON.stringify(rule.collectionPath)} onChange={(event) => chooseCollection(rule.folderKey, event.target.value)}>
+                  <option value="[]">{t("uncategorized")}</option>
+                  {collectionPaths.length ? <optgroup label={t("existingImportCollections")}>{collectionPaths.map((path) => <option key={JSON.stringify(path)} value={JSON.stringify(path)}>{path.join(" / ")}</option>)}</optgroup> : null}
+                  {pendingCollectionPaths.length ? <optgroup label={t("draftOption")}>{pendingCollectionPaths.map((path) => <option key={JSON.stringify(path)} value={JSON.stringify(path)}>{path.join(" / ")} · {t("draftOption")}</option>)}</optgroup> : null}
+                  <option value="new">＋ {t("newCollection")}</option>
                 </select>
-                <label className="bookmark-check"><input type="checkbox" disabled={!rule.selected} checked={rule.isArchived} onChange={(event) => updateFolderRule(rule.folderKey, { isArchived: event.target.checked })} /><span className="sr-only">{t("archiveOnImport")}</span></label>
-                <div className="bookmark-collection-control">
-                  <label className="check-field"><input type="checkbox" disabled={!rule.selected} checked={rule.collectionPath.length > 0} onChange={(event) => updateFolderRule(rule.folderKey, { collectionPath: event.target.checked ? defaultCollectionPath(displayPath, true) : [] })} /> {t("createCollectionFromFolder")}</label>
-                  {rule.collectionPath.length ? <input className="field__input" aria-label={t("collectionPath")} placeholder={t("collectionPathPlaceholder")} value={rule.collectionPath.join(" / ")} onChange={(event) => updateFolderRule(rule.folderKey, { collectionPath: parseCollectionPath(event.target.value) })} /> : null}
-                </div>
-              </div>;
-            })}
+                {newCollectionRows.has(rule.folderKey) ? <div className="bookmark-collection-create">
+                  <input className="field__input" disabled={!rule.selected} aria-label={t("collectionName")} placeholder={t("collectionPlaceholder")} value={collectionNames[rule.folderKey] ?? ""} onChange={(event) => setCollectionNames((current) => ({ ...current, [rule.folderKey]: event.target.value }))} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); createImportCollection(rule.folderKey); } }} />
+                  <Button type="button" variant="secondary" disabled={!rule.selected || !collectionNames[rule.folderKey]?.trim()} onClick={() => createImportCollection(rule.folderKey)}>{t("createCollectionFromFolder")}</Button>
+                </div> : null}
+              </div>
+            </div>;
+          }} />
           </div>
         </ImportStep>
 
         <ImportStep heading={t("bookmarkSiteMapping")} hint={t("bookmarkSiteMappingHint")}>
           <div className="bookmark-site-grid">
-            {originRows.map(([origin, count]) => {
+            {originRows.filter(([origin]) => !excludedHostnames.has(new URL(origin).hostname)).map(([origin, count]) => {
               const mapping = siteMappings.find((candidate) => candidate.origin === origin);
               if (!mapping) return null;
-              const value = mapping.target.type === "unassigned" ? "unassigned" : mapping.target.type === "new" ? "new" : `existing:${mapping.target.siteId}`;
+              const value = mapping.target.type === "unassigned" ? "unassigned" : mapping.target.type === "new" ? (mapping.target.siteName.trim() ? `draft:${mapping.target.siteName}` : "new") : `existing:${mapping.target.siteId}`;
               const exactSite = findExactEndpointSite(origin, sites);
               return <article className="bookmark-site-row" key={origin}>
-                <div className="bookmark-site-row__origin"><strong>{new URL(origin).hostname}</strong><span>{count} · {origin}</span></div>
+                <div className="bookmark-site-row__origin">
+                  <div className="bookmark-domain-heading">
+                    <div className="bookmark-domain-action">
+                      <button className="bookmark-domain-exclude" type="button" disabled={busy} aria-label={t("excludeImportDomain")} aria-describedby={`exclude-domain-${encodeURIComponent(origin)}`} onClick={() => excludeDomain(new URL(origin).hostname, true)}>
+                        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" /></svg>
+                      </button>
+                      <span className="bookmark-domain-tooltip" role="tooltip" id={`exclude-domain-${encodeURIComponent(origin)}`}>{t("excludeImportDomain")}</span>
+                    </div>
+                    <strong>{new URL(origin).hostname}</strong>
+                  </div>
+                  <span className="bookmark-domain-address">{count} · {origin}</span>
+                </div>
                 <label className="field"><span className="field__label">{t("targetSite")}</span><select className="field__input" value={value} onChange={(event) => updateSiteTarget(origin, event.target.value)}>
                   <option value="unassigned">{t("unassignedImport")}</option>
                   {sites.map((site) => <option value={`existing:${site.id}`} key={site.id}>{site.name}{exactSite?.id === site.id ? ` · ${t("exactEndpointMatch")}` : ""}</option>)}
+                  {draftSiteNames.map((name) => <option key={name} value={`draft:${name}`}>{name} · {t("draftOption")}</option>)}
                   <option value="new">{t("createNewSiteOption")}</option>
                 </select></label>
                 {mapping.target.type === "new" ? <label className="field"><span className="field__label">{t("newSiteNameForImport")}</span><input className="field__input" value={mapping.target.siteName} onChange={(event) => updateNewSiteName(origin, event.target.value)} /></label> : null}
               </article>;
             })}
           </div>
+          {excludedRows.length ? <details className="bookmark-excluded-domains"><summary>{t("excludedImportDomains")} ({excludedRows.length})</summary>
+            {excludedRows.map(([host, count]) => <div key={host}><span>{host} · {count}</span><Button type="button" variant="ghost" disabled={busy} onClick={() => excludeDomain(host, false)}>{t("restoreImportDomain")}</Button></div>)}
+          </details> : null}
         </ImportStep>
 
         <ImportStep heading={t("bookmarkPreviewAction")} hint={t("bookmarkPreviewHint")}>
           <div className="bookmark-preview-actions">
-            <Button type="button" variant="secondary" disabled={busy || !selectedCandidates.length} onClick={() => void generatePreview()}>{t("previewBookmarkImport")}</Button>
+            <Button type="button" variant="secondary" disabled={busy || !includedCandidates.length} onClick={() => void generatePreview()}>{t("previewBookmarkImport")}</Button>
             {preview?.canApply ? <Button type="button" disabled={busy} onClick={() => void applyImport()}>{t("applyBookmarkImport")}</Button> : null}
           </div>
           {preview ? <BookmarkPlanPreview preview={preview} /> : null}
@@ -275,24 +378,11 @@ function createDefaultFolderRule(folderKey: string, path: string[]): BookmarkFol
   const readingState: ReadingState = normalized.some((segment) => ["done", "read", "已读", "完成"].includes(segment))
     ? "read"
     : normalized.some((segment) => ["reading", "在读", "阅读中"].includes(segment)) ? "reading" : "unread";
-  return { folderKey, selected: true, readingState, isArchived, collectionPath: defaultCollectionPath(path, false) };
+  return { folderKey, selected: true, readingState, isArchived, collectionPath: [] };
 }
 
 function localizeFolderPath(path: string[]): string[] {
   return path.map((segment) => segment === UNTITLED_BOOKMARK_FOLDER ? t("bookmarkUntitledFolder") : segment);
-}
-
-function defaultCollectionPath(path: string[], force: boolean): string[] {
-  const filtered = path.filter((segment) => {
-    const normalized = segment.trim().toLocaleLowerCase();
-    return !STATUS_FOLDER_NAMES.has(normalized) && !BROWSER_ROOT_FOLDER_NAMES.has(normalized);
-  }).slice(-5);
-  if (filtered.length || !force) return filtered;
-  return path.slice(-5);
-}
-
-function parseCollectionPath(value: string): string[] {
-  return value.split("/").map((segment) => segment.trim()).filter(Boolean).slice(0, 5);
 }
 
 function inferSiteTarget(origin: string, sites: Site[]): BookmarkSiteTarget {

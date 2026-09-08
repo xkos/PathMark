@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "本次不匯入此網域下的全部網址",
+  excludedImportDomains: "本次已排除的網域",
+  restoreImportDomain: "恢復匯入",
+
+  clearItems: "清空項目資料",
+  clearItemsHint: "永久刪除全部項目（包含封存項目），保留站點、分類與設定。此操作無法復原。",
+  clearItemsDone: "項目資料已清空，站點、分類與設定已保留。",
+
+  existingImportCollections: "已有分類",
+  importCollectionHint: "請選擇已有分類，或選擇「新增分類」。目錄名稱不會自動變成分類；本次新增的分類會在確認匯入時儲存。",
+  finishImportCollection: "請先完成新增分類，或改選已有分類、未分類。",
+
+  itemsPerPage: "每頁筆數",
+  itemRange: "第 {start}–{end} 筆，共 {total} 筆",
+
+  selectAll: "全選",
+  selectResults: "全選篩選結果",
+  previousPage: "上一頁",
+  nextPage: "下一頁",
+  syncSite: "同步站點",
+  syncSiteHint: "儲存站點後，選擇要同步的未歸站網址；相同資源路徑會合併為一筆。",
+  mergeOnSync: "同步時合併為一筆",
+  deleteSelectedQuestion: "確定刪除選取的 {count} 筆資料？",
+  draftOption: "本次新增",
+
   appName: "本機閱讀收藏",
   appShortName: "閱讀收藏",
   libraryTitle: "本機閱讀資料庫",
@@ -24,7 +49,7 @@ export const messages: Record<MessageKey, string> = {
   noteOptional: "筆記（可選）",
   notePlaceholder: "為什麼收藏，之後重點看什麼？",
   collection: "收藏分類",
-  inbox: "收件匣",
+  uncategorized: "未分類",
   tags: "標籤",
   tagsPlaceholder: "論文, RAG",
   readingState: "閱讀狀態",
@@ -120,9 +145,9 @@ export const messages: Record<MessageKey, string> = {
   migrating: "遷移中…", confirmMigration: "確認遷移", collectionsHint: "分類回答“資料放在哪裡”，不會參與 URL 身分判斷，最多支援 5 層。",
   newCollection: "建立分類", collectionList: "分類清單", noCollections: "尚未建立分類", collectionEditor: "分類編輯器",
   collectionName: "分類名稱", collectionPlaceholder: "例如：待讀論文", parentCollection: "父分類", topLevelCollection: "頂層分類",
-  itemsCount: "{total} 條 · {unread} 未讀", moveUp: "上移", moveDown: "下移", deleteCollectionMove: "刪除，{count} 條移入收件匣",
+  itemsCount: "{total} 條 · {unread} 未讀", moveUp: "上移", moveDown: "下移", deleteCollectionMove: "刪除，{count} 筆設為未分類",
   deleteCollectionItems: "刪除分類及項目", deleteCollection: "刪除分類", saveCollection: "儲存分類", collectionSaved: "分類已儲存。",
-  deleteItemsStrategy: "同時刪除其中項目", moveItemsStrategy: "將其中項目移入收件匣",
+  deleteItemsStrategy: "同時刪除其中項目", moveItemsStrategy: "保留其中項目並取消分類",
   deleteCollectionQuestion: "確定刪除分類“{name}”及其子分類，並{action}嗎？", collectionDeleted: "已刪除 {collections} 個分類，處理 {items} 條資料。",
   sitesHint: "把歷史網域和新網域歸入同一網站，讓同一資源保持穩定身分。", newSite: "建立網站", siteList: "網站清單",
   endpointsCount: "{count} 個 Endpoint", noSites: "尚未建立網站", siteEditor: "網站編輯器", siteName: "網站名稱",

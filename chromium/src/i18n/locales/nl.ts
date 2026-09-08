@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "Alle URL’s van dit domein uitsluiten van deze import",
+  excludedImportDomains: "Domeinen uitgesloten van deze import",
+  restoreImportDomain: "Opnieuw opnemen",
+
+  clearItems: "Items wissen",
+  clearItemsHint: "Alle items, inclusief gearchiveerde items, definitief verwijderen. Sites, collecties en instellingen blijven behouden. Dit kan niet ongedaan worden gemaakt.",
+  clearItemsDone: "Items gewist. Sites, collecties en instellingen zijn behouden.",
+
+  existingImportCollections: "Bestaande collecties",
+  importCollectionHint: "Kies een collectie of maak er een aan. Mapnamen maken geen collecties aan. Nieuwe collecties worden opgeslagen bij bevestiging van de import.",
+  finishImportCollection: "Voltooi het aanmaken of kies een bestaande collectie of Zonder collectie.",
+
+  itemsPerPage: "Items per pagina",
+  itemRange: "{start}–{end} van {total}",
+
+  selectAll: "Alles selecteren",
+  selectResults: "Alle resultaten selecteren",
+  previousPage: "Vorige pagina",
+  nextPage: "Volgende pagina",
+  syncSite: "Site synchroniseren",
+  syncSiteHint: "Selecteer na het opslaan de niet-toegewezen URL’s. Gelijke resourcepaden worden samengevoegd tot één item.",
+  mergeOnSync: "Samenvoegen bij synchronisatie",
+  deleteSelectedQuestion: "De {count} geselecteerde items verwijderen?",
+  draftOption: "Nieuw in deze import",
+
   appName: "Lokale leesbibliotheek", appShortName: "Leesbibliotheek", libraryTitle: "Lokale leesbibliotheek",
   loadingPage: "Huidige pagina identificeren…", currentPage: "Huidige pagina", title: "Titel", site: "Site",
   siteDescription: "Een site groepeert meerdere domeinen of URL-voorvoegsels als één inhoudsbron.", autoMatched: "Automatisch gekoppeld",
@@ -9,7 +34,7 @@ export const messages: Record<MessageKey, string> = {
   newSiteName: "Naam van nieuwe site", newSitePlaceholder: "Voorbeeld: Voorbeeldartikelen", firstEndpoint: "Eerste endpoint",
   addEndpoint: "Endpoint om aan de geselecteerde site toe te voegen", endpointWillBeAdded: "Deze URL komt nog niet overeen met de site. Dit voorvoegsel wordt toegevoegd wanneer u opslaat.",
   endpointPrefilled: "Ingevuld vanaf de huidige pagina. Voeg zo nodig een padvoorvoegsel toe.", noteOptional: "Notitie (optioneel)",
-  notePlaceholder: "Waarom wilt u dit bewaren en waarop moet u later letten?", collection: "Collectie", inbox: "Postvak IN", tags: "Labels",
+  notePlaceholder: "Waarom wilt u dit bewaren en waarop moet u later letten?", collection: "Collectie", uncategorized: "Zonder collectie", tags: "Labels",
   tagsPlaceholder: "artikelen, RAG", readingState: "Leesstatus", unread: "Ongelezen", reading: "Aan het lezen", read: "Gelezen", archived: "Gearchiveerd",
   viewIdentity: "Uiteindelijke identiteit bekijken", viewIdentityDetails: "Identiteitsdetails bekijken", saving: "Opslaan…", saveToLibrary: "Opslaan in bibliotheek",
   manageLibrary: "Bibliotheek beheren", savedUnread: "Opgeslagen · Ongelezen", savedReading: "Opgeslagen · Aan het lezen", savedRead: "Opgeslagen · Gelezen",
@@ -43,9 +68,9 @@ export const messages: Record<MessageKey, string> = {
   migrating: "Verplaatsen…", confirmMigration: "Verplaatsing bevestigen", collectionsHint: "Collecties bepalen waar items staan en hebben geen invloed op de URL-identiteit. Maximaal vijf niveaus worden ondersteund.",
   newCollection: "Nieuwe collectie", collectionList: "Collectielijst", noCollections: "Nog geen collecties", collectionEditor: "Collectie-editor",
   collectionName: "Collectienaam", collectionPlaceholder: "Voorbeeld: Te lezen artikelen", parentCollection: "Bovenliggende collectie", topLevelCollection: "Hoofdniveau",
-  itemsCount: "{total} items · {unread} ongelezen", moveUp: "Omhoog verplaatsen", moveDown: "Omlaag verplaatsen", deleteCollectionMove: "Verwijderen; {count} items naar Postvak IN verplaatsen",
+  itemsCount: "{total} items · {unread} ongelezen", moveUp: "Omhoog verplaatsen", moveDown: "Omlaag verplaatsen", deleteCollectionMove: "Verwijderen; {count} items zonder collectie behouden",
   deleteCollectionItems: "Collectie en items verwijderen", deleteCollection: "Collectie verwijderen", saveCollection: "Collectie opslaan", collectionSaved: "Collectie opgeslagen.",
-  deleteItemsStrategy: "de items verwijderen", moveItemsStrategy: "de items naar Postvak IN verplaatsen",
+  deleteItemsStrategy: "de items verwijderen", moveItemsStrategy: "items zonder collectie behouden",
   deleteCollectionQuestion: "“{name}”, de subcollecties verwijderen en {action}?", collectionDeleted: "{collections} collecties verwijderd en {items} items verwerkt.",
   sitesHint: "Groepeer oude en nieuwe domeinen in één site, zodat dezelfde bron een stabiele identiteit behoudt.", newSite: "Nieuwe site", siteList: "Sitelijst",
   endpointsCount: "{count} endpoints", noSites: "Nog geen sites", siteEditor: "Site-editor", siteName: "Sitenaam",

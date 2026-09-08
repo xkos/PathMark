@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "Loại tất cả URL thuộc tên miền này khỏi lần nhập này",
+  excludedImportDomains: "Tên miền bị loại khỏi lần nhập này",
+  restoreImportDomain: "Đưa vào lại",
+
+  clearItems: "Xóa dữ liệu mục",
+  clearItemsHint: "Xóa vĩnh viễn tất cả các mục, kể cả mục đã lưu trữ. Giữ lại trang web, bộ sưu tập và cài đặt. Không thể hoàn tác.",
+  clearItemsDone: "Đã xóa các mục. Trang web, bộ sưu tập và cài đặt được giữ lại.",
+
+  existingImportCollections: "Bộ sưu tập hiện có",
+  importCollectionHint: "Chọn bộ sưu tập hoặc tạo mới. Tên thư mục không tự tạo bộ sưu tập. Bộ sưu tập mới được lưu khi xác nhận nhập.",
+  finishImportCollection: "Hoàn tất tạo hoặc chọn bộ sưu tập hiện có hay Chưa phân loại.",
+
+  itemsPerPage: "Số mục mỗi trang",
+  itemRange: "{start}–{end} trên {total}",
+
+  selectAll: "Chọn tất cả",
+  selectResults: "Chọn tất cả kết quả",
+  previousPage: "Trang trước",
+  nextPage: "Trang sau",
+  syncSite: "Đồng bộ trang web",
+  syncSiteHint: "Sau khi lưu, chọn các URL chưa được gán để đồng bộ. Các đường dẫn tài nguyên giống nhau sẽ được gộp thành một mục.",
+  mergeOnSync: "Gộp thành một mục khi đồng bộ",
+  deleteSelectedQuestion: "Xóa {count} mục đã chọn?",
+  draftOption: "Mới trong lần nhập này",
+
   appName: "Thư viện đọc cục bộ", appShortName: "Thư viện đọc", libraryTitle: "Thư viện đọc cục bộ",
   loadingPage: "Đang nhận diện trang hiện tại…", currentPage: "Trang hiện tại", title: "Tiêu đề", site: "Trang web",
   siteDescription: "Một trang web nhóm nhiều tên miền hoặc tiền tố URL thành một nguồn nội dung.", autoMatched: "Đã tự động khớp",
@@ -9,7 +34,7 @@ export const messages: Record<MessageKey, string> = {
   newSiteName: "Tên trang web mới", newSitePlaceholder: "Ví dụ: Bài viết mẫu", firstEndpoint: "Endpoint đầu tiên",
   addEndpoint: "Endpoint cần thêm vào trang web đã chọn", endpointWillBeAdded: "URL này chưa khớp với trang web. Tiền tố này sẽ được thêm khi bạn lưu.",
   endpointPrefilled: "Được điền từ trang hiện tại. Thêm tiền tố đường dẫn nếu cần.", noteOptional: "Ghi chú (không bắt buộc)",
-  notePlaceholder: "Tại sao lưu nội dung này và sau này cần tập trung vào điều gì?", collection: "Bộ sưu tập", inbox: "Hộp thư đến", tags: "Thẻ",
+  notePlaceholder: "Tại sao lưu nội dung này và sau này cần tập trung vào điều gì?", collection: "Bộ sưu tập", uncategorized: "Chưa phân loại", tags: "Thẻ",
   tagsPlaceholder: "bài viết, RAG", readingState: "Trạng thái đọc", unread: "Chưa đọc", reading: "Đang đọc", read: "Đã đọc", archived: "Đã lưu trữ",
   viewIdentity: "Xem định danh cuối", viewIdentityDetails: "Xem chi tiết định danh", saving: "Đang lưu…", saveToLibrary: "Lưu vào thư viện",
   manageLibrary: "Quản lý thư viện", savedUnread: "Đã lưu · Chưa đọc", savedReading: "Đã lưu · Đang đọc", savedRead: "Đã lưu · Đã đọc",
@@ -43,9 +68,9 @@ export const messages: Record<MessageKey, string> = {
   migrating: "Đang chuyển…", confirmMigration: "Xác nhận chuyển", collectionsHint: "Bộ sưu tập sắp xếp vị trí của mục và không ảnh hưởng đến định danh URL. Hỗ trợ tối đa năm cấp.",
   newCollection: "Bộ sưu tập mới", collectionList: "Danh sách bộ sưu tập", noCollections: "Chưa có bộ sưu tập", collectionEditor: "Trình sửa bộ sưu tập",
   collectionName: "Tên bộ sưu tập", collectionPlaceholder: "Ví dụ: Bài viết cần đọc", parentCollection: "Bộ sưu tập cha", topLevelCollection: "Cấp cao nhất",
-  itemsCount: "{total} mục · {unread} chưa đọc", moveUp: "Chuyển lên", moveDown: "Chuyển xuống", deleteCollectionMove: "Xóa; chuyển {count} mục vào Hộp thư đến",
+  itemsCount: "{total} mục · {unread} chưa đọc", moveUp: "Chuyển lên", moveDown: "Chuyển xuống", deleteCollectionMove: "Xóa; giữ {count} mục chưa phân loại",
   deleteCollectionItems: "Xóa bộ sưu tập và mục", deleteCollection: "Xóa bộ sưu tập", saveCollection: "Lưu bộ sưu tập", collectionSaved: "Đã lưu bộ sưu tập.",
-  deleteItemsStrategy: "xóa các mục của bộ sưu tập", moveItemsStrategy: "chuyển các mục vào Hộp thư đến",
+  deleteItemsStrategy: "xóa các mục của bộ sưu tập", moveItemsStrategy: "giữ các mục và bỏ phân loại",
   deleteCollectionQuestion: "Xóa “{name}”, các bộ sưu tập con và {action}?", collectionDeleted: "Đã xóa {collections} bộ sưu tập và xử lý {items} mục.",
   sitesHint: "Nhóm tên miền cũ và mới vào một trang web để cùng một tài nguyên giữ định danh ổn định.", newSite: "Trang web mới", siteList: "Danh sách trang web",
   endpointsCount: "{count} endpoint", noSites: "Chưa có trang web", siteEditor: "Trình sửa trang web", siteName: "Tên trang web",

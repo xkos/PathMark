@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "Excluir todas las URL de este dominio de esta importación",
+  excludedImportDomains: "Dominios excluidos de esta importación",
+  restoreImportDomain: "Volver a incluir",
+
+  clearItems: "Borrar los elementos",
+  clearItemsHint: "Elimina permanentemente todos los elementos, incluidos los archivados. Se conservan los sitios, las colecciones y los ajustes. No se puede deshacer.",
+  clearItemsDone: "Elementos borrados. Se conservaron los sitios, las colecciones y los ajustes.",
+
+  existingImportCollections: "Colecciones existentes",
+  importCollectionHint: "Elige una colección o crea una. Los nombres de carpetas no crean colecciones. Las nuevas se guardan al confirmar la importación.",
+  finishImportCollection: "Termina de crear la colección o elige una existente o Sin colección.",
+
+  itemsPerPage: "Elementos por página",
+  itemRange: "{start}–{end} de {total}",
+
+  selectAll: "Seleccionar todo",
+  selectResults: "Seleccionar todos los resultados",
+  previousPage: "Página anterior",
+  nextPage: "Página siguiente",
+  syncSite: "Sincronizar sitio",
+  syncSiteHint: "Tras guardar el sitio, selecciona las URL sin asignar. Las rutas de recurso iguales se fusionan en una sola entrada.",
+  mergeOnSync: "Fusionar al sincronizar",
+  deleteSelectedQuestion: "¿Eliminar las {count} entradas seleccionadas?",
+  draftOption: "Nuevo en esta importación",
+
   appName: "Biblioteca de lectura local",
   appShortName: "Biblioteca de lectura",
   libraryTitle: "Biblioteca de lectura local",
@@ -24,7 +49,7 @@ export const messages: Record<MessageKey, string> = {
   noteOptional: "Nota (opcional)",
   notePlaceholder: "¿Por qué quieres guardarlo y en qué deberías fijarte más adelante?",
   collection: "Colección",
-  inbox: "Bandeja de entrada",
+  uncategorized: "Sin colección",
   tags: "Etiquetas",
   tagsPlaceholder: "artículos, RAG",
   readingState: "Estado de lectura",
@@ -144,13 +169,13 @@ export const messages: Record<MessageKey, string> = {
   itemsCount: "{total} elementos · {unread} sin leer",
   moveUp: "Subir",
   moveDown: "Bajar",
-  deleteCollectionMove: "Eliminar y mover {count} elementos a la Bandeja de entrada",
+  deleteCollectionMove: "Eliminar; dejar {count} elementos sin colección",
   deleteCollectionItems: "Eliminar la colección y sus elementos",
   deleteCollection: "Eliminar colección",
   saveCollection: "Guardar colección",
   collectionSaved: "Colección guardada.",
   deleteItemsStrategy: "eliminar sus elementos",
-  moveItemsStrategy: "mover sus elementos a la Bandeja de entrada",
+  moveItemsStrategy: "conservar los elementos sin colección",
   deleteCollectionQuestion: "¿Eliminar «{name}», sus subcolecciones y {action}?",
   collectionDeleted: "Se eliminaron {collections} colecciones y se procesaron {items} elementos.",
   sitesHint: "Agrupa los dominios antiguos y nuevos en un sitio para que el mismo recurso conserve una identidad estable.",

@@ -2,6 +2,31 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  excludeImportDomain: "Exclure toutes les URL de ce domaine de cet import",
+  excludedImportDomains: "Domaines exclus de cet import",
+  restoreImportDomain: "Inclure à nouveau",
+
+  clearItems: "Effacer les entrées",
+  clearItemsHint: "Supprimer définitivement toutes les entrées, y compris celles archivées. Les sites, collections et paramètres sont conservés. Cette action est irréversible.",
+  clearItemsDone: "Entrées effacées. Sites, collections et paramètres conservés.",
+
+  existingImportCollections: "Collections existantes",
+  importCollectionHint: "Choisissez une collection ou créez-en une. Les noms de dossiers ne créent pas de collections. Les nouvelles collections sont enregistrées à la confirmation de l’import.",
+  finishImportCollection: "Terminez la création ou choisissez une collection existante ou Sans collection.",
+
+  itemsPerPage: "Éléments par page",
+  itemRange: "{start}–{end} sur {total}",
+
+  selectAll: "Tout sélectionner",
+  selectResults: "Sélectionner tous les résultats",
+  previousPage: "Page précédente",
+  nextPage: "Page suivante",
+  syncSite: "Synchroniser le site",
+  syncSiteHint: "Après enregistrement, sélectionnez les URL non affectées à synchroniser. Les chemins de ressource identiques sont fusionnés en une seule entrée.",
+  mergeOnSync: "Fusionner lors de la synchronisation",
+  deleteSelectedQuestion: "Supprimer les {count} entrées sélectionnées ?",
+  draftOption: "Créé dans cet import",
+
   appName: "Bibliothèque de lecture locale",
   appShortName: "Bibliothèque de lecture",
   libraryTitle: "Bibliothèque de lecture locale",
@@ -24,7 +49,7 @@ export const messages: Record<MessageKey, string> = {
   noteOptional: "Note (facultative)",
   notePlaceholder: "Pourquoi l’enregistrer et sur quoi devrez-vous vous concentrer plus tard ?",
   collection: "Collection",
-  inbox: "Boîte de réception",
+  uncategorized: "Sans collection",
   tags: "Étiquettes",
   tagsPlaceholder: "articles, RAG",
   readingState: "État de lecture",
@@ -144,13 +169,13 @@ export const messages: Record<MessageKey, string> = {
   itemsCount: "{total} éléments · {unread} non lus",
   moveUp: "Monter",
   moveDown: "Descendre",
-  deleteCollectionMove: "Supprimer et déplacer {count} éléments vers la Boîte de réception",
+  deleteCollectionMove: "Supprimer ; conserver {count} éléments sans collection",
   deleteCollectionItems: "Supprimer la collection et ses éléments",
   deleteCollection: "Supprimer la collection",
   saveCollection: "Enregistrer la collection",
   collectionSaved: "Collection enregistrée.",
   deleteItemsStrategy: "supprimer ses éléments",
-  moveItemsStrategy: "déplacer ses éléments vers la Boîte de réception",
+  moveItemsStrategy: "conserver les éléments sans collection",
   deleteCollectionQuestion: "Supprimer « {name} », ses sous-collections et {action} ?",
   collectionDeleted: "{collections} collections supprimées et {items} éléments traités.",
   sitesHint: "Regroupez les anciens et nouveaux domaines dans un même site afin que la ressource conserve une identité stable.",

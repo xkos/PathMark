@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { SelectionTree, TreeSelectionActions, type SelectionNode } from "./SelectionTree";
+import { useEffect, useMemo, useState } from "react";
 import type { UrlIdentity } from "../domain/identity";
 import { siteToDraft, type EndpointDraft, type SiteDraft } from "../domain/site-management";
 import type { Site } from "../domain/models";
@@ -9,6 +10,7 @@ import { requestActionIconRefresh } from "../browser/action-refresh";
 import { localizeError, t } from "../i18n";
 
 export function SiteManager() {
+  const [loading, setLoading] = useState(true);
   const [sites, setSites] = useState<Site[]>([]);
   const [draft, setDraft] = useState<SiteDraft>(() => createEmptySiteDraft());
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export function SiteManager() {
   const [selectedRemapIds, setSelectedRemapIds] = useState<Set<string>>(() => new Set());
 
   useEffect(() => {
-    void reloadSites();
+    void reloadSites().catch((error) => setError(describeError(error))).finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -92,12 +94,11 @@ export function SiteManager() {
     setError("");
     setNotice("");
     try {
-      if (requiresImpactPreview && !impactIsCurrent) {
-        throw new Error(t("sitePreviewRequired"));
-      }
       const saved = await readingLibrary.saveSite(draft);
       await reloadSites(saved.id);
       setReviewedFingerprint(siteConfigurationFingerprint(siteToDraft(saved)));
+      setImpact(null);
+      setSelectedRemapIds(new Set());
       setNotice(t("siteSaved"));
       requestActionIconRefresh();
     } catch (saveError) {
@@ -108,6 +109,7 @@ export function SiteManager() {
   }
 
   async function runImpactPreview(): Promise<void> {
+    setSaving(true);
     setError("");
     setNotice("");
     try {
@@ -118,7 +120,7 @@ export function SiteManager() {
     } catch (impactError) {
       setImpact(null);
       setError(describeError(impactError));
-    }
+    } finally { setSaving(false); }
   }
 
   async function remapSelectedItems(): Promise<void> {
@@ -127,9 +129,11 @@ export function SiteManager() {
       setError(t("saveBeforeRemap"));
       return;
     }
+    setSaving(true);
     setError("");
     try {
-      const updated = await readingLibrary.remapItems([...selectedRemapIds]);
+      const updated = await readingLibrary.syncSiteItems(selectedId!, selectedSyncIds.map((change) => change.itemId));
+      setRelatedItemCount(await readingLibrary.countItemsForSite(selectedId!));
       const nextImpact = await readingLibrary.previewSiteChange(draft);
       setImpact(nextImpact);
       setReviewedFingerprint(siteConfigurationFingerprint(draft));
@@ -138,7 +142,7 @@ export function SiteManager() {
       requestActionIconRefresh();
     } catch (remapError) {
       setError(describeError(remapError));
-    }
+    } finally { setSaving(false); }
   }
 
   async function runPreview(): Promise<void> {
@@ -167,6 +171,29 @@ export function SiteManager() {
     }
   }
 
+  const syncChanges = useMemo(() => impact?.identityChanges.filter((change) => change.before.siteId === null && change.after.siteId === selectedId) ?? [], [impact, selectedId]);
+  const syncNodes = useMemo(() => {
+    const hosts = new Map<string, SelectionNode>();
+    for (const change of syncChanges) {
+      const host = new URL(change.before.normalizedUrl).host;
+      const hostNode = hosts.get(host) ?? { id: `host:${host}`, label: host, selectable: false, showCount: true, children: [] };
+      hosts.set(host, hostNode);
+      const prefix = change.after.endpointPrefix!;
+      let endpoint = hostNode.children!.find((node) => node.id === `endpoint:${prefix}`);
+      if (!endpoint) { endpoint = { id: `endpoint:${prefix}`, label: prefix, selectable: false, showCount: true, children: [] }; hostNode.children!.push(endpoint); }
+      endpoint.children!.push({ id: change.itemId, label: `${change.title} · ${change.after.resourceKey}${change.hasConflict ? ` · ${t("mergeOnSync")}` : ""}` });
+    }
+    return [...hosts.values()];
+  }, [syncChanges]);
+  function selectSync(ids: string[], checked: boolean) {
+    setSelectedRemapIds((current) => {
+      const next = new Set(current);
+      for (const id of ids) { if (checked) next.add(id); else next.delete(id); }
+      return next;
+    });
+  }
+  const selectedSyncIds = syncChanges.filter((change) => selectedRemapIds.has(change.itemId));
+
   const policyParameters =
     draft.queryPolicy.mode === "keep-only-identity"
       ? draft.queryPolicy.identityParams
@@ -174,9 +201,10 @@ export function SiteManager() {
   const selectedSite = sites.find((site) => site.id === selectedId);
   const draftFingerprint = siteConfigurationFingerprint(draft);
   const savedFingerprint = selectedSite ? siteConfigurationFingerprint(siteToDraft(selectedSite)) : null;
-  const hasEndpointConfiguration = draft.endpoints.some((endpoint) => endpoint.prefix.trim());
-  const requiresImpactPreview = hasEndpointConfiguration && draftFingerprint !== savedFingerprint;
+  const requiresImpactPreview = draftFingerprint !== savedFingerprint;
   const impactIsCurrent = impact !== null && reviewedFingerprint === draftFingerprint;
+
+  if (loading) return <div className="loading">{t("loadingLibrary")}</div>;
 
   return (
     <div className="site-management">
@@ -316,68 +344,15 @@ export function SiteManager() {
 
           <section className="impact-preview">
             <div className="site-editor__section-heading">
-              <div>
-                <h3>{t("impactPreview")}</h3>
-                <p>{t("impactPreviewHint")}</p>
-              </div>
-              <Button type="button" variant="secondary" onClick={() => void runImpactPreview()}>{t("previewImpact")}</Button>
+              <div><h3>{t("syncSite")}</h3><p>{t("syncSiteHint")}</p></div>
+              <Button type="button" variant="secondary" disabled={saving || !selectedSite || requiresImpactPreview} onClick={() => void runImpactPreview()}>{t("syncSite")}</Button>
             </div>
-            {impact && !impactIsCurrent ? <div className="impact-preview__stale">{t("impactStale")}</div> : null}
-            {impactIsCurrent && impact ? (
-              <>
-                <div className="impact-summary">
-                  <div><strong>{impact.associatedItemCount}</strong><span>{t("associatedItems")}</span></div>
-                  <div><strong>{impact.resolutionChanges.length}</strong><span>{t("defaultAddressChanges")}</span></div>
-                  <div><strong>{impact.identityChanges.length}</strong><span>{t("identityChanges")}</span></div>
-                  <div><strong>{impact.identityChanges.filter((change) => change.hasConflict).length}</strong><span>{t("canonicalConflicts")}</span></div>
-                </div>
-
-                {impact.resolutionChanges.length ? (
-                  <div className="impact-group">
-                    <h4>{t("defaultOpenChanges")}</h4>
-                    {impact.resolutionChanges.map((change) => (
-                      <div className="impact-row" key={change.itemId}>
-                        <strong>{change.title}</strong>
-                        <span>{change.beforeUrl ?? t("noEndpointAvailable")}</span>
-                        <span className="impact-row__arrow">→</span>
-                        <span>{change.afterUrl ?? t("noEndpointAvailable")}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-
-                {impact.identityChanges.length ? (
-                  <div className="impact-group">
-                    <div className="impact-group__heading">
-                      <h4>{t("remappableItems")}</h4>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        disabled={!selectedRemapIds.size || requiresImpactPreview}
-                        onClick={() => void remapSelectedItems()}
-                      >
-                        {t("remapSelected")}
-                      </Button>
-                    </div>
-                    {impact.identityChanges.map((change) => (
-                      <label className={`identity-impact${change.hasConflict ? " identity-impact--conflict" : ""}`} key={change.itemId}>
-                        <input
-                          type="checkbox"
-                          disabled={change.hasConflict}
-                          checked={selectedRemapIds.has(change.itemId)}
-                          onChange={(event) => setSelectedRemapIds((current) => toggleSetValue(current, change.itemId, event.target.checked))}
-                        />
-                        <span>
-                          <strong>{change.title}</strong>
-                          <small>{formatIdentity(change.before)} → {formatIdentity(change.after)}</small>
-                          {change.hasConflict ? <small className="identity-impact__error">{t("remapConflict")}</small> : null}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                ) : <p className="impact-preview__empty">{t("noRemapNeeded")}</p>}
-              </>
-            ) : null}
+            {impact && !impactIsCurrent ? <p>{t("saveBeforeRemap")}</p> : null}
+            {impactIsCurrent ? <>
+              <TreeSelectionActions nodes={syncNodes} onSelect={selectSync} />
+              <SelectionTree nodes={syncNodes} selected={selectedRemapIds} onSelect={selectSync} />
+              {!syncChanges.length ? <p>{t("noRemapNeeded")}</p> : <Button type="button" disabled={saving || !selectedSyncIds.length || requiresImpactPreview} onClick={() => void remapSelectedItems()}>{t("syncSite")} ({selectedSyncIds.length})</Button>}
+            </> : null}
           </section>
 
           <section className="match-preview">
@@ -404,7 +379,7 @@ export function SiteManager() {
           {notice ? <div className="notice-panel" role="status">{notice}</div> : null}
 
           <footer className="site-editor__footer">
-            <p className="muted">{t("endpointSaveHint")}</p>
+            <p className="muted">{t("syncSiteHint")}</p>
             <div className="site-editor__footer-actions">
               {selectedId ? (
                 relatedItemCount ? (
@@ -456,19 +431,6 @@ function siteConfigurationFingerprint(draft: SiteDraft): string {
     endpoints: draft.endpoints.map(({ id, prefix, enabled }) => ({ id, prefix: prefix.trim(), enabled })),
     queryPolicy: draft.queryPolicy,
   });
-}
-
-function toggleSetValue(current: Set<string>, value: string, checked: boolean): Set<string> {
-  const next = new Set(current);
-  if (checked) next.add(value);
-  else next.delete(value);
-  return next;
-}
-
-function formatIdentity(identity: UrlIdentity): string {
-  return identity.kind === "site"
-    ? `${identity.siteName ?? t("genericSite")} ${identity.resourceKey ?? ""}`
-    : t("unassigned");
 }
 
 function describeError(error: unknown): string {

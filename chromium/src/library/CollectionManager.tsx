@@ -157,7 +157,7 @@ export function CollectionManager() {
             <div className="collection-editor__actions">
               {selectedId ? impactedItems ? (
                 <>
-                  <Button type="button" variant="ghost" onClick={() => void deleteCollection("move-items-to-inbox")}>{t("deleteCollectionMove", { count: impactedItems })}</Button>
+                  <Button type="button" variant="ghost" onClick={() => void deleteCollection("unclassify-items")}>{t("deleteCollectionMove", { count: impactedItems })}</Button>
                   <Button type="button" variant="ghost" onClick={() => void deleteCollection("delete-items")}>{t("deleteCollectionItems")}</Button>
                 </>
               ) : <Button type="button" variant="ghost" onClick={() => void deleteCollection("delete-items")}>{t("deleteCollection")}</Button> : null}
