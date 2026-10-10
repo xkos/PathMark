@@ -4,7 +4,7 @@
   "name": "__MSG_extensionName__",
   "short_name": "__MSG_extensionShortName__",
   "description": "__MSG_extensionDescription__",
-  "version": "0.2.13",
+  "version": "0.2.14",
   "action": {
     "default_title": "__MSG_extensionName__",
     "default_popup": "popup.html",
@@ -25,7 +25,8 @@
     "service_worker": "assets/background.js"
   },
   "options_page": "library.html",
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "scripting", "storage"],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
   "optional_permissions": ["bookmarks"],
   "icons": {
     "16": "icons/icon-16.png",

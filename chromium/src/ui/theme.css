@@ -249,3 +249,5 @@ textarea.field__input {
 .muted {
   color: var(--color-text-muted);
 }
+
+.collection-color-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-inline-end: 7px; border: 1px solid rgb(0 0 0 / 15%); }

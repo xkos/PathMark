@@ -135,6 +135,7 @@ function parseCollection(value: unknown, path: string, errors: string[]): Collec
   const required = ["id", "name", "parentId", "sortOrder", "createdAt", "updatedAt"];
   if (!hasRequired(value, required, path, errors)) return null;
   if (!uuid(value.id)) errors.push(pathIssue(`${path}.id`, "validationUuid"));
+  if (value.color !== undefined && (typeof value.color !== "string" || !/^#[0-9a-f]{6}$/i.test(value.color))) errors.push(pathIssue(`${path}.color`, "validationInvalid"));
   if (!nonEmptyString(value.name)) errors.push(pathIssue(`${path}.name`, "validationRequired"));
   if (value.parentId !== null && !uuid(value.parentId)) errors.push(pathIssue(`${path}.parentId`, "validationUuidOrNull"));
   if (!nonNegativeInteger(value.sortOrder)) errors.push(pathIssue(`${path}.sortOrder`, "validationNonNegativeInteger"));

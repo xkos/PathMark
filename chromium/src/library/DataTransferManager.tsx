@@ -1,3 +1,4 @@
+import { LinkMarkingControl } from "./LinkMarkingControl";
 import { useEffect, useState } from "react";
 import type { ImportMode, ImportPreview, SameIdImportPolicy } from "../domain/library-transfer";
 import { readingLibrary } from "../storage/library-instance";
@@ -143,6 +144,8 @@ export function DataTransferManager() {
           </select>
         </label>
       </section>
+
+      <LinkMarkingControl />
 
       {settings ? <section className="transfer-card settings-card" aria-labelledby="settings-heading">
         <div><h3 id="settings-heading">{t("normalizationDefaults")}</h3><p>{t("normalizationHint")}</p></div>

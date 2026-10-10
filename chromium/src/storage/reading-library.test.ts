@@ -559,3 +559,93 @@ describe("ReadingLibrary", () => {
     expect(await library.getSettings()).toEqual(DEFAULT_SETTINGS);
   });
 });
+
+describe("quick capture and endpoint migration", () => {
+  const draft = { name: "Forum", description: "", endpoints: [{ prefix: "https://forum.test", enabled: true }], queryPolicy: { mode: "keep-all-except-ignored" as const, ignoredParams: [] } };
+  const page = { url: "https://forum.test/topic/1", title: "Resource", note: "", tags: [], collectionId: null, readingState: "unread" as const };
+
+  it("only auto-saves recognized pages and preserves existing data across concurrent opens", async () => {
+    const library = createLibrary();
+    expect((await library.saveMatchedPage(page)).item).toBeNull();
+    await library.saveSite(draft);
+    const results = await Promise.all([library.saveMatchedPage(page), library.saveMatchedPage(page)]);
+    expect(results[0].item?.id).toBe(results[1].item?.id);
+    expect(await library.listItems()).toHaveLength(1);
+    const collection = await library.saveCollection({ name: "Expired", parentId: null });
+    const item = results[0].item!;
+    await library.updateItem(item.id, { ...item, collectionId: collection.id, note: "Keep me", readingState: "read", isArchived: true });
+    const reopened = (await library.saveMatchedPage(page)).item!;
+    expect(reopened).toMatchObject({ collectionId: collection.id, note: "Keep me", readingState: "read", isArchived: true });
+  });
+
+  it("creates a site and migrates one item with an editable path prefix", async () => {
+    const library = createLibrary();
+    const item = await library.savePage(page);
+    const target = { ...draft, id: "new-site", endpoints: [{ prefix: "https://forum.test/topic", enabled: true }] };
+    const preview = await library.previewItemMigration(item.id, target.id, target);
+    expect(preview.after.resourceKey).toBe("/1");
+    expect(await library.listSites()).toHaveLength(0);
+    const result = await library.migrateItem(item.id, target.id, target);
+    expect(result).toMatchObject({ siteId: target.id, resourceKey: "/1", id: item.id });
+    expect(await library.listSites()).toHaveLength(1);
+  });
+
+  it("adds a domain to an existing site and merges the same resource", async () => {
+    const library = createLibrary();
+    const site = await library.saveSite(draft);
+    const existing = await library.savePage({ ...page, note: "Original notes", readingState: "read" });
+    const incoming = await library.savePage({ ...page, url: "https://mirror.test/topic/1", note: "Mirror notes" });
+    const updatedDraft = { ...draft, id: site.id, endpoints: [...draft.endpoints, { prefix: "https://mirror.test", enabled: true }] };
+    const preview = await library.previewItemMigration(incoming.id, site.id, updatedDraft);
+    expect(preview.conflictingItem?.id).toBe(existing.id);
+    const result = await library.migrateItem(incoming.id, site.id, updatedDraft);
+    expect(result.id).toBe(existing.id);
+    expect(result.readingState).toBe("read");
+    expect(result.note).toContain("Mirror notes");
+    expect(await library.listItems()).toHaveLength(1);
+    expect((await library.recognize(incoming.originalUrl)).item?.id).toBe(existing.id);
+  });
+
+  it("rolls back site creation when the edited prefix does not match the item", async () => {
+    const library = createLibrary();
+    const item = await library.savePage(page);
+    const target = { ...draft, id: "invalid-site", endpoints: [{ prefix: "https://forum.test/other", enabled: true }] };
+    await expect(library.migrateItem(item.id, target.id, target)).rejects.toThrow();
+    expect(await library.listSites()).toHaveLength(0);
+    expect((await library.listItems())[0]).toEqual(item);
+  });
+});
+
+describe("collection colors", () => {
+  it("persists colors, preserves them when renaming, and includes them in backups", async () => {
+    const library = createLibrary();
+    const collection = await library.saveCollection({ name: "Expired", parentId: null, color: "#DC2626" });
+    expect(collection.color).toBe("#dc2626");
+    const renamed = await library.saveCollection({ id: collection.id, name: "Unavailable", parentId: null });
+    expect(renamed.color).toBe("#dc2626");
+    const backup = await library.exportLibrary();
+    backup.collections[0].id = crypto.randomUUID();
+    const preview = await library.previewImport(backup, "replace");
+    expect(preview.errors).toEqual([]);
+    expect(backup.collections[0].color).toBe("#dc2626");
+    await library.applyImport(backup, "replace");
+    expect((await library.listCollections())[0].color).toBe("#dc2626");
+    delete backup.collections[0].color;
+    expect((await library.previewImport(backup, "replace")).errors).toEqual([]);
+    backup.collections[0].color = "not-a-color";
+    expect((await library.previewImport(backup, "replace")).errors.length).toBeGreaterThan(0);
+  });
+});
+
+describe("saved link lookup", () => {
+  it("matches endpoint aliases in batches without saving links or exposing notes", async () => {
+    const library = createLibrary();
+    await library.saveSite({name:"Videos",description:"",endpoints:[{prefix:"https://old.test",enabled:true},{prefix:"https://new.test",enabled:true}],queryPolicy:{mode:"keep-all-except-ignored",ignoredParams:[]}});
+    const collection = await library.saveCollection({name:"Expired",parentId:null,color:"#dc2626"});
+    await library.savePage({url:"https://old.test/video/1",title:"Video",note:"Private note",tags:["private"],collectionId:collection.id,readingState:"read"});
+    await library.savePage({url:"https://else.test/2",title:"Other",note:"",tags:[],collectionId:null,readingState:"read"});
+    const links = await library.recognizeLinks(["https://new.test/video/1?utm_source=recommendation", "https://new.test/video/1?utm_source=recommendation", "https://new.test/video/2", "https://else.test/2", "javascript:alert(1)", "bad"]);
+    expect(links).toEqual([{url:"https://new.test/video/1?utm_source=recommendation",color:"#dc2626",collectionName:"Expired"},{url:"https://else.test/2",color:"#2563eb",collectionName:null}]);
+    expect(await library.listItems()).toHaveLength(2);
+  });
+});

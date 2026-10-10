@@ -36,6 +36,9 @@ for (const [appLocale, chromeLocale] of Object.entries(supportedLocales)) {
   }
 }
 
+const contentSource = readFileSync(resolve(distPath, "assets/link-markers.js"), "utf8");
+if (/^\s*(?:import|export)\b/m.test(contentSource) || /\bimport\s*\(/.test(contentSource)) throw new Error("Link marker script must be self-contained");
+
 const actionIconDirectory = resolve(distPath, "icons/action");
 for (const fileName of readdirSync(actionIconDirectory).filter((name) => name.endsWith(".png"))) {
   const png = readFileSync(resolve(actionIconDirectory, fileName));

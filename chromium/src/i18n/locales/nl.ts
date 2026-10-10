@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "Opgeslagen links op webpagina’s markeren",
+  linkMarkingPermission: "Sta eenmaal toegang tot HTTP/HTTPS-websites toe voor automatische markeringen. Uitschakelen verwijdert markeringen en toegangsrechten.",
+  linkMarkingFailed: "De linkmarkering kon niet worden gewijzigd. Probeer het opnieuw.",
+
+  saved: "Opgeslagen",
+  collectionColor: "Pictogramkleur",
+  customColor: "Aangepaste kleur",
+  collectionColorHint: "Opgeslagen pagina’s gebruiken de kleur van hun collectie. Zonder categorie is het pictogram blauw.",
+
+  editDetails: "Titel, notities en tags",
+  migrationEndpointHint: "Voeg bij het opslaan dit domein of padvoorvoegsel toe aan de doelsite en verplaats dit item. Andere items kunnen via de site-instellingen worden gesynchroniseerd.",
   excludeImportDomain: "Alle URL’s van dit domein uitsluiten van deze import",
   excludedImportDomains: "Domeinen uitgesloten van deze import",
   restoreImportDomain: "Opnieuw opnemen",

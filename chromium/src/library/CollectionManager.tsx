@@ -1,3 +1,5 @@
+import { COLLECTION_COLORS, collectionColor } from "../domain/collection-color";
+import { requestActionIconRefresh } from "../browser/action-refresh";
 import { useEffect, useMemo, useState } from "react";
 import { collectDescendantIds, flattenCollections, type CollectionDraft } from "../domain/collection-management";
 import type { Collection } from "../domain/models";
@@ -42,7 +44,7 @@ export function CollectionManager() {
 
   function selectCollection(collection: Collection): void {
     setSelectedId(collection.id);
-    setDraft({ id: collection.id, name: collection.name, parentId: collection.parentId });
+    setDraft({ id: collection.id, name: collection.name, color: collection.color, parentId: collection.parentId });
     void readingLibrary.countItemsForCollectionTree(collection.id).then(setImpactedItems);
     resetFeedback();
   }
@@ -65,6 +67,7 @@ export function CollectionManager() {
     try {
       const saved = await readingLibrary.saveCollection(draft);
       await reloadCollections(saved.id);
+      requestActionIconRefresh();
       setNotice(t("collectionSaved"));
     } catch (saveError) {
       setError(describeError(saveError));
@@ -85,6 +88,7 @@ export function CollectionManager() {
     try {
       const result = await readingLibrary.deleteCollection(selectedId, strategy);
       await reloadCollections();
+      requestActionIconRefresh();
       setNotice(t("collectionDeleted", { collections: result.collections, items: result.items }));
     } catch (deleteError) {
       setError(describeError(deleteError));
@@ -111,7 +115,7 @@ export function CollectionManager() {
               style={{ paddingInlineStart: `${14 + depth * 18}px` }}
               onClick={() => selectCollection(collection)}
             >
-              <span>{collection.name}</span><small>{t("itemsCount", { total: stats[collection.id]?.total ?? 0, unread: stats[collection.id]?.unread ?? 0 })}</small>
+              <span><i className="collection-color-dot" style={{ backgroundColor: collectionColor(collection.color) }} />{collection.name}</span><small>{t("itemsCount", { total: stats[collection.id]?.total ?? 0, unread: stats[collection.id]?.unread ?? 0 })}</small>
             </button>
           )) : <p className="collection-list__empty">{t("noCollections")}</p>}
         </aside>
@@ -141,6 +145,15 @@ export function CollectionManager() {
                 ))}
             </select>
           </label>
+
+          <fieldset className="collection-color-picker">
+            <legend>{t("collectionColor")}</legend>
+            <div className="collection-color-picker__options">
+              {COLLECTION_COLORS.map((color) => <button key={color} type="button" aria-label={`${t("collectionColor")} ${color}`} aria-pressed={collectionColor(draft.color) === color} style={{ backgroundColor: color }} onClick={() => setDraft({ ...draft, color })} />)}
+              <input type="color" aria-label={t("customColor")} value={collectionColor(draft.color)} onChange={(event) => setDraft({ ...draft, color: event.target.value })} />
+            </div>
+            <small>{t("collectionColorHint")}</small>
+          </fieldset>
 
           {error ? <div className="error-panel" role="alert">{error}</div> : null}
           {notice ? <div className="notice-panel" role="status">{notice}</div> : null}

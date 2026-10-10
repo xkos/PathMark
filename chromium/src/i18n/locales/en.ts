@@ -1,6 +1,17 @@
 import type { AppErrorCode } from "../../domain/app-error";
 
 export const messages = {
+  markSavedLinks: "Mark saved links on webpages",
+  linkMarkingPermission: "Enable once to allow access to HTTP/HTTPS websites. Saved links are then marked automatically; turning this off removes the marks and releases website access.",
+  linkMarkingFailed: "Could not change link marking. Please try again.",
+
+  saved: "Saved",
+  collectionColor: "Icon color",
+  customColor: "Custom color",
+  collectionColorHint: "Saved pages use their collection color in the browser toolbar. Uncategorized pages use blue.",
+
+  editDetails: "Title, notes and tags",
+  migrationEndpointHint: "Add this domain or path prefix to the target site and move this item when saving. Other items can be synced in site settings.",
   excludeImportDomain: "Exclude all URLs under this domain from this import",
   excludedImportDomains: "Domains excluded from this import",
   restoreImportDomain: "Include again",

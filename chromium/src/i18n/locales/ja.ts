@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "ウェブページの保存済みリンクを表示",
+  linkMarkingPermission: "初回に HTTP/HTTPS サイトへのアクセスを許可すると、自動で表示されます。オフにするとマークとアクセス権を削除します。",
+  linkMarkingFailed: "リンク表示の設定を変更できませんでした。再試行してください。",
+
+  saved: "保存済み",
+  collectionColor: "アイコンの色",
+  customColor: "カスタムカラー",
+  collectionColorHint: "保存済みページのアイコンにはコレクションの色を使います。未分類は青色です。",
+
+  editDetails: "タイトル・メモ・タグ",
+  migrationEndpointHint: "保存時にこのドメインまたはパスの接頭辞を移行先サイトに追加し、この項目を移行します。他の項目はサイト設定で同期できます。",
   excludeImportDomain: "このドメインのすべてのURLを今回のインポートから除外",
   excludedImportDomains: "今回のインポートから除外したドメイン",
   restoreImportDomain: "再び含める",

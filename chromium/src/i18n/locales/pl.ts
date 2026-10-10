@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "Oznaczaj zapisane linki na stronach",
+  linkMarkingPermission: "Jednorazowo zezwól na dostęp do witryn HTTP/HTTPS, aby automatycznie oznaczać linki. Wyłączenie usuwa oznaczenia i uprawnienia.",
+  linkMarkingFailed: "Nie udało się zmienić oznaczania linków. Spróbuj ponownie.",
+
+  saved: "Zapisano",
+  collectionColor: "Kolor ikony",
+  customColor: "Własny kolor",
+  collectionColorHint: "Zapisane strony używają koloru kolekcji. Strony bez kategorii są niebieskie.",
+
+  editDetails: "Tytuł, notatki i tagi",
+  migrationEndpointHint: "Podczas zapisywania dodaj tę domenę lub prefiks ścieżki do witryny docelowej i przenieś ten element. Pozostałe elementy można zsynchronizować w ustawieniach witryny.",
   excludeImportDomain: "Wyklucz wszystkie adresy URL tej domeny z tego importu",
   excludedImportDomains: "Domeny wykluczone z tego importu",
   restoreImportDomain: "Uwzględnij ponownie",

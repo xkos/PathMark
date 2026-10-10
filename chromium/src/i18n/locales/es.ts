@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "Marcar enlaces guardados en páginas web",
+  linkMarkingPermission: "Autoriza una vez el acceso a sitios HTTP/HTTPS para marcar automáticamente. Al desactivar se eliminan las marcas y el permiso de acceso.",
+  linkMarkingFailed: "No se pudo cambiar el marcado de enlaces. Inténtalo de nuevo.",
+
+  saved: "Guardado",
+  collectionColor: "Color del icono",
+  customColor: "Color personalizado",
+  collectionColorHint: "Las páginas guardadas usan el color de su colección. Las páginas sin categoría usan azul.",
+
+  editDetails: "Título, notas y etiquetas",
+  migrationEndpointHint: "Al guardar, añade este dominio o prefijo de ruta al sitio de destino y mueve este elemento. Los demás elementos pueden sincronizarse en los ajustes del sitio.",
   excludeImportDomain: "Excluir todas las URL de este dominio de esta importación",
   excludedImportDomains: "Dominios excluidos de esta importación",
   restoreImportDomain: "Volver a incluir",

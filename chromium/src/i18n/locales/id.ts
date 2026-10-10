@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "Tandai tautan tersimpan di halaman web",
+  linkMarkingPermission: "Izinkan akses ke situs HTTP/HTTPS sekali untuk penandaan otomatis. Menonaktifkan akan menghapus tanda dan izin akses.",
+  linkMarkingFailed: "Tidak dapat mengubah penandaan tautan. Coba lagi.",
+
+  saved: "Tersimpan",
+  collectionColor: "Warna ikon",
+  customColor: "Warna khusus",
+  collectionColorHint: "Halaman tersimpan memakai warna koleksinya. Halaman tanpa kategori berwarna biru.",
+
+  editDetails: "Judul, catatan, dan tag",
+  migrationEndpointHint: "Saat menyimpan, tambahkan domain atau awalan jalur ini ke situs tujuan dan pindahkan item ini. Item lainnya dapat disinkronkan di pengaturan situs.",
   excludeImportDomain: "Kecualikan semua URL domain ini dari impor ini",
   excludedImportDomains: "Domain yang dikecualikan dari impor ini",
   restoreImportDomain: "Sertakan kembali",

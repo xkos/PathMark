@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "Gespeicherte Links auf Webseiten markieren",
+  linkMarkingPermission: "Einmal Zugriff auf HTTP/HTTPS-Websites erlauben. Links werden automatisch markiert. Ausschalten entfernt Markierungen und Zugriffsrechte.",
+  linkMarkingFailed: "Die Linkmarkierung konnte nicht geändert werden. Bitte erneut versuchen.",
+
+  saved: "Gespeichert",
+  collectionColor: "Symbolfarbe",
+  customColor: "Eigene Farbe",
+  collectionColorHint: "Gespeicherte Seiten verwenden die Farbe ihrer Sammlung. Ohne Sammlung ist das Symbol blau.",
+
+  editDetails: "Titel, Notizen und Tags",
+  migrationEndpointHint: "Beim Speichern wird diese Domain oder dieses Pfadpräfix zur Zielwebsite hinzugefügt und dieser Eintrag verschoben. Weitere Einträge lassen sich in den Website-Einstellungen synchronisieren.",
   excludeImportDomain: "Alle URLs dieser Domain von diesem Import ausschließen",
   excludedImportDomains: "Von diesem Import ausgeschlossene Domains",
   restoreImportDomain: "Wieder einschließen",

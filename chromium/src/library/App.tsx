@@ -20,6 +20,7 @@ export function App() {
   const [items, setItems] = useState<Item[]>([]);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<ViewFilter>("all");
+  const [revision, setRevision] = useState(0);
   const [loading, setLoading] = useState(true);
   const [section, setSection] = useState<LibrarySection>("items");
   const [sites, setSites] = useState<Site[]>([]);
@@ -53,7 +54,7 @@ export function App() {
       .catch((error) => { if (active) setBulkError(localizeError(error)); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [section]);
+  }, [section, revision]);
 
   const locale = getLocale();
   const visibleItems = useMemo(() => {
@@ -256,8 +257,8 @@ export function App() {
           item={migrationItem}
           sites={sites}
           onClose={() => setMigrationItem(null)}
-          onMigrated={(updated) => {
-            setItems((current) => current.map((item) => item.id === updated.id ? updated : item));
+          onMigrated={() => {
+            setRevision((value) => value + 1);
             setMigrationItem(null);
             requestActionIconRefresh();
           }}

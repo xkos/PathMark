@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "Web sayfalarında kaydedilen bağlantıları işaretle",
+  linkMarkingPermission: "Otomatik işaretleme için HTTP/HTTPS sitelerine bir kez erişim izni verin. Kapatıldığında işaretler ve erişim izni kaldırılır.",
+  linkMarkingFailed: "Bağlantı işaretleme ayarı değiştirilemedi. Tekrar deneyin.",
+
+  saved: "Kaydedildi",
+  collectionColor: "Simge rengi",
+  customColor: "Özel renk",
+  collectionColorHint: "Kaydedilen sayfalar koleksiyon rengini kullanır. Kategorisiz sayfalar mavidir.",
+
+  editDetails: "Başlık, notlar ve etiketler",
+  migrationEndpointHint: "Kaydederken bu alan adını veya yol önekini hedef siteye ekleyip bu öğeyi taşıyın. Diğer öğeler site ayarlarından eşitlenebilir.",
   excludeImportDomain: "Bu alan adındaki tüm URL’leri bu içe aktarmadan çıkar",
   excludedImportDomains: "Bu içe aktarmadan çıkarılan alan adları",
   restoreImportDomain: "Yeniden dahil et",

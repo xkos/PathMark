@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { collectionColor } from "../domain/collection-color";
+import { useEffect, useRef, useState } from "react";
 import { getActivePage, type ActivePageSnapshot } from "../browser/active-page";
 import { setActionVisualStateForTab } from "../browser/action-state";
 import type { Collection, ReadingState, Site } from "../domain/models";
@@ -25,7 +26,7 @@ export function App() {
   const [view, setView] = useState<ViewState>({ kind: "loading" });
   const [note, setNote] = useState("");
   const [tags, setTags] = useState("");
-  const [readingState, setReadingState] = useState<ReadingState>("unread");
+  const [readingState, setReadingState] = useState<ReadingState>("read");
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState("");
   const [collectionId, setCollectionId] = useState("");
@@ -40,18 +41,24 @@ export function App() {
   const [siteError, setSiteError] = useState("");
   const [sitePreviewing, setSitePreviewing] = useState(false);
   const [formError, setFormError] = useState("");
-  const [deleteConfirming, setDeleteConfirming] = useState(false);
 
-  async function load() {
+  const started = useRef(false);
+
+  async function load(autoSave = false) {
     try {
       const [{ page, recognition }, settings, loadedCollections, loadedSites] = await Promise.all([loadPopupPage({
         getActivePage,
         recognize: (url) => readingLibrary.recognize(url),
         setActionStateForTab: async (tabId, item) => {
           if (typeof chrome === "undefined" || !chrome.action) return;
-          await setActionVisualStateForTab(tabId, item);
+          const collection = item?.collectionId ? await readingLibrary.database.collections.get(item.collectionId) : undefined;
+          await setActionVisualStateForTab(tabId, item, chrome.action, collection);
         },
       }), readingLibrary.getSettings(), readingLibrary.listCollections(), readingLibrary.listSites()]);
+      if (autoSave && !recognition.item && recognition.identity.siteId) {
+        Object.assign(recognition, await readingLibrary.saveMatchedPage({ ...page, note: "", tags: [], collectionId: null, readingState: settings.defaultReadingState }));
+        requestActionIconRefresh();
+      }
       setCollections(loadedCollections);
       setSites(loadedSites);
       if (!recognition.item) {
@@ -70,7 +77,9 @@ export function App() {
   }
 
   useEffect(() => {
-    void load();
+    if (started.current) return;
+    started.current = true;
+    void load(true);
   }, []);
 
   useEffect(() => {
@@ -144,10 +153,16 @@ export function App() {
     await readingLibrary.saveSite(ensureEndpointInDraft(siteToDraft(selectedSite), endpointPrefix));
   }
 
-  async function changeExistingState(state: ReadingState) {
+  async function changeCollection(collectionId: string) {
     if (view.kind !== "ready" || !view.recognition.item) return;
-    await readingLibrary.setReadingState(view.recognition.item.id, state);
-    await load();
+    setSaving(true);
+    setFormError("");
+    try {
+      await readingLibrary.updateItem(view.recognition.item.id, { ...view.recognition.item, collectionId: collectionId || null });
+      requestActionIconRefresh();
+      await load();
+    } catch (error) { setFormError(toErrorMessage(error)); }
+    finally { setSaving(false); }
   }
 
   async function deleteCurrentItem(): Promise<void> {
@@ -156,7 +171,6 @@ export function App() {
     setSaving(true);
     try {
       await readingLibrary.deleteItem(item.id);
-      setDeleteConfirming(false);
       requestActionIconRefresh();
       await load();
     } catch (error) {
@@ -189,22 +203,16 @@ export function App() {
           {view.recognition.item ? (
             <ExistingItem
               recognition={view.recognition}
-              onChangeState={(state) => void changeExistingState(state)}
+              collections={collections}
+              onChangeCollection={(value) => void changeCollection(value)}
               onDelete={() => void deleteCurrentItem()}
-              deleteConfirming={deleteConfirming}
-              onRequestDelete={() => setDeleteConfirming(true)}
-              onCancelDelete={() => setDeleteConfirming(false)}
               busy={saving}
             />
           ) : (
             <section className="popup__form">
-              <label className="field">
-                <span className="field__label">{t("title")}</span>
-                <input className="field__input" value={title} onChange={(event) => setTitle(event.target.value)} />
-              </label>
               <section className="popup-site-card" aria-labelledby="popup-site-title">
                 <div className="popup-site-card__heading">
-                  <div><h3 id="popup-site-title">{t("site")}</h3><p>{t("siteDescription")}</p></div>
+                  <div><h3 id="popup-site-title">{t("site")}</h3></div>
                   {view.recognition.identity.siteId && (siteSelection === "auto" || siteSelection === view.recognition.identity.siteId) ? <Badge tone="info">{t("autoMatched")}</Badge> : null}
                 </div>
                 <label className="field">
@@ -219,6 +227,22 @@ export function App() {
                 {siteSelection === "new" || needsEndpoint ? <label className="field"><span className="field__label">{siteSelection === "new" ? t("firstEndpoint") : t("addEndpoint")}</span><input className="field__input" value={endpointPrefix} onChange={(event) => setEndpointPrefix(event.target.value)} /><small>{needsEndpoint ? t("endpointWillBeAdded") : t("endpointPrefilled")}</small></label> : null}
                 {siteError ? <div className="error-panel" role="alert">{siteError}</div> : null}
               </section>
+              <div className="popup__metadata-grid">
+                <label className="field">
+                  <span className="field__label">{t("collection")}</span>
+                  <select className="field__input" value={collectionId} onChange={(event) => setCollectionId(event.target.value)}>
+                    <option value="">{t("uncategorized")}</option>
+                    {flattenCollections(collections).map(({ collection, depth }) => <option key={collection.id} value={collection.id}>{`${"　".repeat(depth)}${collection.name}`}</option>)}
+                  </select>
+                </label>
+
+              </div>
+
+              <details className="popup__identity-details"><summary>{t("editDetails")}</summary><div className="popup__extra">
+              <label className="field">
+                <span className="field__label">{t("title")}</span>
+                <input className="field__input" value={title} onChange={(event) => setTitle(event.target.value)} />
+              </label>
               <label className="field">
                 <span className="field__label">{t("noteOptional")}</span>
                 <textarea
@@ -229,33 +253,25 @@ export function App() {
                   placeholder={t("notePlaceholder")}
                 />
               </label>
-              <div className="popup__metadata-grid">
-                <label className="field">
-                  <span className="field__label">{t("collection")}</span>
-                  <select className="field__input" value={collectionId} onChange={(event) => setCollectionId(event.target.value)}>
-                    <option value="">{t("uncategorized")}</option>
-                    {flattenCollections(collections).map(({ collection, depth }) => <option key={collection.id} value={collection.id}>{`${"　".repeat(depth)}${collection.name}`}</option>)}
-                  </select>
-                </label>
                 <label className="field">
                   <span className="field__label">{t("tags")}</span>
                   <input className="field__input" value={tags} onChange={(event) => setTags(event.target.value)} placeholder={t("tagsPlaceholder")} />
                 </label>
-              </div>
               <div className="field">
                 <span className="field__label">{t("readingState")}</span>
                 <ReadingStateControl value={readingState} onChange={setReadingState} />
               </div>
+</div></details>
               <details className="popup__identity-details">
                 <summary>{t("viewIdentity")}</summary>
                 <PageIdentityCard identity={sitePreview ?? view.recognition.identity} />
               </details>
-              {formError ? <div className="error-panel" role="alert">{formError}</div> : null}
             </section>
           )}
         </>
       )}
 
+      {formError ? <div className="error-panel" role="alert">{formError}</div> : null}
       <footer className="popup__footer">
         {view.kind === "ready" && !view.recognition.item ? <Button full disabled={saving || sitePreviewing || Boolean(siteError)} onClick={() => void save()}>{saving ? t("saving") : t("saveToLibrary")}</Button> : null}
         <Button variant="ghost" onClick={() => {
@@ -281,58 +297,43 @@ function createNewSiteDraft(id: string, name: string, endpointPrefix: string): S
 
 function ExistingItem({
   recognition,
-  onChangeState,
+  collections,
+  onChangeCollection,
   onDelete,
-  deleteConfirming,
-  onRequestDelete,
-  onCancelDelete,
   busy,
 }: {
   recognition: PageRecognition;
-  onChangeState: (state: ReadingState) => void;
+  collections: Collection[];
+  onChangeCollection: (value: string) => void;
   onDelete: () => void;
-  deleteConfirming: boolean;
-  onRequestDelete: () => void;
-  onCancelDelete: () => void;
   busy: boolean;
 }) {
   const item = recognition.item!;
-  const tone = item.readingState === "read" ? "success" : item.readingState === "reading" ? "info" : "warning";
-  const label = item.readingState === "read" ? t("savedRead") : item.readingState === "reading" ? t("savedReading") : t("savedUnread");
 
   return (
     <section className="popup__existing">
       <div className="popup__status">
-        <Badge tone={tone}>{label}</Badge>
-        {item.firstReadAt && item.readingState !== "read" ? <Badge tone="success">{t("readBefore")}</Badge> : null}
+        <Badge tone="success">{t("saved")}</Badge>
       </div>
-      {item.note ? <p>{item.note}</p> : <p className="muted">{t("noNote")}</p>}
+      <dl className="popup__saved-identity">
+        <dt>{t("site")}</dt><dd>{recognition.identity.siteName ?? t("unassigned")}</dd>
+        <dt>Path</dt><dd>{item.resourceKey ?? new URL(item.originalUrl).pathname}</dd>
+      </dl>
+      <label className="field"><span className="field__label"><i className="collection-color-dot" style={{ backgroundColor: collectionColor(collections.find((collection) => collection.id === item.collectionId)?.color) }} />{t("collection")}</span>
+        <select className="field__input" disabled={busy} value={item.collectionId ?? ""} onChange={(event) => onChangeCollection(event.target.value)}>
+          <option value="">{t("uncategorized")}</option>
+          {flattenCollections(collections).map(({ collection, depth }) => <option key={collection.id} value={collection.id}>{`${"　".repeat(depth)}${collection.name}`}</option>)}
+        </select>
+      </label>
+      {item.note ? <p>{item.note}</p> : null}
       <details className="popup__identity-details">
         <summary>{t("viewIdentityDetails")}</summary>
         <PageIdentityCard identity={recognition.identity} />
       </details>
       <div className="popup__actions">
-        {item.readingState === "read" ? (
-          <Button variant="secondary" onClick={() => onChangeState("unread")}>
-            {t("markUnreadAgain")}
-          </Button>
-        ) : (
-          <Button onClick={() => onChangeState("read")}>{t("markRead")}</Button>
-        )}
-        {deleteConfirming ? (
-          <div className="popup__delete-confirm" role="alert">
-            <div>
-              <strong>{t("deleteCurrentQuestion")}</strong>
-              <p>{t("deleteCurrentHint")}</p>
-            </div>
-            <div className="popup__delete-confirm-actions">
-              <Button variant="ghost" disabled={busy} onClick={onCancelDelete}>{t("cancel")}</Button>
-              <Button className="popup__delete-confirm-button" variant="secondary" disabled={busy} onClick={onDelete}>
-                {busy ? t("deleting") : t("confirmDelete")}
-              </Button>
-            </div>
-          </div>
-        ) : <Button className="popup__delete-button" variant="ghost" disabled={busy} onClick={onRequestDelete}>{t("deleteCurrent")}</Button>}
+        <Button className="popup__delete-button" variant="ghost" disabled={busy} onClick={onDelete}>
+          {busy ? t("deleting") : t("deleteCurrent")}
+        </Button>
       </div>
     </section>
   );

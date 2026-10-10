@@ -1,7 +1,9 @@
+import { collectionColor } from "./collection-color";
 import { AppError } from "./app-error";
 import type { Collection, UUID } from "./models";
 
 export interface CollectionDraft {
+  color?: string;
   id?: UUID;
   name: string;
   parentId: UUID | null;
@@ -53,6 +55,7 @@ export function prepareCollection(draft: CollectionDraft, options: PrepareCollec
   return {
     id: draft.id ?? options.createId(),
     name,
+    color: collectionColor(draft.color ?? current?.color),
     parentId: draft.parentId,
     sortOrder: current?.sortOrder ?? (siblings.length ? Math.max(...siblings.map((item) => item.sortOrder)) + 1 : 0),
     createdAt: current?.createdAt ?? options.now,

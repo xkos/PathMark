@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "웹페이지의 저장된 링크 표시",
+  linkMarkingPermission: "처음 켤 때 HTTP/HTTPS 사이트 접근을 허용하면 자동으로 표시합니다. 끄면 표시와 사이트 접근 권한을 제거합니다.",
+  linkMarkingFailed: "링크 표시 설정을 변경할 수 없습니다. 다시 시도하세요.",
+
+  saved: "저장됨",
+  collectionColor: "아이콘 색상",
+  customColor: "사용자 지정 색상",
+  collectionColorHint: "저장된 페이지의 아이콘은 컬렉션 색상을 사용합니다. 미분류는 파란색입니다.",
+
+  editDetails: "제목, 메모 및 태그",
+  migrationEndpointHint: "저장할 때 이 도메인 또는 경로 접두사를 대상 사이트에 추가하고 이 항목을 이동합니다. 다른 항목은 사이트 설정에서 동기화할 수 있습니다.",
   excludeImportDomain: "이 도메인의 모든 URL을 이번 가져오기에서 제외",
   excludedImportDomains: "이번 가져오기에서 제외된 도메인",
   restoreImportDomain: "다시 포함",

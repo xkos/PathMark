@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "在網頁中標記已收藏的連結",
+  linkMarkingPermission: "首次開啟需允許存取 HTTP/HTTPS 網站，授權後自動標記已收藏連結。關閉後移除標記並釋放網站存取權限。",
+  linkMarkingFailed: "無法變更連結標記設定，請重試。",
+
+  saved: "已收藏",
+  collectionColor: "擴充功能圖示顏色",
+  customColor: "自訂顏色",
+  collectionColorHint: "已收藏頁面的擴充功能圖示使用所屬分類的顏色；未分類使用藍色。",
+
+  editDetails: "編輯標題、筆記和標籤",
+  migrationEndpointHint: "儲存時將此網域或路徑前綴加入目標站點，並遷移本條目。其他條目可在站點管理中同步。",
   excludeImportDomain: "本次不匯入此網域下的全部網址",
   excludedImportDomains: "本次已排除的網域",
   restoreImportDomain: "恢復匯入",

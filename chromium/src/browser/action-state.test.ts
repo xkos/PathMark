@@ -1,52 +1,40 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { vi } from "vitest";
-import { getActionTitle, resolveActionVisualState, setActionVisualStateForTab } from "./action-state";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createCollectionIcon, getActionTitle, resolveActionVisualState, setActionVisualStateForTab } from "./action-state";
 import { setLocaleForTesting } from "../i18n";
 
-describe("resolveActionVisualState", () => {
-  beforeEach(() => setLocaleForTesting("zh-CN"));
-  afterEach(() => setLocaleForTesting(null));
-  it("uses gray unrecorded state when the page has no item", () => {
-    expect(resolveActionVisualState(null)).toBe("unrecorded");
-  });
-
-  it("treats unread and reading items as todo", () => {
-    expect(resolveActionVisualState({ readingState: "unread", isArchived: false })).toBe("todo");
-    expect(resolveActionVisualState({ readingState: "reading", isArchived: false })).toBe("todo");
-  });
-
-  it("uses read state for a non-archived read item", () => {
-    expect(resolveActionVisualState({ readingState: "read", isArchived: false })).toBe("read");
-  });
-
-  it("gives archive state precedence over reading state", () => {
-    expect(resolveActionVisualState({ readingState: "read", isArchived: true })).toBe("archived");
-    expect(getActionTitle("archived")).toContain("已归档");
-  });
-
-  it("sets the amber icon and todo title for an unread Edge tab", async () => {
-    const setIcon = vi.fn(async () => undefined);
-    const setTitle = vi.fn(async () => undefined);
-
-    const state = await setActionVisualStateForTab(
-      42,
-      { readingState: "unread", isArchived: false },
-      { setIcon, setTitle },
-    );
-
-    expect(state).toBe("todo");
-    expect(setIcon).toHaveBeenCalledWith({
-      tabId: 42,
-      path: {
-        16: "/icons/action/todo-16.png",
-        32: "/icons/action/todo-32.png",
-      },
+describe("collection action icons", () => {
+  beforeEach(() => {
+    setLocaleForTesting("zh-CN");
+    vi.stubGlobal("ImageData", class {
+      data: Uint8ClampedArray;
+      constructor(public width: number, public height: number) { this.data = new Uint8ClampedArray(width * height * 4); }
     });
-    expect(setTitle).toHaveBeenCalledWith({ tabId: 42, title: "本地阅读收藏：当前页面待读" });
   });
-
-  it("localizes action titles for an English browser", () => {
-    setLocaleForTesting("en");
-    expect(getActionTitle("archived")).toBe("Local Reading Library: current page is archived");
+  afterEach(() => { setLocaleForTesting(null); vi.unstubAllGlobals(); });
+  it("uses saved state independently of reading and archive status", () => {
+    expect(resolveActionVisualState(null)).toBe("unrecorded");
+    for (const readingState of ["unread", "reading", "read"] as const) {
+      expect(resolveActionVisualState({readingState, isArchived: true})).toBe("saved");
+    }
+  });
+  it("draws the chosen color at both toolbar sizes with transparent margins", () => {
+    for (const size of [16, 32] as const) {
+      const icon = createCollectionIcon("#dc2626", size);
+      expect(Array.from(icon.data.slice(0,4))).toEqual([0,0,0,0]);
+      const index = (2 * (size/16) * size + 4 * (size/16)) * 4;
+      expect(Array.from(icon.data.slice(index,index+4))).toEqual([220,38,38,255]);
+    }
+  });
+  it("applies the category color and name, then resets an unrecorded tab", async () => {
+    const action = {setIcon: vi.fn(async (_details: chrome.action.TabIconDetails) => undefined), setTitle: vi.fn(async (_details: chrome.action.TitleDetails) => undefined)};
+    await setActionVisualStateForTab(42,{readingState:"unread",isArchived:false},action,{name:"已失效",color:"#dc2626"});
+    expect(action.setIcon.mock.calls[0][0]).toHaveProperty("imageData");
+    expect(action.setTitle).toHaveBeenLastCalledWith({tabId:42,title:expect.stringContaining("已失效")});
+    await setActionVisualStateForTab(42,null,action);
+    expect(action.setIcon).toHaveBeenLastCalledWith({tabId:42,path:{16:"/icons/action/unrecorded-16.png",32:"/icons/action/unrecorded-32.png"}});
+  });
+  it("falls back to blue for old collections and names uncategorized pages", () => {
+    expect(createCollectionIcon("invalid",16).data).toEqual(createCollectionIcon("#2563eb",16).data);
+    expect(getActionTitle("saved")).toContain("未分类");
   });
 });

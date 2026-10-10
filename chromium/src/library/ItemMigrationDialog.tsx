@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { siteToDraft, type SiteDraft } from "../domain/site-management";
+import { ensureEndpointInDraft, suggestSiteFromUrl } from "../popup/site-selection";
 import type { Item, Site } from "../domain/models";
 import { readingLibrary } from "../storage/library-instance";
 import type { ItemMigrationPreview } from "../storage/reading-library";
@@ -13,38 +15,53 @@ interface ItemMigrationDialogProps {
 }
 
 export function ItemMigrationDialog({ item, sites, onClose, onMigrated }: ItemMigrationDialogProps) {
-  const initialTarget = item.siteId ? "" : sites[0]?.id ?? "";
+  const initialTarget = item.siteId ?? sites[0]?.id ?? "new";
   const [targetSiteId, setTargetSiteId] = useState(initialTarget);
+  const [newSiteId] = useState(() => crypto.randomUUID());
+  const [name, setName] = useState(() => suggestSiteFromUrl(item.originalUrl).name);
+  const [prefix, setPrefix] = useState(() => suggestSiteFromUrl(item.originalUrl).endpointPrefix);
+  const [previewing, setPreviewing] = useState(true);
   const [preview, setPreview] = useState<ItemMigrationPreview | null>(null);
   const [error, setError] = useState("");
   const [working, setWorking] = useState(false);
 
-  async function runPreview(): Promise<void> {
-    setError("");
-    try {
-      setPreview(await readingLibrary.previewItemMigration(item.id, targetSiteId || null));
-    } catch (previewError) {
-      setPreview(null);
-      setError(describeError(previewError));
-    }
+  function selectedDraft(): SiteDraft {
+    if (targetSiteId === "new") return { id: newSiteId, name, description: "", endpoints: [{ prefix, enabled: true }], queryPolicy: { mode: "keep-all-except-ignored", ignoredParams: [] } };
+    const site = sites.find((candidate) => candidate.id === targetSiteId);
+    if (!site) throw new Error(t("siteNotFound"));
+    return ensureEndpointInDraft(siteToDraft(site), prefix);
   }
 
+  useEffect(() => {
+    let cancelled = false;
+    setPreview(null);
+    setError("");
+    setPreviewing(true);
+    async function previewChange() {
+      try {
+        const draft = selectedDraft();
+        const result = await readingLibrary.previewItemMigration(item.id, draft.id!, draft);
+        if (!cancelled) setPreview(result);
+      } catch (error) { if (!cancelled) setError(describeError(error)); }
+      finally { if (!cancelled) setPreviewing(false); }
+    }
+    void previewChange();
+    return () => { cancelled = true; };
+  }, [targetSiteId, prefix, name, newSiteId, item.id, sites]);
+
   async function confirmMigration(): Promise<void> {
-    if (!preview || preview.conflictingItem) return;
+    if (!preview || previewing || working) return;
     setWorking(true);
     setError("");
     try {
-      onMigrated(await readingLibrary.migrateItem(item.id, targetSiteId || null));
+      const draft = selectedDraft();
+      onMigrated(await readingLibrary.migrateItem(item.id, draft.id!, draft));
     } catch (migrationError) {
       setError(describeError(migrationError));
     } finally {
       setWorking(false);
     }
   }
-
-  const unchanged = preview
-    ? preview.before.siteId === preview.after.siteId && preview.before.canonicalKey === preview.after.canonicalKey
-    : false;
 
   return (
     <div className="dialog-backdrop">
@@ -69,6 +86,7 @@ export function ItemMigrationDialog({ item, sites, onClose, onMigrated }: ItemMi
             <span className="field__label">{t("targetSite")}</span>
             <select
               className="field__input"
+              disabled={working}
               value={targetSiteId}
               onChange={(event) => {
                 setTargetSiteId(event.target.value);
@@ -76,28 +94,28 @@ export function ItemMigrationDialog({ item, sites, onClose, onMigrated }: ItemMi
                 setError("");
               }}
             >
-              <option value="">{t("unassigned")}</option>
+              <option value="new">{t("createSite")}</option>
               {sites.map((site) => <option key={site.id} value={site.id}>{site.name}</option>)}
             </select>
           </label>
 
-          <Button type="button" variant="secondary" onClick={() => void runPreview()}>{t("previewMigration")}</Button>
+          {targetSiteId === "new" ? <label className="field"><span className="field__label">{t("newSiteName")}</span><input className="field__input" value={name} disabled={working} onChange={(event) => setName(event.target.value)} /></label> : null}
+          <label className="field"><span className="field__label">{t("addEndpoint")}</span><input className="field__input" value={prefix} disabled={working} onChange={(event) => setPrefix(event.target.value)} /><small>{t("migrationEndpointHint")}</small></label>
 
           {preview ? (
             <dl className="migration-preview">
               <dt>{t("migratedSite")}</dt><dd>{preview.after.siteName ?? t("unassigned")}</dd>
               <dt>{t("matchedEndpoint")}</dt><dd>{preview.after.endpointPrefix ?? "—"}</dd>
               <dt>{t("resourceKey")}</dt><dd>{preview.after.resourceKey ?? "—"}</dd>
-              <dt>{t("canonicalKey")}</dt><dd>{preview.after.canonicalKey}</dd>
+
             </dl>
           ) : null}
 
           {preview?.conflictingItem ? (
             <div className="error-panel" role="alert">
-              {t("migrationConflict", { title: preview.conflictingItem.title })}
+              {t("mergeOnSync")}: {preview.conflictingItem.title}
             </div>
           ) : null}
-          {unchanged ? <div className="notice-panel">{t("migrationUnchanged")}</div> : null}
           {error ? <div className="error-panel" role="alert">{error}</div> : null}
         </div>
 
@@ -105,7 +123,7 @@ export function ItemMigrationDialog({ item, sites, onClose, onMigrated }: ItemMi
           <Button type="button" variant="ghost" onClick={onClose}>{t("cancel")}</Button>
           <Button
             type="button"
-            disabled={!preview || Boolean(preview.conflictingItem) || unchanged || working}
+            disabled={!preview || previewing || working}
             onClick={() => void confirmMigration()}
           >
             {working ? t("migrating") : t("confirmMigration")}

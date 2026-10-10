@@ -14,6 +14,7 @@ export type QueryPolicy =
     };
 
 export interface Collection {
+  color?: string;
   id: UUID;
   name: string;
   parentId: UUID | null;
@@ -72,7 +73,7 @@ export interface AppSettings {
 export const DEFAULT_SETTINGS: AppSettings = {
   globalIgnoredQueryParams: ["utm_*", "fbclid", "gclid", "mc_cid", "mc_eid"],
   stripTrailingSlash: true,
-  defaultReadingState: "unread",
+  defaultReadingState: "read",
   defaultView: "unread",
 };
 

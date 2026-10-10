@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "ทำเครื่องหมายลิงก์ที่บันทึกบนหน้าเว็บ",
+  linkMarkingPermission: "อนุญาตการเข้าถึงเว็บไซต์ HTTP/HTTPS ครั้งเดียวเพื่อทำเครื่องหมายอัตโนมัติ เมื่อปิดจะลบเครื่องหมายและสิทธิ์เข้าถึงเว็บไซต์",
+  linkMarkingFailed: "เปลี่ยนการตั้งค่าเครื่องหมายลิงก์ไม่ได้ โปรดลองอีกครั้ง",
+
+  saved: "บันทึกแล้ว",
+  collectionColor: "สีไอคอน",
+  customColor: "สีที่กำหนดเอง",
+  collectionColorHint: "หน้าที่บันทึกใช้สีของคอลเล็กชัน หน้าที่ไม่มีหมวดหมู่ใช้สีน้ำเงิน",
+
+  editDetails: "ชื่อเรื่อง บันทึก และแท็ก",
+  migrationEndpointHint: "เพิ่มโดเมนหรือคำนำหน้าเส้นทางนี้ไปยังไซต์ปลายทางและย้ายรายการนี้เมื่อบันทึก สามารถซิงค์รายการอื่นได้ในการตั้งค่าไซต์",
   excludeImportDomain: "ยกเว้นทุก URL ของโดเมนนี้จากการนำเข้าครั้งนี้",
   excludedImportDomains: "โดเมนที่ยกเว้นจากการนำเข้าครั้งนี้",
   restoreImportDomain: "รวมอีกครั้ง",

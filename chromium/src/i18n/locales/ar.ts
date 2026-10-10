@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "تمييز الروابط المحفوظة على صفحات الويب",
+  linkMarkingPermission: "اسمح بالوصول إلى مواقع HTTP/HTTPS مرة واحدة للتمييز التلقائي. يؤدي الإيقاف إلى إزالة العلامات وإلغاء إذن الوصول.",
+  linkMarkingFailed: "تعذر تغيير تمييز الروابط. حاول مجددًا.",
+
+  saved: "محفوظ",
+  collectionColor: "لون الأيقونة",
+  customColor: "لون مخصص",
+  collectionColorHint: "تستخدم أيقونة الصفحات المحفوظة لون مجموعتها. الصفحات غير المصنفة زرقاء.",
+
+  editDetails: "العنوان والملاحظات والوسوم",
+  migrationEndpointHint: "أضف هذا النطاق أو بادئة المسار إلى الموقع المستهدف وانقل هذا العنصر عند الحفظ. يمكن مزامنة العناصر الأخرى في إعدادات الموقع.",
   excludeImportDomain: "استبعاد جميع روابط هذا النطاق من هذا الاستيراد",
   excludedImportDomains: "النطاقات المستبعدة من هذا الاستيراد",
   restoreImportDomain: "تضمين مجدداً",

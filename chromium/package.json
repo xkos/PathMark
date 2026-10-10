@@ -1,11 +1,11 @@
 {
   "name": "jingji-reading-library-extension",
   "private": true,
-  "version": "0.2.13",
+  "version": "0.2.14",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && vite build --config vite.background.config.ts && node scripts/verify-extension-build.mjs",
+    "build": "tsc -b && vite build && vite build --config vite.background.config.ts && vite build --config vite.content.config.ts && node scripts/verify-extension-build.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },

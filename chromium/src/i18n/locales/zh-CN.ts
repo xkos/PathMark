@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "在网页中标记已收藏的链接",
+  linkMarkingPermission: "首次开启需允许访问 HTTP/HTTPS 网站，授权后自动标记已收藏链接。关闭后移除标记并释放网站访问权限。",
+  linkMarkingFailed: "未能更改链接标记设置，请重试。",
+
+  saved: "已收藏",
+  collectionColor: "插件图标颜色",
+  customColor: "自定义颜色",
+  collectionColorHint: "已收藏页面的插件图标使用所属分类的颜色；未分类使用蓝色。",
+
+  editDetails: "编辑标题、笔记和标签",
+  migrationEndpointHint: "保存时将此域名或路径前缀加入目标站点，并迁移本条目。其他条目可在站点管理中同步。",
   excludeImportDomain: "本次不导入此域名下的全部地址",
   excludedImportDomains: "本次已排除的域名",
   restoreImportDomain: "恢复导入",

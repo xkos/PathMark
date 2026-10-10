@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "Отмечать сохранённые ссылки на страницах",
+  linkMarkingPermission: "Один раз разрешите доступ к сайтам HTTP/HTTPS для автоматических отметок. Отключение удаляет отметки и разрешение на доступ.",
+  linkMarkingFailed: "Не удалось изменить настройку отметок ссылок. Попробуйте ещё раз.",
+
+  saved: "Сохранено",
+  collectionColor: "Цвет значка",
+  customColor: "Свой цвет",
+  collectionColorHint: "Значок сохранённой страницы использует цвет коллекции. Без категории значок синий.",
+
+  editDetails: "Заголовок, заметки и теги",
+  migrationEndpointHint: "При сохранении этот домен или префикс пути добавится к целевому сайту, а запись будет перенесена. Остальные записи можно синхронизировать в настройках сайта.",
   excludeImportDomain: "Исключить все URL этого домена из текущего импорта",
   excludedImportDomains: "Домены, исключённые из этого импорта",
   restoreImportDomain: "Включить снова",

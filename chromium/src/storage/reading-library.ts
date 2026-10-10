@@ -1,3 +1,4 @@
+import { collectionColor } from "../domain/collection-color";
 import type { Collection, Item, ReadingState, SavePageInput, Site } from "../domain/models";
 import type { Table } from "dexie";
 import { AppError } from "../domain/app-error";
@@ -103,6 +104,37 @@ export class ReadingLibrary {
     const identity = identifyUrl(url, sites, settingsRecord?.value ?? DEFAULT_SETTINGS);
     const item = (await this.database.items.where("canonicalKey").equals(identity.canonicalKey).first()) ?? null;
     return { identity, item };
+  }
+
+  /** Batch, read-only lookup for visible page links. Never exposes the full library. */
+  async recognizeLinks(urls: string[]): Promise<Array<{ url: string; color: string; collectionName: string | null }>> {
+    return this.database.transaction("r", this.database.items, this.database.sites, this.database.settings, this.database.collections, async () => {
+      const [sites, settings, collections] = await Promise.all([this.listSites(), this.getSettings(), this.listCollections()]);
+      const identities = new Map<string, string>();
+      for (const url of new Set(urls.slice(0, 200))) {
+        if (url.length > 8192) continue;
+        try { identities.set(url, identifyUrl(url, sites, settings).canonicalKey); } catch { /* Unsupported or ambiguous URLs are not marked. */ }
+      }
+      if (!identities.size) return [];
+      const items = await this.database.items.where("canonicalKey").anyOf([...new Set(identities.values())]).toArray();
+      const byKey = new Map(items.map((item) => [item.canonicalKey, item]));
+      const byCollection = new Map(collections.map((collection) => [collection.id, collection]));
+      return [...identities].flatMap(([url, key]) => {
+        const item = byKey.get(key);
+        if (!item) return [];
+        const collection = item.collectionId ? byCollection.get(item.collectionId) : undefined;
+        return [{ url, color: collectionColor(collection?.color), collectionName: collection?.name ?? null }];
+      });
+    });
+  }
+
+  async saveMatchedPage(input: SavePageInput): Promise<PageRecognition> {
+    return this.database.transaction("rw", this.database.items, this.database.sites, this.database.settings, async () => {
+      const recognition = await this.recognize(input.url);
+      if (recognition.item || !recognition.identity.siteId) return recognition;
+      const item = await this.savePage(input);
+      return { ...recognition, item };
+    });
   }
 
   async savePage(input: SavePageInput): Promise<Item> {
@@ -530,7 +562,7 @@ export class ReadingLibrary {
     });
   }
 
-  async previewItemMigration(itemId: string, targetSiteId: string | null): Promise<ItemMigrationPreview> {
+  async previewItemMigration(itemId: string, targetSiteId: string | null, draft?: SiteDraft): Promise<ItemMigrationPreview> {
     const [item, sites, settingsRecord] = await Promise.all([
       this.database.items.get(itemId),
       this.database.sites.toArray(),
@@ -538,6 +570,11 @@ export class ReadingLibrary {
     ]);
     if (!item) throw new SiteConfigurationError("savedItemMissing");
 
+    if (draft) {
+      const site = prepareSite(draft, { existingSites: sites, now: this.now(), createId: this.createId });
+      sites.splice(0, sites.length, ...sites.filter((candidate) => candidate.id !== site.id), site);
+      targetSiteId = site.id;
+    }
     const settings = settingsRecord?.value ?? DEFAULT_SETTINGS;
     const recognizedBefore = identifyUrl(item.originalUrl, sites, settings);
     const before = identityFromStoredItem(item, recognizedBefore, sites);
@@ -556,7 +593,7 @@ export class ReadingLibrary {
     };
   }
 
-  async migrateItem(itemId: string, targetSiteId: string | null): Promise<Item> {
+  async migrateItem(itemId: string, targetSiteId: string | null, draft?: SiteDraft): Promise<Item> {
     return this.database.transaction("rw", this.database.items, this.database.sites, this.database.settings, async () => {
       const [item, sites, settingsRecord] = await Promise.all([
         this.database.items.get(itemId),
@@ -565,6 +602,11 @@ export class ReadingLibrary {
       ]);
       if (!item) throw new SiteConfigurationError("savedItemMissing");
 
+      if (draft) {
+        const site = await this.saveSite(draft);
+        sites.splice(0, sites.length, ...sites.filter((candidate) => candidate.id !== site.id), site);
+        targetSiteId = site.id;
+      }
       const identity = identifyItemForTargetSite(
         item,
         targetSiteId,
@@ -572,7 +614,7 @@ export class ReadingLibrary {
         settingsRecord?.value ?? DEFAULT_SETTINGS,
       );
       const conflictingItem = await this.database.items.where("canonicalKey").equals(identity.canonicalKey).first();
-      if (conflictingItem && conflictingItem.id !== item.id) {
+      if (!draft && conflictingItem && conflictingItem.id !== item.id) {
         throw new SiteConfigurationError("migrationConflict", { title: conflictingItem.title });
       }
 
@@ -583,8 +625,10 @@ export class ReadingLibrary {
         canonicalKey: identity.canonicalKey,
         updatedAt: this.now(),
       };
-      await this.database.items.put(updated);
-      return updated;
+      const result = conflictingItem && conflictingItem.id !== item.id ? mergeSiteItems(conflictingItem, updated, this.now()) : updated;
+      if (result.id !== item.id) await this.database.items.delete(item.id);
+      await this.database.items.put(result);
+      return result;
     });
   }
 

@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "Đánh dấu liên kết đã lưu trên trang web",
+  linkMarkingPermission: "Cho phép truy cập các trang HTTP/HTTPS một lần để tự động đánh dấu. Tắt sẽ xóa dấu và quyền truy cập.",
+  linkMarkingFailed: "Không thể thay đổi đánh dấu liên kết. Vui lòng thử lại.",
+
+  saved: "Đã lưu",
+  collectionColor: "Màu biểu tượng",
+  customColor: "Màu tùy chỉnh",
+  collectionColorHint: "Trang đã lưu dùng màu của bộ sưu tập. Trang chưa phân loại dùng màu xanh dương.",
+
+  editDetails: "Tiêu đề, ghi chú và thẻ",
+  migrationEndpointHint: "Khi lưu, thêm tên miền hoặc tiền tố đường dẫn này vào trang đích và chuyển mục này. Có thể đồng bộ các mục khác trong cài đặt trang.",
   excludeImportDomain: "Loại tất cả URL thuộc tên miền này khỏi lần nhập này",
   excludedImportDomains: "Tên miền bị loại khỏi lần nhập này",
   restoreImportDomain: "Đưa vào lại",

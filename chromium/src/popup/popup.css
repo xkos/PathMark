@@ -269,47 +269,6 @@
   background: #fff1f0;
 }
 
-.popup__delete-confirm {
-  display: grid;
-  gap: 12px;
-  padding: 13px 14px;
-  border: 1px solid #fecdca;
-  border-radius: 10px;
-  background: #fff6f5;
-}
-
-.popup__delete-confirm strong {
-  color: #912018;
-  font-size: 13px;
-}
-
-.popup__delete-confirm p {
-  margin: 4px 0 0;
-  color: #7a271a;
-  font-size: 11px;
-  line-height: 1.55;
-}
-
-.popup__delete-confirm-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.popup__delete-confirm-actions .button {
-  min-height: 34px;
-  padding-inline: 11px;
-}
-
-.popup__delete-confirm-button {
-  border-color: #d92d20;
-  color: #b42318;
-}
-
-.popup__delete-confirm-button:hover:not(:disabled) {
-  background: #fee4e2;
-}
-
 .popup-page .error-panel {
   border: 1px solid #fecdca;
   border-radius: 8px;
@@ -347,3 +306,25 @@
   place-items: center;
   color: var(--color-text-muted);
 }
+
+/* Keep primary capture and organization controls visible without scrolling. */
+.popup-page { height: 580px; }
+.popup-page #root { height: 580px; }
+.popup__header { min-height: 44px; padding: 8px 16px; }
+.popup__brand::before { width: 24px; height: 24px; background-size: 20px; }
+.popup__page-context { padding: 10px 16px; }
+.popup__form, .popup__existing { gap: 10px; padding: 12px 16px; }
+.popup-site-card { gap: 8px; padding: 10px; }
+.popup-page .field { gap: 4px; }
+.popup-page .field__input { min-height: 34px; padding: 6px 9px; }
+.popup-page .segmented__option { min-height: 34px; }
+.popup__metadata-grid { grid-template-columns: 1fr; }
+.popup__extra { display: grid; gap: 10px; padding: 10px; }
+.popup__saved-identity { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 12px; margin: 0; padding: 10px; background: white; border: 1px solid #eaecf0; border-radius: 8px; }
+.popup__saved-identity dt { color: #667085; }
+.popup__saved-identity dd { margin: 0; overflow-wrap: anywhere; max-height: 64px; overflow-y: auto; }
+.popup__actions { grid-template-columns: 1fr 1fr; }
+.popup__footer { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; }
+.popup__footer > .button--ghost:only-child { grid-column: 1 / -1; }
+.popup__identity-details summary { padding-block: 8px; }
+.popup-site-card__heading { display: none; }

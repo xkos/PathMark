@@ -2,6 +2,17 @@ import type { AppErrorCode } from "../../domain/app-error";
 import type { MessageKey } from "./en";
 
 export const messages: Record<MessageKey, string> = {
+  markSavedLinks: "वेब पृष्ठों पर सहेजे गए लिंक चिह्नित करें",
+  linkMarkingPermission: "स्वचालित चिह्नों के लिए एक बार HTTP/HTTPS साइटों तक पहुँच की अनुमति दें। बंद करने पर चिह्न और पहुँच की अनुमति हटा दी जाती है।",
+  linkMarkingFailed: "लिंक चिह्नित करने की सेटिंग नहीं बदली जा सकी। फिर कोशिश करें।",
+
+  saved: "सहेजा गया",
+  collectionColor: "आइकन का रंग",
+  customColor: "कस्टम रंग",
+  collectionColorHint: "सहेजे गए पृष्ठ अपने संग्रह का रंग इस्तेमाल करते हैं। बिना श्रेणी के पृष्ठ नीले होते हैं।",
+
+  editDetails: "शीर्षक, नोट्स और टैग",
+  migrationEndpointHint: "सहेजते समय इस डोमेन या पथ उपसर्ग को लक्ष्य साइट में जोड़ें और इस प्रविष्टि को स्थानांतरित करें। अन्य प्रविष्टियाँ साइट सेटिंग में सिंक की जा सकती हैं।",
   excludeImportDomain: "इस आयात से इस डोमेन के सभी URL बाहर करें",
   excludedImportDomains: "इस आयात से बाहर किए गए डोमेन",
   restoreImportDomain: "फिर शामिल करें",
