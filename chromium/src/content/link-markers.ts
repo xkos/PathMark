@@ -1,3 +1,4 @@
+import { visibleLinkRect } from "./link-marker-rect";
 // This bundle runs in the isolated extension world. The page's links remain untouched.
 const QUERY = "pathmark-link-query";
 const REFRESH = "pathmark-link-refresh";
@@ -112,9 +113,10 @@ function start() {
       const occupied = new Set<string>();
       for (const link of visible) {
         const match = cache.get(href(link) ?? "");
-        const rect = link.getClientRects()[0] ?? link.getBoundingClientRect();
+        const rect = visibleLinkRect(link.getClientRects(), innerWidth, innerHeight);
+        if (!rect) { badges.get(link)?.remove(); badges.delete(link); continue; }
         const key = `${Math.round(rect.left)}:${Math.round(rect.top)}`;
-        const usable = link.isConnected && rect.width > 0 && rect.height > 0 && rect.top >= 14 && rect.top < innerHeight && rect.right > 0 && rect.left < innerWidth && getComputedStyle(link).visibility !== "hidden";
+        const usable = link.isConnected && rect.top >= 14 && getComputedStyle(link).visibility !== "hidden";
         if (!match || !usable || occupied.has(key)) { badges.get(link)?.remove(); badges.delete(link); continue; }
         occupied.add(key);
         let badge = badges.get(link);
